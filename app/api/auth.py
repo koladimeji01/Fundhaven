@@ -169,6 +169,7 @@ def login(login_data: LoginRequest):
     # production/development users must always complete email verification.
     testing_without_otp = (
         os.getenv("ENVIRONMENT", "development").lower() == "testing"
+        and "PYTEST_CURRENT_TEST" in os.environ
         and os.getenv("BUDGETWISE_TEST_OTP") != "1"
     )
     if testing_without_otp:
