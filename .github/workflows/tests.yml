@@ -1,0 +1,28 @@
+name: BudgetWise Python tests
+
+on:
+  push:
+    branches:
+      - feature/brevo-email-security
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: testing
+      DATABASE_NAME: ci_budgetwise.db
+      SECRET_KEY: this-is-a-ci-only-test-key-not-for-production-2026
+      ALGORITHM: HS256
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install fastapi uvicorn pytest httpx PyJWT "pwdlib[argon2]" python-dotenv email-validator
+      - name: Run tests without contacting Brevo
+        run: python -m pytest -q
