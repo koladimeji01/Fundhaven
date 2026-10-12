@@ -442,8 +442,13 @@ function updateSummary(user, dashboard) {
 
     if (incomeElement) incomeElement.textContent = formatCurrency(income);
     if (expensesElement) expensesElement.textContent = formatCurrency(expenses);
-    if (balanceElement) balanceElement.textContent = formatCurrency(balance);
-    if (savingsElement) savingsElement.textContent = `${savingsRate.toFixed(1)}%`;
+    const incomeKnown = dashboard.income_recorded !== false;
+    if (balanceElement) {
+        balanceElement.textContent = incomeKnown ? formatCurrency(balance) : "—";
+    }
+    if (savingsElement) {
+        savingsElement.textContent = incomeKnown ? `${savingsRate.toFixed(1)}%` : "—";
+    }
 }
 
 // ============================================================
