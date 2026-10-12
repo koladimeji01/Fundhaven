@@ -9,6 +9,8 @@ from app import database
 
 from app.migrations.manager import run_migrations
 
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.config import (
     APP_NAME,
     APP_VERSION
@@ -85,7 +87,16 @@ Then click **Authorize** in Swagger and enter:
 
     lifespan=lifespan
 )
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:5500",
+        "http://localhost:5500",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # ==========================================
 # DATABASE ERROR HANDLER

@@ -1,10 +1,11 @@
 from fastapi import APIRouter
 
-
 from app.api.auth import router as auth_router
 from app.api.users import router as users_router
 from app.api.expenses import router as expenses_router
 from app.api.dashboard import router as dashboard_router
+from app.api.budgets import router as budgets_router
+from app.api.goals import router as goals_router
 
 
 # ==========================================
@@ -36,6 +37,14 @@ router.include_router(
     dashboard_router
 )
 
+router.include_router(
+    budgets_router
+)
+
+router.include_router(
+    goals_router
+)
+
 
 # ==========================================
 # API V1 HOME
@@ -51,5 +60,7 @@ def api_v1_home():
     return {
         "message":
         "Welcome to BudgetWise API v1",
-        "version": "1"
+
+        "version":
+        "1"
     }

@@ -1,0 +1,2913 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+
+        name="viewport"
+
+        content="width=device-width, initial-scale=1.0"
+
+    >
+
+    <title>Reports - BudgetWise</title>
+
+    <link
+
+        rel="stylesheet"
+
+        href="css/dashboard.css"
+
+    >
+
+    <!-- Lucide Icons -->
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+
+        /* =========================================
+
+           REPORTS PAGE
+
+        ========================================= */
+
+        .reports-content {
+
+            padding: 28px 32px 40px;
+
+        }
+
+        .reports-header {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 28px;
+
+        }
+
+        .reports-header-text {
+
+            min-width: 0;
+
+        }
+
+        .reports-label {
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            letter-spacing: 1.2px;
+
+            margin-bottom: 7px;
+
+            opacity: 0.65;
+
+        }
+
+        .reports-header h1 {
+
+            margin: 0;
+
+            font-size: 28px;
+
+            line-height: 1.2;
+
+        }
+
+        .reports-header p {
+
+            margin: 8px 0 0;
+
+            font-size: 14px;
+
+            opacity: 0.65;
+
+        }
+
+        .reports-refresh {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            border: 0;
+
+            border-radius: 10px;
+
+            padding: 11px 16px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            white-space: nowrap;
+
+        }
+
+        .reports-refresh svg {
+
+            width: 17px;
+
+            height: 17px;
+
+        }
+
+        .reports-refresh:disabled {
+
+            opacity: 0.65;
+
+            cursor: wait;
+
+        }
+
+        /* =========================================
+
+           SUMMARY CARDS
+
+        ========================================= */
+
+        .reports-summary {
+
+            display: grid;
+
+            grid-template-columns:
+
+                repeat(4, minmax(0, 1fr));
+
+            gap: 18px;
+
+            margin-bottom: 24px;
+
+        }
+
+        .report-stat-card {
+
+            padding: 20px;
+
+            border-radius: 14px;
+
+            background:
+
+                var(--card-bg, #ffffff);
+
+            border:
+
+                1px solid rgba(0, 0, 0, 0.06);
+
+        }
+
+        .report-stat-top {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+        }
+
+        .report-stat-label {
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.5px;
+
+            opacity: 0.6;
+
+            margin-bottom: 8px;
+
+        }
+
+        .report-stat-value {
+
+            font-size: 24px;
+
+            font-weight: 700;
+
+            line-height: 1.2;
+
+        }
+
+        .report-stat-icon {
+
+            width: 42px;
+
+            height: 42px;
+
+            border-radius: 12px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            background:
+
+                rgba(0, 0, 0, 0.04);
+
+        }
+
+        .report-stat-icon svg {
+
+            width: 20px;
+
+            height: 20px;
+
+        }
+
+        .report-stat-footer {
+
+            margin-top: 14px;
+
+            font-size: 12px;
+
+            opacity: 0.55;
+
+        }
+
+        /* =========================================
+
+           MAIN REPORT SECTIONS
+
+        ========================================= */
+
+        .reports-main-grid {
+
+            display: grid;
+
+            grid-template-columns:
+
+                minmax(0, 1.6fr)
+
+                minmax(320px, 1fr);
+
+            gap: 20px;
+
+            margin-bottom: 20px;
+
+        }
+
+        .reports-bottom-grid {
+
+            display: grid;
+
+            grid-template-columns:
+
+                minmax(280px, 0.9fr)
+
+                minmax(0, 1.6fr);
+
+            gap: 20px;
+
+        }
+
+        .report-card {
+
+            background:
+
+                var(--card-bg, #ffffff);
+
+            border:
+
+                1px solid rgba(0, 0, 0, 0.06);
+
+            border-radius: 14px;
+
+            padding: 22px;
+
+            min-width: 0;
+
+        }
+
+        .report-card-header {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+
+        }
+
+        .report-card-title h2 {
+
+            margin: 0;
+
+            font-size: 17px;
+
+            line-height: 1.3;
+
+        }
+
+        .report-card-title p {
+
+            margin: 5px 0 0;
+
+            font-size: 12px;
+
+            opacity: 0.55;
+
+        }
+
+        .report-card-icon {
+
+            width: 38px;
+
+            height: 38px;
+
+            border-radius: 10px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+
+                rgba(0, 0, 0, 0.04);
+
+            flex-shrink: 0;
+
+        }
+
+        .report-card-icon svg {
+
+            width: 18px;
+
+            height: 18px;
+
+        }
+
+        /* =========================================
+
+           CHART AREAS
+
+        ========================================= */
+
+        .report-chart {
+
+            width: 100%;
+
+            min-height: 260px;
+
+        }
+
+        .reports-bar-chart {
+
+            min-height: 250px;
+
+            height: 250px;
+
+            display: flex;
+
+            align-items: flex-end;
+
+            justify-content: space-around;
+
+            gap: 12px;
+
+            padding:
+
+                10px 5px
+
+                5px;
+
+            border-bottom:
+
+                1px solid rgba(0, 0, 0, 0.08);
+
+        }
+
+        .chart-column {
+
+            flex: 1;
+
+            height: 100%;
+
+            min-width: 35px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: flex-end;
+
+            align-items: center;
+
+            gap: 7px;
+
+        }
+
+        .chart-bar {
+
+            width: min(48px, 70%);
+
+            min-height: 8px;
+
+            border-radius:
+
+                7px 7px 3px 3px;
+
+            background:
+
+                #123d2c;
+
+            transition:
+
+                height 0.3s ease,
+
+                opacity 0.2s ease;
+
+        }
+
+        .chart-bar:hover {
+
+            opacity: 0.75;
+
+        }
+
+        .chart-value {
+
+            font-size: 9px;
+
+            font-weight: 600;
+
+            opacity: 0.65;
+
+            white-space: nowrap;
+
+        }
+
+        .chart-label {
+
+            font-size: 10px;
+
+            opacity: 0.6;
+
+            white-space: nowrap;
+
+        }
+
+        .report-chart .empty-state,
+
+        .highest-category .empty-state,
+
+        .expense-table-empty {
+
+            min-height: 210px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 30px 20px;
+
+        }
+
+        .empty-icon {
+
+            width: 48px;
+
+            height: 48px;
+
+            border-radius: 14px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            margin-bottom: 12px;
+
+            background:
+
+                rgba(0, 0, 0, 0.04);
+
+        }
+
+        .empty-icon svg {
+
+            width: 22px;
+
+            height: 22px;
+
+        }
+
+        .empty-state h3 {
+
+            margin: 0 0 6px;
+
+            font-size: 14px;
+
+        }
+
+        .empty-state p {
+
+            margin: 0;
+
+            font-size: 12px;
+
+            opacity: 0.55;
+
+            max-width: 280px;
+
+            line-height: 1.5;
+
+        }
+
+        /* =========================================
+
+           CATEGORY REPORT
+
+        ========================================= */
+
+        .category-report-list {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 18px;
+
+            padding-top: 5px;
+
+        }
+
+        .category-item {
+
+            width: 100%;
+
+        }
+
+        .category-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 12px;
+
+            margin-bottom: 7px;
+
+        }
+
+        .category-name {
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+        }
+
+        .category-amount {
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            white-space: nowrap;
+
+        }
+
+        .category-track {
+
+            width: 100%;
+
+            height: 8px;
+
+            border-radius: 99px;
+
+            overflow: hidden;
+
+            background:
+
+                rgba(0, 0, 0, 0.07);
+
+        }
+
+        .category-fill {
+
+            height: 100%;
+
+            min-width: 3px;
+
+            border-radius: 99px;
+
+            background:
+
+                #123d2c;
+
+            transition:
+
+                width 0.4s ease;
+
+        }
+
+        .category-percentage {
+
+            margin-top: 5px;
+
+            font-size: 10px;
+
+            opacity: 0.5;
+
+            text-align: right;
+
+        }
+
+        /* =========================================
+
+           HIGHEST CATEGORY
+
+        ========================================= */
+
+        .highest-category {
+
+            min-height: 260px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+        }
+
+        .highest-category-content {
+
+            width: 100%;
+
+            text-align: center;
+
+            padding: 20px;
+
+        }
+
+        .highest-category-icon {
+
+            width: 58px;
+
+            height: 58px;
+
+            margin:
+
+                0 auto 14px;
+
+            border-radius: 16px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+
+                rgba(0, 0, 0, 0.04);
+
+        }
+
+        .highest-category-icon svg {
+
+            width: 26px;
+
+            height: 26px;
+
+        }
+
+        .highest-category-label {
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.8px;
+
+            opacity: 0.5;
+
+            margin-bottom: 8px;
+
+        }
+
+        .highest-category-name {
+
+            font-size: 21px;
+
+            font-weight: 700;
+
+            margin-bottom: 7px;
+
+        }
+
+        .highest-category-amount {
+
+            font-size: 17px;
+
+            font-weight: 600;
+
+        }
+
+        .highest-category-note {
+
+            margin-top: 10px;
+
+            font-size: 11px;
+
+            line-height: 1.5;
+
+            opacity: 0.5;
+
+        }
+
+        /* =========================================
+
+           EXPENSE TABLE
+
+        ========================================= */
+
+        .expense-table-container {
+
+            width: 100%;
+
+            overflow-x: auto;
+
+        }
+
+        .expense-table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            font-size: 13px;
+
+        }
+
+        .expense-table th {
+
+            text-align: left;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.4px;
+
+            opacity: 0.55;
+
+            padding: 10px 8px;
+
+            border-bottom:
+
+                1px solid rgba(0, 0, 0, 0.08);
+
+        }
+
+        .expense-table td {
+
+            padding: 13px 8px;
+
+            border-bottom:
+
+                1px solid rgba(0, 0, 0, 0.05);
+
+        }
+
+        .expense-table tr:last-child td {
+
+            border-bottom: none;
+
+        }
+
+        /* =====================================================
+
+        SIDEBAR PROFILE FIX
+
+        ===================================================== */
+
+        .sidebar-bottom {
+
+            width: 100%;
+
+            min-width: 0;
+
+            overflow: hidden;
+
+        }
+
+        .user-mini {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            width: 100%;
+
+            min-width: 0;
+
+        }
+
+        .user-mini .avatar {
+
+            width: 36px;
+
+            height: 36px;
+
+            min-width: 36px;
+
+            flex-shrink: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50%;
+
+            overflow: hidden;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+        }
+
+        .user-mini-info {
+
+            flex: 1;
+
+            min-width: 0;
+
+            overflow: hidden;
+
+        }
+
+        .user-mini-name {
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+        }
+
+        .user-mini-email {
+
+            display: block;
+
+            max-width: 100%;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+            font-size: 11px;
+
+            line-height: 1.4;
+
+        }
+
+        /* Topbar controls and dropdown positioning */
+
+        .top-actions {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: flex-end;
+
+            gap: 18px;
+
+            margin-left: auto;
+
+            min-width: 0;
+
+        }
+
+        .reports-top-action-wrap {
+
+            position: relative;
+
+            display: flex;
+
+            align-items: center;
+
+        }
+
+        .notification {
+
+            position: relative;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            width: 40px;
+
+            height: 40px;
+
+            padding: 0;
+
+            border: 0;
+
+            border-radius: 10px;
+
+            background: transparent;
+
+            color: inherit;
+
+            cursor: pointer;
+
+        }
+
+        .notification:hover,
+
+        .top-user:hover {
+
+            background: #f2f6f3;
+
+        }
+
+        .notification > svg {
+
+            width: 20px;
+
+            height: 20px;
+
+        }
+
+        .notification-dot {
+
+            position: absolute;
+
+            top: 8px;
+
+            right: 8px;
+
+            width: 7px;
+
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #e05252;
+
+            border: 1px solid #fff;
+
+        }
+
+        .top-user {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 9px;
+
+            min-height: 42px;
+
+            padding: 4px 8px;
+
+            border: 0;
+
+            border-radius: 10px;
+
+            background: transparent;
+
+            color: inherit;
+
+            font: inherit;
+
+            text-align: left;
+
+            cursor: pointer;
+
+        }
+
+        .top-user .avatar {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            width: 34px;
+
+            height: 34px;
+
+            min-width: 34px;
+
+            border-radius: 50%;
+
+            background: #e3eee7;
+
+            color: #123d2c;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            overflow: hidden;
+
+        }
+
+        .top-user-name {
+
+            max-width: 130px;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+        }
+
+        .top-user > svg {
+
+            width: 15px;
+
+            height: 15px;
+
+            flex-shrink: 0;
+
+        }
+
+        .reports-dropdown {
+
+            position: absolute;
+
+            top: calc(100% + 10px);
+
+            right: 0;
+
+            z-index: 1500;
+
+            display: none;
+
+            width: 300px;
+
+            max-width: calc(100vw - 28px);
+
+            max-height: min(420px, calc(100vh - 100px));
+
+            overflow-y: auto;
+
+            border: 1px solid #e4ebe7;
+
+            border-radius: 12px;
+
+            background: #fff;
+
+            color: #344052;
+
+            box-shadow: 0 12px 30px rgba(18, 61, 44, 0.14);
+
+        }
+
+        .reports-dropdown.show {
+
+            display: block;
+
+        }
+
+        .reports-dropdown-heading {
+
+            padding: 15px 16px;
+
+            border-bottom: 1px solid #edf1ef;
+
+        }
+
+        .reports-dropdown-heading strong,
+
+        .reports-dropdown-heading span {
+
+            display: block;
+
+        }
+
+        .reports-dropdown-heading strong {
+
+            font-size: 13px;
+
+            color: #24352c;
+
+        }
+
+        .reports-dropdown-heading span {
+
+            margin-top: 4px;
+
+            color: #84918a;
+
+            font-size: 11px;
+
+        }
+
+        .reports-dropdown-item {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+
+            width: 100%;
+
+            padding: 12px 15px;
+
+            border: 0;
+
+            border-bottom: 1px solid #f0f2f3;
+
+            background: #fff;
+
+            color: #344052;
+
+            font: inherit;
+
+            font-size: 12px;
+
+            text-align: left;
+
+            text-decoration: none;
+
+            cursor: pointer;
+
+        }
+
+        .reports-dropdown-item:last-child {
+
+            border-bottom: 0;
+
+        }
+
+        .reports-dropdown-item:hover {
+
+            background: #f5f8f6;
+
+        }
+
+        .reports-dropdown-item svg {
+
+            width: 17px;
+
+            height: 17px;
+
+            flex-shrink: 0;
+
+            color: #276749;
+
+        }
+
+        .reports-notification-message {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 11px;
+
+            padding: 17px 16px;
+
+            color: #64736b;
+
+            font-size: 12px;
+
+            line-height: 1.6;
+
+        }
+
+        .reports-notification-message > svg {
+
+            width: 18px;
+
+            height: 18px;
+
+            flex-shrink: 0;
+
+            margin-top: 1px;
+
+            color: #276749;
+
+        }
+
+        .reports-notification-message strong {
+
+            display: block;
+
+            margin-bottom: 3px;
+
+            color: #344052;
+
+        }
+
+        .reports-notification-message p {
+
+            margin: 0;
+
+        }
+
+        .reports-logout {
+
+            color: #b42318;
+
+        }
+
+        .reports-logout svg {
+
+            color: #b42318;
+
+        }
+
+        @media (max-width: 550px) {
+
+            .top-actions {
+
+                gap: 6px;
+
+            }
+
+            .top-user {
+
+                gap: 6px;
+
+                padding: 4px;
+
+            }
+
+            .top-user-name {
+
+                max-width: 75px;
+
+            }
+
+            .reports-dropdown {
+
+                right: -4px;
+
+                max-width: calc(100vw - 24px);
+
+            }
+
+        }
+
+/* =========================================
+
+           RESPONSIVE
+
+        ========================================= */
+
+        @media (max-width: 1100px) {
+
+            .reports-summary {
+
+                grid-template-columns:
+
+                    repeat(2, minmax(0, 1fr));
+
+            }
+
+            .reports-main-grid,
+
+            .reports-bottom-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            .reports-content {
+
+                padding:
+
+                    22px 18px 32px;
+
+            }
+
+            .reports-header {
+
+                flex-direction: column;
+
+                align-items: stretch;
+
+            }
+
+            .reports-refresh {
+
+                width: 100%;
+
+            }
+
+            .reports-summary {
+
+                grid-template-columns: 1fr;
+
+            }
+
+            .report-card {
+
+                padding: 18px;
+
+            }
+
+            .report-stat-value {
+
+                font-size: 21px;
+
+            }
+
+            .reports-bar-chart {
+
+                gap: 5px;
+
+            }
+
+            .chart-column {
+
+                min-width: 25px;
+
+            }
+
+            .chart-bar {
+
+                width: 70%;
+
+            }
+
+            .chart-value {
+
+                font-size: 8px;
+
+            }
+
+        }
+
+    </style>
+
+
+<!-- BudgetWise unified visual redesign (styles built into this HTML) -->
+<style>
+
+/* ==========================================================
+   BUDGETWISE | REPORTS — UNIFIED DESIGN 2026
+   Preserves all chart hooks, table hooks and existing scripts.
+   ========================================================== */
+:root {
+  --bw-dark: #123d2c;
+  --bw-green: #276c4e;
+  --bw-text: #193a2a;
+  --bw-muted: #788d80;
+  --bw-border: #e0eae3;
+  --bw-page: #f5f8f6;
+  --bw-shadow: 0 5px 24px rgba(21,59,40,.035);
+}
+*,*::before,*::after { box-sizing: border-box; }
+body {
+  margin:0;
+  background:var(--bw-page);
+  color:var(--bw-text);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+button,input,select {font:inherit}
+button {cursor:pointer}
+.app {min-height:100vh}
+/* SIDEBAR — mirror the new Goals, Dashboard, Transactions and Budgets */
+.sidebar {
+  position:fixed;top:0;left:0;width:245px;height:100vh;
+  display:flex;flex-direction:column;z-index:1000;
+  padding:0 13px;background:#123d2c!important;color:#fff;
+  border-right:1px solid rgba(255,255,255,.06);
+}
+.sidebar .brand {
+  display:flex;align-items:center;gap:12px;
+  padding:24px 9px 27px;min-height:auto;
+}
+.sidebar .brand-icon {
+  width:37px;height:37px;min-width:37px;display:flex;align-items:center;
+  justify-content:center;border-radius:10px;background:#fff;color:#123d2c;
+  font-weight:800;font-size:20px;
+}
+.sidebar .brand-name {font-weight:800;font-size:18px;letter-spacing:-.4px;color:#fff}
+.sidebar .nav {
+  flex:1;min-height:0;overflow-y:auto;display:block;padding:0 0 18px;
+}
+.sidebar .nav-section {margin:4px 0 20px}
+.sidebar .nav-title {
+  margin:15px 0 10px;padding:0 12px;
+  font-size:10px;font-weight:800;letter-spacing:1px;
+  color:#89aa99;text-transform:uppercase;
+}
+.sidebar .nav-link {
+  display:flex;align-items:center;gap:12px;min-height:45px;
+  padding:0 12px;margin-bottom:3px;border-radius:10px;
+  color:#c6d7ce;text-decoration:none;font-weight:500;font-size:13px;
+  transition:background .2s,color .2s;
+}
+.sidebar .nav-link:hover {background:rgba(255,255,255,.1);color:#fff}
+.sidebar .nav-link.active {background:#2b674d!important;color:#fff;font-weight:700}
+.sidebar .nav-icon {
+  width:18px;height:18px;min-width:18px;display:flex;align-items:center;justify-content:center;
+}
+.sidebar .nav-icon i,.sidebar .nav-icon svg {width:18px;height:18px;flex-shrink:0}
+.sidebar .sidebar-bottom {
+  margin-top:auto;padding:16px 5px 18px;width:100%;min-width:0;
+  border-top:1px solid rgba(255,255,255,.13);background:transparent;
+}
+.sidebar .user-mini {display:flex;align-items:center;gap:10px;min-width:0}
+.sidebar .user-mini .avatar {
+  width:35px;height:35px;min-width:35px;border-radius:50%;
+  background:#dfefe5;color:#123d2c;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:800;
+}
+.sidebar .user-mini-info {min-width:0;flex:1;overflow:hidden}
+.sidebar .user-mini-name {
+  color:white;font-size:12px;font-weight:700;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.sidebar .user-mini-email {
+  color:#a6c3b2;font-size:10px;line-height:1.5;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+/* SHELL & TOP BAR */
+.main {margin-left:245px;min-width:0;min-height:100vh;background:var(--bw-page)}
+.main .topbar {
+  display:flex;align-items:center;gap:16px;position:relative;z-index:80;
+  min-height:74px;height:auto;padding:0 30px;background:#fff;
+  border-bottom:1px solid var(--bw-border);overflow:visible;
+}
+.topbar .mobile-menu {display:none!important}
+.topbar .search {
+  display:flex;align-items:center;gap:10px;
+  width:295px;max-width:295px;min-width:145px;flex:0 1 295px;
+  min-height:43px;padding:0 13px;margin-right:auto;
+  border-radius:11px;border:1px solid var(--bw-border);background:#f7f9f8;
+}
+.topbar .search:focus-within {
+  background:#fff;border-color:#86b59b;
+  box-shadow:0 0 0 3px rgba(47,133,83,.09);
+}
+.topbar .search i,.topbar .search svg {width:17px;height:17px;flex-shrink:0;color:#8ba195}
+.topbar .search input {
+  width:100%;min-width:0;outline:0;border:0;background:transparent;
+  font-size:13px;color:var(--bw-text);
+}
+.topbar .top-actions {
+  display:flex;align-items:center;gap:13px;flex-shrink:0;margin-left:auto;position:static;
+}
+.topbar .reports-top-action-wrap {position:relative;display:flex;align-items:center;min-width:0}
+.topbar .notification,
+.topbar .top-user {
+  background:transparent;border:0;border-radius:11px;color:#536e5d;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.topbar .notification {width:42px;height:42px;min-width:42px;position:relative;padding:0}
+.topbar .notification:hover,.topbar .top-user:hover {background:#edf5ef}
+.topbar .notification > svg,.topbar .notification > i {width:19px;height:19px}
+.topbar .top-user {gap:10px;min-height:43px;padding:5px 9px 5px 6px;white-space:nowrap}
+.topbar .top-user .avatar {
+  display:flex;align-items:center;justify-content:center;
+  width:36px;height:36px;min-width:36px;border-radius:50%;
+  background:#deeee5;color:#123d2c;font-size:12px;font-weight:800;
+}
+.topbar .top-user-name {
+  max-width:165px;overflow:hidden;text-overflow:ellipsis;
+  color:var(--bw-text);font-weight:700;font-size:13px;
+}
+.topbar .top-user > svg,.topbar .top-user > i {width:15px;height:15px;flex-shrink:0;color:#759486}
+.topbar .reports-dropdown {
+  position:absolute;z-index:1600;top:calc(100% + 11px);right:0;left:auto;
+  width:310px;max-width:calc(100vw - 24px);max-height:min(420px,calc(100vh - 100px));
+  overflow-y:auto;border:1px solid var(--bw-border);border-radius:13px;
+  padding:5px;background:#fff;color:var(--bw-text);
+  box-shadow:0 12px 32px rgba(18,61,44,.15);
+}
+.topbar .reports-dropdown:not(.show) {display:none}
+.topbar .reports-dropdown.show {display:block}
+.topbar .reports-dropdown-heading {padding:11px 12px 13px;border-bottom:1px solid #edf1ee;margin-bottom:4px}
+.topbar .reports-dropdown-heading strong {color:var(--bw-text);font-size:13px}
+.topbar .reports-dropdown-heading span {font-size:11px;color:var(--bw-muted)}
+.topbar .reports-dropdown-item {
+  display:flex;align-items:center;gap:10px;padding:11px 12px;border:0;
+  border-radius:8px;text-decoration:none;background:transparent;font-size:12px;
+  color:#365342;width:100%;cursor:pointer;
+}
+.topbar .reports-dropdown-item:hover {background:#f0f6f2}
+.topbar .reports-dropdown-item svg {width:17px;height:17px;flex-shrink:0;color:var(--bw-green)}
+.topbar .reports-notification-message {padding:15px 12px;line-height:1.6}
+.topbar .reports-notification-message strong {color:var(--bw-text)}
+.topbar .reports-notification-message p {color:var(--bw-muted)}
+/* HEADER BANNER */
+.reports-content {max-width:1600px;width:100%;margin:0 auto;padding:30px 32px 70px}
+.reports-header {
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding:25px 28px;margin-bottom:23px;
+  background:linear-gradient(112deg,#e8f4ec 0%,#f6faf7 64%,#fff 100%);
+  border:1px solid #dcebe1;border-radius:18px;
+}
+.reports-header-text {min-width:0}
+.reports-label {
+  font-size:10px;letter-spacing:1.2px;font-weight:800;
+  color:#2d7851;margin-bottom:7px;opacity:1;
+}
+.reports-header h1 {
+  margin:0;font-size:clamp(24px,2.2vw,32px);
+  line-height:1.2;font-weight:800;letter-spacing:-.7px;color:var(--bw-text);
+}
+.reports-header p {margin:9px 0 0;font-size:13px;color:#698171;opacity:1;line-height:1.6}
+.reports-refresh {
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  min-height:45px;padding:0 19px;flex-shrink:0;border:0;border-radius:11px;
+  background:#123d2c;color:#fff;font-size:13px;font-weight:700;
+  box-shadow:0 5px 16px rgba(18,61,44,.16);
+  transition:transform .2s,background .2s;
+}
+.reports-refresh:not(:disabled):hover {background:#216445;transform:translateY(-2px)}
+.reports-refresh:disabled {opacity:.65;cursor:wait;transform:none}
+.reports-refresh svg {width:17px;height:17px}
+/* FOUR REPORT METRICS */
+.reports-summary {
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px;margin-bottom:24px;
+}
+.report-stat-card {
+  min-width:0;min-height:148px;padding:21px 22px;position:relative;overflow:hidden;
+  background:#fff;border:1px solid var(--bw-border);border-radius:15px;
+  box-shadow:0 4px 16px rgba(21,59,40,.035);
+  transition:transform .2s,box-shadow .2s;
+}
+.report-stat-card:hover {transform:translateY(-2px);box-shadow:0 9px 24px rgba(21,59,40,.07)}
+.report-stat-card::after {
+  content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
+  background:#65a987;opacity:.72;
+}
+.report-stat-card:nth-child(2)::after {background:#df8c7a}
+.report-stat-card:nth-child(3)::after {background:#558eaf}
+.report-stat-card:nth-child(4)::after {background:#d4a453}
+.report-stat-top {display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.report-stat-label {
+  font-size:12px;letter-spacing:0;font-weight:650;line-height:1.4;
+  color:#728679;opacity:1;margin-bottom:14px;
+}
+.report-stat-value {
+  margin:0;font-size:clamp(20px,2vw,28px);font-weight:800;
+  color:var(--bw-text);line-height:1.18;letter-spacing:-.6px;
+  font-variant-numeric:tabular-nums;overflow-wrap:anywhere;
+}
+.report-stat-icon {
+  width:42px;height:42px;min-width:42px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:#eaf5ee;color:#246b4a;
+}
+.report-stat-card:nth-child(2) .report-stat-icon {background:#fff0ed;color:#b75f55}
+.report-stat-card:nth-child(3) .report-stat-icon {background:#edf3fa;color:#407c9d}
+.report-stat-card:nth-child(4) .report-stat-icon {background:#fcf5e8;color:#ad8239}
+.report-stat-icon svg {width:20px;height:20px}
+.report-stat-footer {margin-top:12px;color:var(--bw-muted);opacity:1;font-size:11px}
+/* CHART PANELS */
+.reports-main-grid {
+  display:grid;grid-template-columns:minmax(0,1.6fr) minmax(315px,1fr);
+  gap:18px;margin-bottom:20px;align-items:stretch;
+}
+.reports-bottom-grid {
+  display:grid;grid-template-columns:minmax(280px,.9fr) minmax(0,1.6fr);
+  gap:18px;align-items:start;
+}
+.report-card {
+  min-width:0;padding:23px 24px;background:#fff;
+  border:1px solid var(--bw-border);border-radius:17px;
+  box-shadow:var(--bw-shadow);overflow:visible;
+}
+.report-card-header {display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px}
+.report-card-title h2 {margin:0;font-size:17px;font-weight:750;color:var(--bw-text)}
+.report-card-title p {color:var(--bw-muted);opacity:1;font-size:12px;line-height:1.55;margin:6px 0 0}
+.report-card-icon {
+  flex-shrink:0;width:39px;height:39px;display:flex;align-items:center;justify-content:center;
+  background:#eaf5ee;color:var(--bw-green);border-radius:11px;
+}
+.report-card-icon svg {width:19px;height:19px}
+.report-chart {min-height:260px;height:auto!important;min-width:0;width:100%;overflow:visible}
+#expenseTrend {min-height:315px}
+#categoryReport {min-height:275px}
+/* CATEGORY BARS */
+.category-report-list {display:flex;flex-direction:column;gap:14px}
+.category-item {min-width:0}
+.category-header {gap:10px}
+.category-name {font-size:12px;font-weight:650;color:#375944}
+.category-amount {font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:#315642}
+.category-track {height:9px;border-radius:99px;background:#e9f0eb;overflow:hidden}
+.category-fill {border-radius:99px;min-height:9px}
+.category-percentage {font-size:11px;color:var(--bw-muted)}
+/* HIGHEST CATEGORY */
+.highest-category {min-height:190px;min-width:0}
+.highest-category-content {min-width:0}
+.highest-category-icon {border-radius:14px;background:#eaf5ee}
+.highest-category-name {font-size:18px;font-weight:800;color:var(--bw-text)}
+.highest-category-amount {font-weight:800;font-variant-numeric:tabular-nums}
+/* TABLE */
+.expense-table-container {width:100%;max-width:100%;overflow-x:auto}
+.expense-table {width:100%;border-collapse:collapse}
+.expense-table thead th {
+  padding:13px 15px;background:#fafcfb;border-bottom:1px solid #eaf0eb;
+  color:#829387;font-size:11px;text-transform:uppercase;letter-spacing:.45px;
+  white-space:nowrap;text-align:left;
+}
+.expense-table tbody td {
+  padding:15px;border-bottom:1px solid #edf1ee;font-size:12px;color:#42604c;
+}
+.expense-table tbody tr:hover {background:#fafcfb}
+.expense-table tbody tr:last-child td {border-bottom:0}
+.empty-state,.expense-table-empty {color:var(--bw-muted);text-align:center}
+.empty-icon {background:#edf5f0;color:var(--bw-green);border-radius:14px}
+/* RESPONSIVE */
+@media (max-width:1200px) {
+  .reports-main-grid {grid-template-columns:minmax(0,1.2fr) minmax(280px,1fr)}
+  .reports-summary {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:1050px) {
+  .reports-main-grid,.reports-bottom-grid {grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:800px) {
+  .sidebar {transform:translateX(-100%);transition:transform .25s ease}
+  .sidebar.open {transform:translateX(0)}
+  .main {margin-left:0}
+  .main .topbar {padding:0 18px}
+  .topbar .mobile-menu {display:flex!important;align-items:center;justify-content:center;flex-shrink:0;width:40px;height:40px;background:transparent;border:0;border-radius:10px;color:#123d2c}
+  .reports-content {padding:24px 20px 56px}
+}
+@media (max-width:600px) {
+  .main .topbar {min-height:64px;padding:0 15px}
+  .topbar .search {display:none}
+  .topbar .top-actions {margin-left:auto;gap:7px}
+  .topbar .top-user-name,.topbar .top-user > svg {display:none}
+  .topbar .reports-dropdown {max-width:calc(100vw - 26px)}
+  .reports-content {padding:18px 14px 48px}
+  .reports-header {padding:22px 19px;flex-direction:column;align-items:stretch}
+  .reports-refresh {width:100%}
+  .reports-summary {grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+  .report-stat-card {min-height:125px;padding:17px 14px}
+  .report-stat-label {font-size:11px;margin-bottom:12px}
+  .report-stat-value {font-size:19px}
+  .report-stat-icon {width:35px;height:35px;min-width:35px}
+  .report-stat-icon svg {width:17px;height:17px}
+  .report-card {padding:19px 16px}
+  .report-card-title h2 {font-size:15px}
+  #expenseTrend {min-height:270px}
+  .expense-table {min-width:540px}
+}
+@media (max-width:360px) {
+  .reports-summary {grid-template-columns:1fr}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =========================================
+
+         SIDEBAR
+
+    ========================================== -->
+
+    <aside
+
+        class="sidebar"
+
+        id="sidebar"
+
+    >
+
+        <div class="brand">
+
+            <div class="brand-icon">
+
+                ₦
+
+            </div>
+
+            <div class="brand-name">
+
+                BudgetWise
+
+            </div>
+
+        </div>
+
+        <nav class="nav">
+
+            <!-- Overview -->
+
+            <div class="nav-section">
+
+                <div class="nav-title">
+
+                    Overview
+
+                </div>
+
+                <a
+
+                    href="dashboard.html"
+
+                    class="nav-link"
+
+                >
+
+                    <span class="nav-icon">
+
+                        <i
+
+                            data-lucide="layout-dashboard"
+
+                        ></i>
+
+                    </span>
+
+                    <span>
+
+                        Dashboard
+
+                    </span>
+
+                </a>
+
+                <a
+
+                    href="transactions.html"
+
+                    class="nav-link"
+
+                >
+
+                    <span class="nav-icon">
+
+                        <i
+
+                            data-lucide="arrow-left-right"
+
+                        ></i>
+
+                    </span>
+
+                    <span>
+
+                        Transactions
+
+                    </span>
+
+                </a>
+
+                <a
+
+                    href="budgets.html"
+
+                    class="nav-link"
+
+                >
+
+                    <span class="nav-icon">
+
+                        <i
+
+                            data-lucide="wallet-cards"
+
+                        ></i>
+
+                    </span>
+
+                    <span>
+
+                        Budgets
+
+                    </span>
+
+                </a>
+
+            </div>
+
+            <!-- Planning -->
+
+            <div class="nav-section">
+
+                <div class="nav-title">
+
+                    Planning
+
+                </div>
+
+                <a
+
+                    href="reports.html"
+
+                    class="nav-link active"
+
+                >
+
+                    <span class="nav-icon">
+
+                        <i
+
+                            data-lucide="bar-chart-3"
+
+                        ></i>
+
+                    </span>
+
+                    <span>
+
+                        Reports
+
+                    </span>
+
+                </a>
+
+                <a
+
+                    href="goals.html"
+
+                    class="nav-link"
+
+                >
+
+                    <span class="nav-icon">
+
+                        <i
+
+                            data-lucide="target"
+
+                        ></i>
+
+                    </span>
+
+                    <span>
+
+                        Goals
+
+                    </span>
+
+                </a>
+
+            </div>
+
+            <!-- Account -->
+
+            <div class="nav-section">
+
+                <div class="nav-title">
+
+                    Account
+
+                </div>
+
+                <a
+
+                    href="settings.html"
+
+                    class="nav-link"
+
+                >
+
+                    <span class="nav-icon">
+
+                        <i
+
+                            data-lucide="settings"
+
+                        ></i>
+
+                    </span>
+
+                    <span>
+
+                        Settings
+
+                    </span>
+
+                </a>
+
+            </div>
+
+        </nav>
+
+        <!-- Sidebar user -->
+
+        <div class="sidebar-bottom">
+
+            <div class="user-mini">
+
+                <div
+
+                    class="avatar"
+
+                    id="sidebarAvatar"
+
+                >
+
+                    K
+
+                </div>
+
+                <div class="user-mini-info">
+
+                    <div
+
+                        class="user-mini-name"
+
+                        id="sidebarUserName"
+
+                    >
+
+                        Kehinde
+
+                    </div>
+
+                    <div
+
+                        class="user-mini-email"
+
+                        id="sidebarUserEmail"
+
+                    >
+
+                        BudgetWise User
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+    <!-- =========================================
+
+         MAIN
+
+    ========================================== -->
+
+    <main class="main">
+
+        <!-- Topbar -->
+
+        <header class="topbar">
+
+            <button
+
+                class="mobile-menu"
+
+                id="mobileMenu"
+
+                type="button"
+
+                aria-label="Open menu"
+
+            >
+
+                <i data-lucide="menu"></i>
+
+            </button>
+
+            <div class="search">
+
+                <i data-lucide="search"></i>
+
+                <input
+
+                    type="text"
+
+                    id="searchInput"
+
+                    placeholder="Search transactions..."
+
+                >
+
+            </div>
+
+            <div class="top-actions" id="reportsTopActions">
+
+    <div class="reports-top-action-wrap">
+
+        <button
+
+            type="button"
+
+            class="notification"
+
+            id="notificationButton"
+
+            aria-label="Open notifications"
+
+            aria-expanded="false"
+
+            aria-controls="reportsNotificationPanel"
+
+        >
+
+            <i data-lucide="bell"></i>
+
+            <span class="notification-dot" aria-hidden="true"></span>
+
+        </button>
+
+        <div class="reports-dropdown" id="reportsNotificationPanel" role="region" aria-label="Notifications">
+
+            <div class="reports-dropdown-heading">
+
+                <strong>Notifications</strong>
+
+                <span>Your BudgetWise updates</span>
+
+            </div>
+
+            <div class="reports-notification-message">
+
+                <i data-lucide="bell-ring" aria-hidden="true"></i>
+
+                <div>
+
+                    <strong>You're all caught up</strong>
+
+                    <p>You don't have any new notifications right now.</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="reports-top-action-wrap">
+
+        <button
+
+            type="button"
+
+            class="top-user"
+
+            id="topProfile"
+
+            aria-label="Open profile menu"
+
+            aria-expanded="false"
+
+            aria-controls="reportsProfileMenu"
+
+        >
+
+            <span class="avatar" id="topAvatar">K</span>
+
+            <span class="top-user-name" id="topUserName">Kehinde</span>
+
+            <i data-lucide="chevron-down" aria-hidden="true"></i>
+
+        </button>
+
+        <div class="reports-dropdown reports-profile-dropdown" id="reportsProfileMenu" role="menu" aria-label="Profile menu">
+
+            <div class="reports-dropdown-heading">
+
+                <strong id="reportsProfileMenuName">Kehinde</strong>
+
+                <span>Manage your BudgetWise account</span>
+
+            </div>
+
+            <a class="reports-dropdown-item" href="dashboard.html" role="menuitem">
+
+                <i data-lucide="layout-dashboard" aria-hidden="true"></i>
+
+                <span>Dashboard</span>
+
+            </a>
+
+            <a class="reports-dropdown-item" href="transactions.html" role="menuitem">
+
+                <i data-lucide="arrow-left-right" aria-hidden="true"></i>
+
+                <span>Transactions</span>
+
+            </a>
+
+            <a class="reports-dropdown-item" href="settings.html" role="menuitem">
+
+                <i data-lucide="settings" aria-hidden="true"></i>
+
+                <span>Settings</span>
+
+            </a>
+
+            <button class="reports-dropdown-item reports-logout" id="reportsLogoutButton" type="button" role="menuitem">
+
+                <i data-lucide="log-out" aria-hidden="true"></i>
+
+                <span>Log out</span>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+        </header>
+
+        <!-- =========================================
+
+             REPORT CONTENT
+
+        ========================================== -->
+
+        <section class="reports-content">
+
+            <!-- Header -->
+
+            <div class="reports-header">
+
+                <div class="reports-header-text">
+
+                    <div class="reports-label">
+
+                        FINANCIAL INSIGHTS
+
+                    </div>
+
+                    <h1>
+
+                        Financial Reports
+
+                    </h1>
+
+                    <p>
+
+                        Get a clear picture of your
+
+                        income, expenses and spending
+
+                        habits.
+
+                    </p>
+
+                </div>
+
+                <button
+
+                    class="reports-refresh"
+
+                    id="refreshReports"
+
+                    type="button"
+
+                >
+
+                    <i
+
+                        data-lucide="refresh-cw"
+
+                    ></i>
+
+                    <span>
+
+                        Refresh
+
+                    </span>
+
+                </button>
+
+            </div>
+
+            <!-- =====================================
+
+                 SUMMARY
+
+            ====================================== -->
+
+            <div class="reports-summary">
+
+                <!-- Income -->
+
+                <div class="report-stat-card">
+
+                    <div class="report-stat-top">
+
+                        <div>
+
+                            <div class="report-stat-label">
+
+                                TOTAL INCOME
+
+                            </div>
+
+                            <div
+
+                                class="report-stat-value"
+
+                                id="reportIncome"
+
+                            >
+
+                                ₦0.00
+
+                            </div>
+
+                        </div>
+
+                        <div class="report-stat-icon">
+
+                            <i
+
+                                data-lucide="trending-up"
+
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+                    <div class="report-stat-footer">
+
+                        Total income recorded
+
+                    </div>
+
+                </div>
+
+                <!-- Expenses -->
+
+                <div class="report-stat-card">
+
+                    <div class="report-stat-top">
+
+                        <div>
+
+                            <div class="report-stat-label">
+
+                                TOTAL EXPENSES
+
+                            </div>
+
+                            <div
+
+                                class="report-stat-value"
+
+                                id="reportExpenses"
+
+                            >
+
+                                ₦0.00
+
+                            </div>
+
+                        </div>
+
+                        <div class="report-stat-icon">
+
+                            <i
+
+                                data-lucide="trending-down"
+
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+                    <div class="report-stat-footer">
+
+                        Total spending recorded
+
+                    </div>
+
+                </div>
+
+                <!-- Balance -->
+
+                <div class="report-stat-card">
+
+                    <div class="report-stat-top">
+
+                        <div>
+
+                            <div class="report-stat-label">
+
+                                CURRENT BALANCE
+
+                            </div>
+
+                            <div
+
+                                class="report-stat-value"
+
+                                id="reportBalance"
+
+                            >
+
+                                ₦0.00
+
+                            </div>
+
+                        </div>
+
+                        <div class="report-stat-icon">
+
+                            <i
+
+                                data-lucide="wallet"
+
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+                    <div class="report-stat-footer">
+
+                        Money remaining
+
+                    </div>
+
+                </div>
+
+                <!-- Savings -->
+
+                <div class="report-stat-card">
+
+                    <div class="report-stat-top">
+
+                        <div>
+
+                            <div class="report-stat-label">
+
+                                SAVINGS RATE
+
+                            </div>
+
+                            <div
+
+                                class="report-stat-value"
+
+                                id="reportSavings"
+
+                            >
+
+                                0%
+
+                            </div>
+
+                        </div>
+
+                        <div class="report-stat-icon">
+
+                            <i
+
+                                data-lucide="piggy-bank"
+
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+                    <div class="report-stat-footer">
+
+                        Percentage of income saved
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- =====================================
+
+                 CHARTS
+
+            ====================================== -->
+
+            <div class="reports-main-grid">
+
+                <!-- Expense Trend -->
+
+                <div class="report-card">
+
+                    <div class="report-card-header">
+
+                        <div class="report-card-title">
+
+                            <h2>
+
+                                Expense Trend
+
+                            </h2>
+
+                            <p>
+
+                                Track how your expenses
+
+                                change over time.
+
+                            </p>
+
+                        </div>
+
+                        <div class="report-card-icon">
+
+                            <i
+
+                                data-lucide="line-chart"
+
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+                    <div
+
+                        class="report-chart"
+
+                        id="expenseTrend"
+
+                    >
+
+                        <div class="empty-state">
+
+                            <div class="empty-icon">
+
+                                <i
+
+                                    data-lucide="bar-chart-3"
+
+                                ></i>
+
+                            </div>
+
+                            <h3>
+
+                                No expense data yet
+
+                            </h3>
+
+                            <p>
+
+                                Add transactions to
+
+                                generate your expense
+
+                                trend.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Category -->
+
+                <div class="report-card">
+
+                    <div class="report-card-header">
+
+                        <div class="report-card-title">
+
+                            <h2>
+
+                                Spending by Category
+
+                            </h2>
+
+                            <p>
+
+                                See which categories
+
+                                take the most money.
+
+                            </p>
+
+                        </div>
+
+                        <div class="report-card-icon">
+
+                            <i
+
+                                data-lucide="pie-chart"
+
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+                    <div
+
+                        class="report-chart"
+
+                        id="categoryReport"
+
+                    >
+
+                        <div class="empty-state">
+
+                            <div class="empty-icon">
+
+                                <i
+
+                                    data-lucide="pie-chart"
+
+                                ></i>
+
+                            </div>
+
+                            <h3>
+
+                                No category data yet
+
+                            </h3>
+
+                            <p>
+
+                                Add expenses to see
+
+                                your category breakdown.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- =====================================
+
+                 LOWER REPORTS
+
+            ====================================== -->
+
+            <div class="reports-bottom-grid">
+
+                <!-- Highest Category -->
+
+                <div class="report-card">
+
+                    <div class="report-card-header">
+
+                        <div class="report-card-title">
+
+                            <h2>
+
+                                Highest Spending
+
+                            </h2>
+
+                            <p>
+
+                                Your biggest expense
+
+                                category.
+
+                            </p>
+
+                        </div>
+
+                        <div class="report-card-icon">
+
+                            <i
+
+                                data-lucide="flame"
+
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+                    <div
+
+                        class="highest-category"
+
+                        id="highestCategory"
+
+                    >
+
+                        <div class="empty-state">
+
+                            <div class="empty-icon">
+
+                                <i
+
+                                    data-lucide="circle-dollar-sign"
+
+                                ></i>
+
+                            </div>
+
+                            <h3>
+
+                                No spending data
+
+                            </h3>
+
+                            <p>
+
+                                Your highest spending
+
+                                category will appear here.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Expense Breakdown -->
+
+                <div class="report-card">
+
+                    <div class="report-card-header">
+
+                        <div class="report-card-title">
+
+                            <h2>
+
+                                Expense Breakdown
+
+                            </h2>
+
+                            <p>
+
+                                Review your recorded
+
+                                expenses.
+
+                            </p>
+
+                        </div>
+
+                        <div class="report-card-icon">
+
+                            <i
+
+                                data-lucide="receipt"
+
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+                    <div
+
+                        id="expenseTableContainer"
+
+                        class="expense-table-container"
+
+                    >
+
+                        <div
+
+                            class="expense-table-empty"
+
+                        >
+
+                            <div class="empty-icon">
+
+                                <i
+
+                                    data-lucide="receipt-text"
+
+                                ></i>
+
+                            </div>
+
+                            <h3>
+
+                                No expenses yet
+
+                            </h3>
+
+                            <p>
+
+                                Your expense records
+
+                                will appear here.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- Reports JavaScript -->
+
+<script src="js/reports.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const notificationButton = document.getElementById("notificationButton");
+
+    const notificationPanel = document.getElementById("reportsNotificationPanel");
+
+    const profileButton = document.getElementById("topProfile");
+
+    const profileMenu = document.getElementById("reportsProfileMenu");
+
+    const logoutButton = document.getElementById("reportsLogoutButton");
+
+    if (!notificationButton || !notificationPanel || !profileButton || !profileMenu) {
+
+        return;
+
+    }
+
+    function closeMenus() {
+
+        notificationPanel.classList.remove("show");
+
+        profileMenu.classList.remove("show");
+
+        notificationButton.setAttribute("aria-expanded", "false");
+
+        profileButton.setAttribute("aria-expanded", "false");
+
+    }
+
+    notificationButton.addEventListener("click", function (event) {
+
+        event.stopPropagation();
+
+        const shouldOpen = !notificationPanel.classList.contains("show");
+
+        closeMenus();
+
+        if (shouldOpen) {
+
+            notificationPanel.classList.add("show");
+
+            notificationButton.setAttribute("aria-expanded", "true");
+
+            if (window.lucide) window.lucide.createIcons();
+
+        }
+
+    });
+
+    profileButton.addEventListener("click", function (event) {
+
+        event.stopPropagation();
+
+        const shouldOpen = !profileMenu.classList.contains("show");
+
+        closeMenus();
+
+        if (shouldOpen) {
+
+            const displayedName = document.getElementById("topUserName")?.textContent?.trim() || "BudgetWise User";
+
+            const menuName = document.getElementById("reportsProfileMenuName");
+
+            if (menuName) menuName.textContent = displayedName;
+
+            profileMenu.classList.add("show");
+
+            profileButton.setAttribute("aria-expanded", "true");
+
+            if (window.lucide) window.lucide.createIcons();
+
+        }
+
+    });
+
+    notificationPanel.addEventListener("click", event => event.stopPropagation());
+
+    profileMenu.addEventListener("click", event => event.stopPropagation());
+
+    document.addEventListener("click", closeMenus);
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key === "Escape") {
+
+            closeMenus();
+
+            notificationButton.focus();
+
+        }
+
+    });
+
+    if (logoutButton) {
+
+        logoutButton.addEventListener("click", function () {
+
+            closeMenus();
+
+            localStorage.removeItem("access_token");
+
+            localStorage.removeItem("user_email");
+
+            localStorage.removeItem("user_name");
+
+            localStorage.removeItem("user_id");
+
+            window.location.replace("login.html");
+
+        });
+
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+
+});
+
+</script>
+
+</body>
+
+</html>

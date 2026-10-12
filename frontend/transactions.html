@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+
+        name="viewport"
+
+        content="width=device-width, initial-scale=1.0"
+
+    >
+
+    <title>Transactions | BudgetWise</title>
+
+    <link
+
+        rel="stylesheet"
+
+        href="css/dashboard.css"
+
+    >
+
+    <!-- Lucide Icons -->
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+
+        /* =====================================================
+
+           TRANSACTIONS PAGE
+
+        ===================================================== */
+
+        .transactions-content {
+
+            padding: 28px 32px 40px;
+
+        }
+
+        .transactions-header {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 28px;
+
+        }
+
+        .transactions-label {
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            letter-spacing: 1.2px;
+
+            opacity: 0.65;
+
+            margin-bottom: 7px;
+
+        }
+
+        .transactions-header h1 {
+
+            margin: 0;
+
+            font-size: 28px;
+
+            line-height: 1.2;
+
+        }
+
+        .transactions-header p {
+
+            margin: 8px 0 0;
+
+            font-size: 14px;
+
+            opacity: 0.65;
+
+        }
+
+        /* Add Expense */
+
+        .add-expense-btn {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            padding: 11px 17px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background: #0b3d2e;
+
+            color: white;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            white-space: nowrap;
+
+        }
+
+        .add-expense-btn:hover {
+
+            opacity: 0.92;
+
+        }
+
+        .add-expense-btn svg {
+
+            width: 17px;
+
+            height: 17px;
+
+        }
+
+        /* Toolbar */
+
+        .transactions-toolbar {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+
+            margin-bottom: 20px;
+
+        }
+
+        .transaction-search {
+
+            position: relative;
+
+            flex: 1;
+
+        }
+
+        .transaction-search svg {
+
+            position: absolute;
+
+            left: 13px;
+
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            width: 17px;
+
+            height: 17px;
+
+            opacity: 0.5;
+
+        }
+
+        .transaction-search input {
+
+            width: 100%;
+
+            height: 44px;
+
+            box-sizing: border-box;
+
+            padding: 0 14px 0 40px;
+
+            border: 1px solid #dfe7e3;
+
+            border-radius: 9px;
+
+            outline: none;
+
+            background: white;
+
+            font-size: 14px;
+
+        }
+
+        .transaction-filter {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+        }
+
+        .transaction-filter svg {
+
+            width: 17px;
+
+            height: 17px;
+
+            opacity: 0.55;
+
+        }
+
+        .transaction-filter select {
+
+            height: 44px;
+
+            min-width: 165px;
+
+            padding: 0 12px;
+
+            border: 1px solid #dfe7e3;
+
+            border-radius: 9px;
+
+            background: white;
+
+            outline: none;
+
+            font-size: 14px;
+
+        }
+
+        /* Main Card */
+
+        .transactions-card {
+
+            background: white;
+
+            border: 1px solid #e7ece9;
+
+            border-radius: 14px;
+
+            overflow: hidden;
+
+        }
+
+        .transactions-card-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 20px 22px;
+
+            border-bottom: 1px solid #edf1ef;
+
+        }
+
+        .transactions-card-title h2 {
+
+            margin: 0;
+
+            font-size: 17px;
+
+            color: #17221e;
+
+        }
+
+        .transactions-card-title p {
+
+            margin: 5px 0 0;
+
+            font-size: 12px;
+
+            color: #718096;
+
+        }
+
+        .transaction-count {
+
+            font-size: 12px;
+
+            color: #718096;
+
+        }
+
+        /* Empty State */
+
+        .empty-state {
+
+            min-height: 280px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 35px 20px;
+
+        }
+
+        .empty-icon {
+
+            width: 55px;
+
+            height: 55px;
+
+            border-radius: 15px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #f1f5f3;
+
+            margin-bottom: 14px;
+
+        }
+
+        .empty-icon svg {
+
+            width: 24px;
+
+            height: 24px;
+
+            color: #0b3d2e;
+
+        }
+
+        .empty-state h3 {
+
+            margin: 0 0 7px;
+
+            font-size: 15px;
+
+            color: #17221e;
+
+        }
+
+        .empty-state p {
+
+            margin: 0 0 18px;
+
+            max-width: 320px;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+
+            color: #718096;
+
+        }
+
+        /* Table */
+
+        .table-wrapper {
+
+            width: 100%;
+
+            overflow-x: auto;
+
+        }
+
+        .transactions-table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+        }
+
+        .transactions-table th {
+
+            padding: 14px 22px;
+
+            text-align: left;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.5px;
+
+            color: #718096;
+
+            background: #fafcfb;
+
+            border-bottom: 1px solid #edf1ef;
+
+        }
+
+        .transactions-table td {
+
+            padding: 16px 22px;
+
+            border-bottom: 1px solid #edf1ef;
+
+            font-size: 13px;
+
+            color: #374151;
+
+        }
+
+        .transactions-table tbody tr:last-child td {
+
+            border-bottom: none;
+
+        }
+
+        .transactions-table tbody tr:hover {
+
+            background: #fafcfb;
+
+        }
+
+        /* Transaction category */
+
+        .transaction-category {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            min-width: 220px;
+
+        }
+
+        .transaction-category-icon {
+
+            width: 42px;
+
+            height: 42px;
+
+            border-radius: 11px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #f1f5f3;
+
+            font-size: 20px;
+
+            flex-shrink: 0;
+
+        }
+
+        .transaction-category-name {
+
+            margin-bottom: 4px;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            color: #17221e;
+
+            text-transform: capitalize;
+
+        }
+
+        .transaction-description {
+
+            font-size: 12px;
+
+            color: #718096;
+
+            max-width: 300px;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+        }
+
+        .transaction-date {
+
+            color: #718096;
+
+            white-space: nowrap;
+
+        }
+
+        .transaction-amount {
+
+            font-weight: 700;
+
+            color: #17221e;
+
+            white-space: nowrap;
+
+        }
+
+        /* Delete */
+
+        .delete-btn {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            border: none;
+
+            background: #fff1f1;
+
+            color: #c53030;
+
+            padding: 8px 11px;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+        }
+
+        .delete-btn svg {
+
+            width: 14px;
+
+            height: 14px;
+
+        }
+
+        .delete-btn:hover {
+
+            background: #ffe3e3;
+
+        }
+
+        /* =====================================================
+
+        SIDEBAR PROFILE FIX
+
+        ===================================================== */
+
+        .sidebar-bottom {
+
+            width: 100%;
+
+            min-width: 0;
+
+            overflow: hidden;
+
+        }
+
+        .user-mini {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            width: 100%;
+
+            min-width: 0;
+
+        }
+
+        .user-mini .avatar {
+
+            width: 36px;
+
+            height: 36px;
+
+            min-width: 36px;
+
+            flex-shrink: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50%;
+
+            overflow: hidden;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+        }
+
+        .user-mini-info {
+
+            flex: 1;
+
+            min-width: 0;
+
+            overflow: hidden;
+
+        }
+
+        .user-mini-name {
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+        }
+
+        .user-mini-email {
+
+            display: block;
+
+            max-width: 100%;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+            font-size: 11px;
+
+            line-height: 1.4;
+
+        }
+
+        /* =====================================================
+
+           RESPONSIVE
+
+        ===================================================== */
+
+        @media (max-width: 800px) {
+
+            .transactions-content {
+
+                padding: 22px 18px 32px;
+
+            }
+
+            .transactions-header {
+
+                flex-direction: column;
+
+            }
+
+            .add-expense-btn {
+
+                width: 100%;
+
+            }
+
+            .transactions-toolbar {
+
+                flex-direction: column;
+
+                align-items: stretch;
+
+            }
+
+            .transaction-search {
+
+                width: 100%;
+
+            }
+
+            .transaction-filter {
+
+                width: 100%;
+
+            }
+
+            .transaction-filter select {
+
+                width: 100%;
+
+            }
+
+            .transactions-table th,
+
+            .transactions-table td {
+
+                padding: 13px 15px;
+
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .transactions-card-header {
+
+                padding: 17px;
+
+            }
+
+            .transactions-table {
+
+                min-width: 650px;
+
+            }
+
+            .transactions-card {
+
+                overflow-x: auto;
+
+            }
+
+        }
+
+/* ===========================================================
+   TRANSACTIONS / BUDGETWISE MODERN PAGE DESIGN
+   Match Goals & Dashboard. Embedded so no new CSS file needed.
+   =========================================================== */
+:root { --bw-deep:#123d2c;--bw-green:#266d4d;--bw-text:#173b2a;--bw-muted:#73877a;--bw-line:#e2ebe5;--bw-soft:#eef6f0;--bw-page:#f5f8f6; }
+*,*::before,*::after {box-sizing:border-box}
+body {margin:0;min-width:320px;background:var(--bw-page);color:var(--bw-text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select {font:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible {outline:3px solid #8bc2a3;outline-offset:2px}
+.app {min-height:100vh}
+.sidebar {position:fixed;inset:0 auto 0 0;width:245px;height:100vh;display:flex;flex-direction:column;background:var(--bw-deep)!important;color:#fff;z-index:1000}
+.sidebar .brand {min-height:84px;display:flex;align-items:center;gap:12px;padding:0 23px}
+.sidebar .brand-icon {width:39px;height:39px;border-radius:11px;background:#fff;color:var(--bw-deep);display:grid;place-items:center;font-size:23px;font-weight:800}
+.sidebar .brand-name {font-size:19px;font-weight:800;letter-spacing:-.5px;color:#fff}
+.sidebar .nav {min-height:0;overflow-y:auto;padding-bottom:16px}
+.sidebar .nav-section {padding:0 14px;margin:14px 0 0}
+.sidebar .nav-title {padding:0 12px;margin:0 0 9px;color:#91b5a2;text-transform:uppercase;letter-spacing:1px;font-size:10px;font-weight:750}
+.sidebar .nav-link {display:flex;align-items:center;gap:12px;min-height:44px;padding:0 13px;margin:0 0 4px;text-decoration:none;color:#c4d8cd;border-radius:10px;font-size:13px;font-weight:550;transition:background .18s,color .18s}
+.sidebar .nav-link:hover {background:#20523e;color:#fff}
+.sidebar .nav-link.active {background:#2c654b!important;color:#fff;font-weight:750}
+.sidebar .nav-icon,.sidebar .nav-icon svg {width:19px;height:19px;min-width:19px;flex-shrink:0;stroke-width:2}
+.sidebar .sidebar-bottom {margin-top:auto;padding:19px;border-top:1px solid #285641;background:var(--bw-deep)}
+.sidebar .user-mini {display:flex;gap:10px;align-items:center;min-width:0}
+.sidebar .user-mini .avatar {display:grid;place-items:center;width:37px;height:37px;min-width:37px;border-radius:50%;background:#e1eee6;color:var(--bw-deep);font-size:12px;font-weight:800}
+.sidebar .user-mini-info {min-width:0;flex:1}
+.sidebar .user-mini-name {font-size:12px;font-weight:700;color:#fff;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.sidebar .user-mini-email {font-size:10px;color:#abcab6;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;display:block;margin-top:4px}
+.main {margin-left:245px;min-height:100vh;min-width:0;background:var(--bw-page)}
+.main .topbar {height:74px;min-height:74px;padding:0 34px;display:flex;align-items:center;gap:17px;position:relative;z-index:50;background:#fff;border-bottom:1px solid var(--bw-line);overflow:visible}
+.topbar .mobile-menu {display:none!important}
+.main .topbar .search {display:flex;align-items:center;gap:10px;width:min(310px,42%);min-width:150px;height:43px;min-height:43px;padding:0 13px;margin-right:auto;border:1px solid #e0e9e3;border-radius:11px;background:#f7f9f7;transition:background .15s,border .15s}
+.topbar .search:focus-within {background:#fff!important;border-color:#83b89c!important;box-shadow:0 0 0 3px #e1f2e8}
+.topbar .search svg {width:17px;height:17px;color:#809285;flex-shrink:0}
+.topbar .search input {min-width:0;width:100%;padding:0;border:0;outline:0;background:transparent;font-size:13px;color:var(--bw-text)}
+.main .topbar .top-actions {display:flex;align-items:center;gap:13px;margin-left:auto;flex-shrink:0}
+.bw-menu-anchor {position:relative;display:flex;align-items:center}
+.main .topbar .notification {position:relative;display:grid;place-items:center;width:42px;height:42px;padding:0;border:0;border-radius:11px;background:transparent;color:#597163;cursor:pointer}
+.main .topbar .notification:hover,.main .topbar .top-user:hover {background:#eef6f0}
+.main .topbar .notification svg {width:19px;height:19px}
+.main .topbar .notification-dot {position:absolute;top:9px;right:8px;width:7px;height:7px;border-radius:50%;background:#de715e;display:none}
+.main .topbar .top-user {display:flex;align-items:center;gap:10px;min-height:42px;padding:4px 9px 4px 5px;border:0;border-radius:11px;background:transparent;color:#294435;cursor:pointer}
+.main .topbar .top-user .avatar {display:grid;place-items:center;width:35px;height:35px;min-width:35px;border-radius:50%;background:#e0eee6;border:1px solid #cfe4d7;color:#123d2c;font-size:12px;font-weight:800}
+.main .topbar #topUserName {max-width:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:650}
+.main .topbar .bw-profile-chevron {width:15px;height:15px;color:#7c9080}
+.bw-dropdown {position:absolute;top:calc(100% + 12px);right:0;z-index:500;min-width:278px;width:300px;max-width:calc(100vw - 30px);max-height:min(420px,calc(100vh - 95px));overflow-y:auto;background:#fff;color:#23412f;border:1px solid #e1ebe5;border-radius:14px;box-shadow:0 16px 42px rgba(18,61,44,.17);padding:8px}
+.bw-dropdown[hidden] {display:none!important}
+.bw-menu-header {padding:12px 13px;border-bottom:1px solid #edf1ee;margin-bottom:5px;display:flex;flex-direction:column;gap:4px}
+.bw-menu-header strong {font-size:13px}
+.bw-menu-header small {font-size:11px;color:#7e9185;overflow-wrap:anywhere}
+.bw-dropdown a,.bw-dropdown button.bw-menu-entry {display:flex;align-items:center;gap:10px;width:100%;min-height:41px;padding:10px 11px;background:transparent;color:#284b35;border:0;border-radius:8px;font:inherit;font-size:12px;text-decoration:none;cursor:pointer;text-align:left}
+.bw-dropdown a:hover,.bw-dropdown button.bw-menu-entry:hover {background:#edf5ef}
+.bw-dropdown a svg,.bw-dropdown button svg {width:16px;height:16px;flex-shrink:0}
+.bw-activity-item {display:flex;align-items:flex-start;gap:10px;padding:10px 11px;border-bottom:1px solid #f0f3f1}
+.bw-activity-item:last-child {border-bottom:0}
+.bw-activity-item > svg {width:17px;height:17px;color:#2d8458;flex-shrink:0;margin-top:2px}
+.bw-activity-item div {flex:1;min-width:0}
+.bw-activity-item strong {display:block;font-size:12px;color:#254733;overflow-wrap:anywhere}
+.bw-activity-item small {display:block;font-size:11px;color:#819186;margin-top:4px}
+.main .transactions-content {max-width:1580px;margin:0 auto;padding:32px 34px 72px}
+.main .transactions-header {position:relative;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:22px;padding:29px 32px;margin-bottom:24px;border:1px solid #dbe9df;border-radius:19px;background:linear-gradient(110deg,#e7f4ea 0%,#f4faf6 57%,#fff 100%);overflow:hidden}
+.main .transactions-header::after {content:"";position:absolute;width:250px;height:250px;right:16%;top:-181px;border-radius:50%;background:rgba(88,168,116,.09);z-index:-1}
+.main .transactions-label {font-size:10px;font-weight:850;letter-spacing:1.5px;color:#31774e;opacity:1;margin-bottom:8px}
+.main .transactions-header h1 {font-size:clamp(25px,2.35vw,34px);line-height:1.2;letter-spacing:-.8px;font-weight:800;color:#153c2a;margin:0}
+.main .transactions-header p {margin:9px 0 0;color:#617b6b;font-size:13px;line-height:1.55;opacity:1}
+.main .add-expense-btn {display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;background:#123d2c;border:0;border-radius:11px;color:#fff;text-decoration:none;white-space:nowrap;font-weight:700;font-size:13px;box-shadow:0 8px 18px rgba(18,61,44,.15);transition:transform .2s,background .2s}
+.main .add-expense-btn:hover {background:#226445;transform:translateY(-2px);opacity:1}
+.main .add-expense-btn svg {width:17px;height:17px}
+.bw-metrics {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px;margin-bottom:23px}
+.bw-metric {position:relative;min-width:0;min-height:149px;padding:21px 21px 20px;border:1px solid var(--bw-line);border-radius:16px;background:#fff;box-shadow:0 8px 28px rgba(20,67,43,.045);overflow:hidden;transition:transform .2s,box-shadow .2s}
+.bw-metric:hover {transform:translateY(-2px);box-shadow:0 12px 28px rgba(18,61,44,.085)}
+.bw-metric::after {content:"";position:absolute;bottom:0;left:0;right:0;height:3px;background:#63ad83}
+.bw-metric:nth-child(2)::after {background:#5793bf}
+.bw-metric:nth-child(3)::after {background:#57ae97}
+.bw-metric:nth-child(4)::after {background:#d3a751}
+.bw-metric-top {display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bw-metric-top>span:first-child {color:#75867a;font-size:12px;font-weight:650}
+.bw-metric-icon {display:grid;place-items:center;width:42px;height:42px;min-width:42px;border-radius:12px;background:#eaf4ec;color:#26704d}
+.bw-metric:nth-child(2) .bw-metric-icon {background:#eef4fa;color:#477da4}
+.bw-metric:nth-child(3) .bw-metric-icon {background:#e8f6f2;color:#318b76}
+.bw-metric:nth-child(4) .bw-metric-icon {background:#fff6e8;color:#b38843}
+.bw-metric-icon svg {width:20px;height:20px}
+.bw-metric>strong {display:block;margin:16px 0 0;color:#173b2a;font-size:clamp(21px,2vw,29px);line-height:1.2;letter-spacing:-.7px;font-weight:800;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.bw-metric>small {display:block;color:#92a499;font-size:11px;margin-top:8px}
+.main .transactions-toolbar {display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:16px 18px;background:#fff;border:1px solid var(--bw-line);border-radius:14px;box-shadow:0 5px 24px rgba(21,59,40,.025)}
+.main .transaction-search {position:relative;flex:1;min-width:0}
+.main .transaction-search input {width:100%;height:46px;padding:0 16px 0 42px;border:1px solid #e1e9e3;border-radius:11px;background:#f9fbfa;font-size:13px;color:#20402f;outline:0}
+.main .transaction-search input:focus {background:#fff;border-color:#83b99c;box-shadow:0 0 0 3px #e1f2e8}
+.main .transaction-search svg {width:17px;height:17px;left:15px;color:#7e9385;opacity:1}
+.main .transaction-filter {display:flex;align-items:center;gap:11px;color:#789080}
+.main .transaction-filter select {height:46px;min-width:182px;padding:0 38px 0 13px;border:1px solid #e1e9e3;border-radius:11px;background:#f9fbfa;font-size:13px;color:#2c4a38;outline:0;cursor:pointer}
+.main .transaction-filter select:focus {border-color:#83b99c;box-shadow:0 0 0 3px #e1f2e8}
+.main .transactions-card {background:#fff;border:1px solid var(--bw-line);border-radius:18px;box-shadow:0 8px 28px rgba(20,67,43,.045);overflow:hidden}
+.main .transactions-card-header {display:flex;align-items:center;justify-content:space-between;gap:13px;min-height:84px;padding:21px 25px;border-bottom:1px solid #eaf0ec}
+.main .transactions-card-title h2 {font-size:18px;font-weight:780;color:#19392a;margin:0}
+.main .transactions-card-title p {color:#96a49b;font-size:11px;margin:7px 0 0}
+.main .transaction-count {padding:7px 11px;border-radius:99px;background:#eaf5ed;color:#397c57;font-size:11px;font-weight:750;white-space:nowrap}
+.main .empty-state {min-height:280px;padding:32px 18px;text-align:center}
+.main .empty-icon {width:59px;height:59px;border-radius:17px;background:#eaf5ee;margin-bottom:15px}
+.main .empty-icon svg {width:25px;height:25px;color:#246b4b}
+.main .empty-state h3 {color:#1c4331;font-size:16px;margin-bottom:8px}
+.main .empty-state p {color:#819589;font-size:12px;line-height:1.6}
+.main .table-wrapper {width:100%;overflow-x:auto}
+.main .transactions-table {width:100%;border-collapse:collapse;min-width:580px}
+.main .transactions-table th {padding:16px 23px;background:#f8fbf9;color:#829588;font-size:10px;letter-spacing:1px;border-bottom:1px solid #e9f0ec}
+.main .transactions-table td {padding:17px 23px;border-bottom:1px solid #eef2ef;font-size:13px;vertical-align:middle;color:#435a49}
+.main .transactions-table tbody tr:hover {background:#f8fbf9}
+.main .transaction-category {display:flex;align-items:center;gap:12px;min-width:150px}
+.main .transaction-category-icon {width:43px;height:43px;border-radius:12px;background:#edf5ef;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#286c4b}
+.main .transaction-category-icon svg {width:19px;height:19px}
+.main .transaction-category-name {font-size:13px;color:#20442e;font-weight:750}
+.main .transaction-description {font-size:12px;color:#7e9284;max-width:290px}
+.main .transaction-date {color:#819286;font-size:12px}
+.main .transaction-amount {color:#1d402d;font-size:13px;font-weight:750;font-variant-numeric:tabular-nums}
+.main .delete-btn {display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;border:1px solid #f4dcdc;border-radius:9px;background:#fff1f1;color:#bd4e4e;font-size:11px;font-weight:700}
+.main .delete-btn:hover {background:#ffe6e6}
+.main .delete-btn svg {width:15px;height:15px}
+/* Retain external JS-created modal structure while polishing its corners. */
+#expenseModal .modal, .expense-modal, .modal-content {border-radius:17px}
+@media (max-width:1190px) {.bw-metrics {grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:800px) {
+  .sidebar {transform:translateX(-100%);transition:transform .22s ease}
+  .sidebar.open {transform:translateX(0)}
+  .main {margin-left:0}
+  .topbar .mobile-menu,.main .topbar .mobile-menu {display:grid!important;place-items:center;flex-shrink:0;background:transparent;border:0;width:40px;height:40px;border-radius:10px}
+  .main .topbar {padding:0 18px;gap:12px}
+  .main .transactions-content {padding:23px 20px 58px}
+}
+@media (max-width:650px) {
+  .main .topbar {height:64px;min-height:64px;padding:0 15px}
+  .main .topbar .search {display:none}
+  .main .topbar #topUserName,.main .topbar .bw-profile-chevron {display:none}
+  .main .topbar .top-actions {gap:7px;margin-left:auto}
+  .main .transactions-header {flex-direction:column;align-items:stretch;padding:23px 20px}
+  .main .transactions-header h1 {font-size:28px}
+  .main .add-expense-btn {width:100%}
+  .main .transactions-toolbar {flex-direction:column;align-items:stretch;padding:13px}
+  .main .transaction-filter {width:100%}
+  .main .transaction-filter select {width:100%}
+  .main .transactions-card-header {padding:19px 17px}
+  .main .transactions-table {min-width:650px}
+}
+@media (max-width:460px) {
+  .bw-metrics {gap:11px}
+  .bw-metric {min-height:128px;padding:16px 14px}
+  .bw-metric-icon {width:35px;height:35px;min-width:35px}
+  .bw-metric-icon svg {width:17px;height:17px}
+  .bw-metric>strong {font-size:19px}
+  .bw-metric-top>span:first-child {font-size:11px}
+}
+@media (max-width:355px) {.bw-metrics {grid-template-columns:1fr}}
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+
+         SIDEBAR
+
+    ====================================================== -->
+
+    <aside
+
+        class="sidebar"
+
+        id="sidebar"
+
+    >
+
+        <!-- Brand -->
+
+        <div class="brand">
+
+            <div class="brand-icon">
+
+                ₦
+
+            </div>
+
+            <div class="brand-name">
+
+                BudgetWise
+
+            </div>
+
+        </div>
+
+        <!-- Navigation -->
+
+        <nav class="nav">
+
+            <!-- Overview -->
+
+            <div class="nav-section">
+
+                <div class="nav-title">
+
+                    Overview
+
+                </div>
+
+                <a
+
+                    href="dashboard.html"
+
+                    class="nav-link"
+
+                >
+
+                    <span class="nav-icon">
+
+                        <i data-lucide="layout-dashboard"></i>
+
+                    </span>
+
+                    <span>
+
+                        Dashboard
+
+                    </span>
+
+                </a>
+
+                <a
+
+                    href="transactions.html"
+
+                    class="nav-link active"
+
+                >
+
+                    <span class="nav-icon">
+
+                        <i data-lucide="arrow-left-right"></i>
+
+                    </span>
+
+                    <span>
+
+                        Transactions
+
+                    </span>
+
+                </a>
+
+                <a
+
+                    href="budgets.html"
+
+                    class="nav-link"
+
+                >
+
+                    <span class="nav-icon">
+
+                        <i data-lucide="wallet-cards"></i>
+
+                    </span>
+
+                    <span>
+
+                        Budgets
+
+                    </span>
+
+                </a>
+
+            </div>
+
+            <!-- Planning -->
+
+            <div class="nav-section">
+
+                <div class="nav-title">
+
+                    Planning
+
+                </div>
+
+                <a
+
+                    href="reports.html"
+
+                    class="nav-link"
+
+                >
+
+                    <span class="nav-icon">
+
+                        <i data-lucide="bar-chart-3"></i>
+
+                    </span>
+
+                    <span>
+
+                        Reports
+
+                    </span>
+
+                </a>
+
+                <a
+
+                    href="goals.html"
+
+                    class="nav-link"
+
+                >
+
+                    <span class="nav-icon">
+
+                        <i data-lucide="target"></i>
+
+                    </span>
+
+                    <span>
+
+                        Goals
+
+                    </span>
+
+                </a>
+
+            </div>
+
+            <!-- Account -->
+
+            <div class="nav-section">
+
+                <div class="nav-title">
+
+                    Account
+
+                </div>
+
+                <a
+
+                    href="settings.html"
+
+                    class="nav-link"
+
+                >
+
+                    <span class="nav-icon">
+
+                        <i data-lucide="settings"></i>
+
+                    </span>
+
+                    <span>
+
+                        Settings
+
+                    </span>
+
+                </a>
+
+            </div>
+
+        </nav>
+
+        <!-- Sidebar User -->
+
+        <div class="sidebar-bottom">
+
+            <div class="user-mini">
+
+                <div
+
+                    class="avatar"
+
+                    id="sidebarAvatar"
+
+                >
+
+                    K
+
+                </div>
+
+                <div class="user-mini-info">
+
+                    <div
+
+                        class="user-mini-name"
+
+                        id="sidebarUserName"
+
+                    >
+
+                        Kehinde
+
+                    </div>
+
+                    <div
+
+                        class="user-mini-email"
+
+                        id="sidebarUserEmail"
+
+                    >
+
+                        BudgetWise User
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+    <!-- =====================================================
+
+         MAIN
+
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- Topbar -->
+
+        <header class="topbar">
+
+            <button
+
+                class="mobile-menu"
+
+                id="mobileMenu"
+
+                type="button"
+
+                aria-label="Open menu"
+
+            >
+
+                <i data-lucide="menu"></i>
+
+            </button>
+
+            <div class="search">
+
+                <i data-lucide="search"></i>
+
+                <input
+
+                    type="text"
+
+                    id="searchInput"
+
+                    placeholder="Search transactions..."
+
+                >
+
+            </div>
+
+            <div class="top-actions">
+                <div class="bw-menu-anchor">
+                    <button class="notification" id="notificationButton"
+                            type="button" aria-label="Recent activity"
+                            aria-expanded="false" aria-controls="transactionsActivityMenu">
+                        <i data-lucide="bell"></i>
+                        <span class="notification-dot" aria-hidden="true"></span>
+                    </button>
+                    <div class="bw-dropdown" id="transactionsActivityMenu" role="region"
+                         aria-label="Recent expense activity" hidden>
+                        <div class="bw-menu-header"><strong>Recent activity</strong><small>Loading expense activity...</small></div>
+                    </div>
+                </div>
+
+                <div class="bw-menu-anchor">
+                    <button class="top-user" id="topProfile" type="button"
+                            aria-label="Open profile menu" aria-expanded="false"
+                            aria-controls="transactionsProfileMenu">
+                        <div class="avatar" id="topAvatar">K</div>
+                        <span id="topUserName">Kehinde</span>
+                        <i class="bw-profile-chevron" data-lucide="chevron-down"></i>
+                    </button>
+                    <div class="bw-dropdown" id="transactionsProfileMenu" role="menu" hidden></div>
+                </div>
+            </div>
+
+        </header>
+
+        <!-- =================================================
+
+             TRANSACTIONS CONTENT
+
+        ================================================== -->
+
+        <section class="transactions-content">
+
+            <!-- Page Header -->
+
+            <div class="transactions-header">
+
+                <div>
+
+                    <div class="transactions-label">
+
+                        FINANCIAL ACTIVITY
+
+                    </div>
+
+                    <h1>
+
+                        Transactions
+
+                    </h1>
+
+                    <p>
+
+                        Track and manage your everyday expenses.
+
+                    </p>
+
+                </div>
+
+                <!-- IMPORTANT:
+
+                     transactions.js expects
+
+                     id="openAddExpense"
+
+                -->
+
+                <button
+
+                    type="button"
+
+                    id="openAddExpense"
+
+                    class="add-expense-btn"
+
+                    onclick="openExpenseForm()"
+
+                >
+
+                    <i data-lucide="plus"></i>
+
+                    <span>
+
+                        Add Expense
+
+                    </span>
+
+                </button>
+
+            </div>
+
+            <!-- Financial summary, populated from authenticated expenses -->
+            <section class="bw-metrics" aria-label="Transactions overview">
+                <article class="bw-metric">
+                    <div class="bw-metric-top">
+                        <span>Total Spending</span>
+                        <span class="bw-metric-icon"><i data-lucide="wallet"></i></span>
+                    </div>
+                    <strong id="bwTotalSpending">—</strong>
+                    <small>Across your recorded expenses</small>
+                </article>
+                <article class="bw-metric">
+                    <div class="bw-metric-top">
+                        <span>This Month</span>
+                        <span class="bw-metric-icon"><i data-lucide="calendar-days"></i></span>
+                    </div>
+                    <strong id="bwMonthlySpending">—</strong>
+                    <small>Expenses recorded this month</small>
+                </article>
+                <article class="bw-metric">
+                    <div class="bw-metric-top">
+                        <span>Transactions</span>
+                        <span class="bw-metric-icon"><i data-lucide="arrow-left-right"></i></span>
+                    </div>
+                    <strong id="bwTransactionTotal">—</strong>
+                    <small>Your saved expense entries</small>
+                </article>
+                <article class="bw-metric">
+                    <div class="bw-metric-top">
+                        <span>Highest Expense</span>
+                        <span class="bw-metric-icon"><i data-lucide="trending-up"></i></span>
+                    </div>
+                    <strong id="bwLargestExpense">—</strong>
+                    <small>Your largest single transaction</small>
+                </article>
+            </section>
+
+            <!-- Search / Filter -->
+
+            <div class="transactions-toolbar">
+
+                <div class="transaction-search">
+
+                    <i data-lucide="search"></i>
+
+                    <input
+
+                        type="text"
+
+                        id="transactionSearch"
+
+                        placeholder="Search expenses..."
+
+                    >
+
+                </div>
+
+                <div class="transaction-filter">
+
+                    <i data-lucide="filter"></i>
+
+                    <select
+
+                        id="categoryFilter"
+
+                    >
+
+                        <option value="">
+
+                            All Categories
+
+                        </option>
+
+                        <option value="food">
+
+                            Food
+
+                        </option>
+
+                        <option value="groceries">
+
+                            Groceries
+
+                        </option>
+
+                        <option value="fuel">
+
+                            Fuel
+
+                        </option>
+
+                        <option value="transport">
+
+                            Transport
+
+                        </option>
+
+                        <option value="shopping">
+
+                            Shopping
+
+                        </option>
+
+                        <option value="bills">
+
+                            Bills
+
+                        </option>
+
+                        <option value="rent">
+
+                            Rent
+
+                        </option>
+
+                        <option value="health">
+
+                            Health
+
+                        </option>
+
+                        <option value="education">
+
+                            Education
+
+                        </option>
+
+                        <option value="entertainment">
+
+                            Entertainment
+
+                        </option>
+
+                        <option value="other">
+
+                            Other
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <!-- Transactions Card -->
+
+            <div class="transactions-card">
+
+                <div class="transactions-card-header">
+
+                    <div class="transactions-card-title">
+
+                        <h2>
+
+                            All Transactions
+
+                        </h2>
+
+                        <p>
+
+                            Your complete expense history
+
+                        </p>
+
+                    </div>
+
+                    <span
+
+                        class="transaction-count"
+
+                        id="transactionCount"
+
+                    >
+
+                        0 transactions
+
+                    </span>
+
+                </div>
+
+                <!-- IMPORTANT:
+
+                     transactions.js renders everything
+
+                     inside transactionsContent
+
+                -->
+
+                <div
+
+                    id="transactionsContent"
+
+                >
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+
+                            <i data-lucide="receipt"></i>
+
+                        </div>
+
+                        <h3>
+
+                            Loading transactions...
+
+                        </h3>
+
+                        <p>
+
+                            Please wait while your transactions are loaded.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- =====================================================
+
+     JAVASCRIPT
+
+====================================================== -->
+
+<script src="js/transactions.js?v=2"></script>
+
+<script>
+/* Transactions top bar and summary only. Existing transactions.js owns CRUD. */
+(() => {
+    "use strict";
+    const $ = id => document.getElementById(id);
+    const apiRoot = "http://127.0.0.1:8000/api/v1";
+    let currentExpenses = [];
+    let updateTimer = null;
+    let lastFetch = 0;
+    let isFetching = false;
+
+    const safe = value => String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    })[c]);
+
+    const naira = amount => new Intl.NumberFormat("en-NG", {
+        style: "currency", currency: "NGN", maximumFractionDigits: 0
+    }).format(Number(amount) || 0);
+
+    const valueOf = expense => Math.max(0, Number(expense?.amount) || 0);
+
+    const dateOf = expense => String(
+        expense?.date || expense?.expense_date || expense?.created_at || ""
+    ).slice(0, 10);
+
+    const listOf = result => Array.isArray(result) ? result :
+        Array.isArray(result?.expenses) ? result.expenses :
+        Array.isArray(result?.items) ? result.items : [];
+
+    const setText = (id, value) => {if ($(id)) $(id).textContent = value;};
+
+    const formatDate = value => {
+        const key = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (!key) return "Date unavailable";
+        return new Date(Number(key[1]), Number(key[2])-1, Number(key[3]))
+            .toLocaleDateString("en-NG", {day:"numeric",month:"short",year:"numeric"});
+    };
+
+    function renderSummary(expenses) {
+        const total = expenses.reduce((sum,e) => sum+valueOf(e), 0);
+        const now = new Date();
+        const month = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+        const monthly = expenses.reduce((sum,e) =>
+            sum + (dateOf(e).startsWith(month) ? valueOf(e) : 0), 0);
+        const highest = Math.max(0, ...expenses.map(valueOf));
+        setText("bwTotalSpending", naira(total));
+        setText("bwMonthlySpending", naira(monthly));
+        setText("bwTransactionTotal", String(expenses.length));
+        setText("bwLargestExpense", naira(highest));
+    }
+
+    function renderActivity(expenses) {
+        const panel = $("transactionsActivityMenu");
+        if (!panel) return;
+        const items = [...expenses].sort((a,b) => dateOf(b).localeCompare(dateOf(a))).slice(0,4);
+        panel.innerHTML = `
+          <div class="bw-menu-header"><strong>Recent activity</strong>
+            <small>Your latest saved expenses</small></div>
+          ${items.length ? items.map(e => `
+            <div class="bw-activity-item">
+              <i data-lucide="receipt"></i>
+              <div><strong>${safe(e.description || e.category || "Expense")}</strong>
+                <small>${safe(e.category || "Other")} · ${formatDate(dateOf(e))} · ${naira(valueOf(e))}</small>
+              </div>
+            </div>
+          `).join("") : `<div class="bw-activity-item"><i data-lucide="check-circle-2"></i>
+               <div><strong>No expense activity yet</strong>
+               <small>New expenses will appear here after you add them.</small></div></div>`}`;
+        window.lucide?.createIcons();
+    }
+
+    async function refreshOverview() {
+        if (isFetching) return;
+        const token = localStorage.getItem("access_token");
+        if (!token) return;
+        isFetching = true;
+        try {
+            const response = await fetch(`${apiRoot}/expenses`, {
+                headers: {Authorization: `Bearer ${token}`, Accept: "application/json"}
+            });
+            if (!response.ok) throw new Error(`Expenses API returned ${response.status}`);
+            const data = listOf(await response.json());
+            currentExpenses = data;
+            renderSummary(data);
+            renderActivity(data);
+            lastFetch = Date.now();
+        } catch (error) {
+            console.warn("Transactions overview not available:", error);
+            ["bwTotalSpending","bwMonthlySpending","bwTransactionTotal","bwLargestExpense"]
+                .forEach(id => setText(id,"—"));
+            const menu = $("transactionsActivityMenu");
+            if (menu) menu.innerHTML = `<div class="bw-menu-header"><strong>Recent activity</strong><small>Unable to load expense activity right now.</small></div>`;
+        } finally {isFetching = false;}
+    }
+
+    function renderProfileMenu() {
+        const name = $("topUserName")?.textContent?.trim() ||
+            localStorage.getItem("user_name") || "BudgetWise User";
+        const email = localStorage.getItem("user_email") || "Personal Account";
+        const panel = $("transactionsProfileMenu");
+        if (!panel) return;
+        panel.innerHTML = `
+          <div class="bw-menu-header"><strong>${safe(name)}</strong><small>${safe(email)}</small></div>
+          <a role="menuitem" href="dashboard.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+          <a role="menuitem" href="reports.html"><i data-lucide="chart-no-axes-combined"></i>Reports</a>
+          <a role="menuitem" href="settings.html"><i data-lucide="settings"></i>Profile &amp; Settings</a>
+          <button class="bw-menu-entry" id="transactionsLogout" type="button" role="menuitem">
+            <i data-lucide="log-out"></i>Log out</button>`;
+        $("transactionsLogout")?.addEventListener("click", () => {
+            ["access_token","user_email","user_name","user_id"]
+                .forEach(key => localStorage.removeItem(key));
+            window.location.replace("login.html");
+        });
+        window.lucide?.createIcons();
+    }
+
+    function setupMenus() {
+        const notification = $("notificationButton");
+        const profile = $("topProfile");
+        const activity = $("transactionsActivityMenu");
+        const profileMenu = $("transactionsProfileMenu");
+        if (!notification || !profile || !activity || !profileMenu) return;
+        const close = () => {
+            activity.hidden = true;
+            profileMenu.hidden = true;
+            notification.setAttribute("aria-expanded", "false");
+            profile.setAttribute("aria-expanded", "false");
+        };
+        notification.addEventListener("click", e => {
+            e.stopPropagation();
+            const shouldOpen = activity.hidden;
+            close();
+            if (shouldOpen) {
+                activity.hidden = false;
+                notification.setAttribute("aria-expanded","true");
+                if (Date.now()-lastFetch > 30000) void refreshOverview();
+            }
+        });
+        profile.addEventListener("click", e => {
+            e.stopPropagation();
+            const shouldOpen = profileMenu.hidden;
+            close();
+            if (shouldOpen) {
+                renderProfileMenu();
+                profileMenu.hidden = false;
+                profile.setAttribute("aria-expanded","true");
+            }
+        });
+        activity.addEventListener("click", e => e.stopPropagation());
+        profileMenu.addEventListener("click", e => e.stopPropagation());
+        document.addEventListener("click", close);
+        document.addEventListener("keydown", e => {if(e.key === "Escape")close();});
+    }
+
+    function setupQuickSearch() {
+        const quick = $("searchInput");
+        const search = $("transactionSearch");
+        if (!quick || !search) return;
+        quick.addEventListener("input", () => {
+            search.value = quick.value;
+            search.dispatchEvent(new Event("input", {bubbles: true}));
+        });
+    }
+
+    function setupRefreshAfterUpdates() {
+        const content = $("transactionsContent");
+        if (!content || !window.MutationObserver) return;
+        const observer = new MutationObserver(() => {
+            clearTimeout(updateTimer);
+            updateTimer = setTimeout(() => {void refreshOverview();}, 550);
+        });
+        observer.observe(content, {childList:true,subtree:true});
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        setupMenus();
+        setupQuickSearch();
+        setupRefreshAfterUpdates();
+        void refreshOverview();
+        window.lucide?.createIcons();
+    });
+})();
+
+</script>
+
+<!-- =====================================================
+
+     LUCIDE INITIALIZATION
+
+====================================================== -->
+
+<script>
+
+    document.addEventListener(
+
+        "DOMContentLoaded",
+
+        function () {
+
+            if (window.lucide) {
+
+                lucide.createIcons();
+
+            }
+
+        }
+
+    );
+
+</script>
+
+</body>
+
+</html>

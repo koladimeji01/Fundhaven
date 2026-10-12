@@ -1,0 +1,2159 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Budgets | BudgetWise</title>
+
+    <!-- LUCIDE ICONS -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+
+        /* ================================================
+           BUDGETWISE - MODERN BUDGETS PAGE
+        ================================================ */
+
+        :root {
+            --deep: #123d2c;
+            --green: #286e4f;
+            --ink: #193a2a;
+            --muted: #7a8d81;
+            --border: #e1eae4;
+            --page: #f5f8f6;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Inter, -apple-system,
+                BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--page);
+            color: var(--ink);
+            min-height: 100vh;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 2px solid #4c9870;
+            outline-offset: 3px;
+        }
+
+        .app {
+            min-height: 100vh;
+        }
+
+        /* ================================================
+           SIDEBAR
+        ================================================ */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 245px;
+            height: 100vh;
+            background: var(--deep);
+            color: #ffffff;
+            padding: 0 13px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255,255,255,.06);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 24px 9px 27px;
+        }
+
+        .brand-icon {
+            width: 37px;
+            height: 37px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            color: var(--deep);
+            font-size: 20px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .brand-name {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding-bottom: 18px;
+        }
+
+        .nav-section {
+            margin: 4px 0 20px;
+        }
+
+        .nav-section-title {
+            color: #89aa99;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 0 12px;
+            margin: 15px 0 10px;
+            text-transform: uppercase;
+        }
+
+        .nav-item {
+            min-height: 45px;
+            padding: 0 12px;
+            margin-bottom: 3px;
+            color: #c6d7ce;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background .2s ease, color .2s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: #2b674d;
+            color: white;
+            font-weight: 700;
+        }
+
+        .nav-item svg,
+        .nav-item i {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        /* ================================================
+           SIDEBAR PROFILE
+        ================================================ */
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding: 16px 5px 18px;
+            border-top: 1px solid rgba(255,255,255,.13);
+            min-width: 0;
+        }
+
+        .user-mini {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            min-width: 0;
+        }
+
+        .user-mini .avatar {
+            width: 35px;
+            height: 35px;
+            min-width: 35px;
+            border-radius: 50%;
+            background: #dfefe5;
+            color: var(--deep);
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-mini-info {
+            min-width: 0;
+        }
+
+        .user-mini-name {
+            font-size: 12px;
+            font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .user-mini-email {
+            color: #a6c3b2;
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        /* ================================================
+           MAIN
+        ================================================ */
+
+        .main {
+            margin-left: 245px;
+            min-width: 0;
+            min-height: 100vh;
+        }
+
+        /* ================================================
+           TOP BAR
+        ================================================ */
+
+        .topbar {
+            min-height: 74px;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            z-index: 1100;
+            overflow: visible;
+        }
+
+        .mobile-menu {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 0;
+            background: transparent;
+            color: var(--deep);
+            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-menu:hover {
+            background: #edf6ef;
+        }
+
+        .mobile-menu svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .topbar-left {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ================================================
+           SEARCH
+        ================================================ */
+
+        .search-box {
+            width: 295px;
+            max-width: 100%;
+            height: 43px;
+            padding: 0 13px;
+            border: 1px solid var(--border);
+            background: #f7f9f8;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: .2s;
+        }
+
+        .search-box:focus-within {
+            border-color: #86b59b;
+            box-shadow: 0 0 0 3px rgba(47,133,83,.09);
+            background: white;
+        }
+
+        .search-box svg,
+        .search-box i {
+            width: 17px;
+            height: 17px;
+            color: #8ba195;
+            flex-shrink: 0;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--ink);
+            min-width: 0;
+            width: 100%;
+            font-size: 13px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            gap: 13px;
+        }
+
+        /* ================================================
+           NOTIFICATION BUTTON
+        ================================================ */
+
+        .notification-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #567264;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-btn:hover,
+        .user-profile:hover {
+            background: #edf5ef;
+        }
+
+        .notification-btn > svg,
+        .notification-btn > i {
+            width: 19px;
+            height: 19px;
+            flex-shrink: 0;
+        }
+
+        /* ================================================
+           TOP PROFILE
+        ================================================ */
+
+        .user-profile {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 5px 10px 5px 6px;
+            border-radius: 11px;
+            min-height: 43px;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #deeee5;
+            color: var(--deep);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            gap: 3px;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 700;
+            max-width: 165px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--ink);
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .profile-chevron {
+            color: #759486;
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        /* ================================================
+           NOTIFICATION AND PROFILE DROPDOWNS
+
+           Existing budgets.js creates these menus.
+        ================================================ */
+
+        .budget-topbar-menu {
+            position: absolute;
+            top: calc(100% + 11px);
+            right: 0;
+            z-index: 2500;
+            width: 310px;
+            max-width: calc(100vw - 25px);
+            max-height: min(420px, calc(100vh - 100px));
+            overflow-y: auto;
+            display: none;
+            background: #ffffff;
+            color: var(--ink);
+            box-shadow: 0 12px 30px rgba(18,61,44,.15);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            text-align: left;
+            cursor: default;
+        }
+
+        .budget-topbar-menu.show {
+            display: block;
+        }
+
+        .budget-menu-heading {
+            padding: 15px 16px;
+            border-bottom: 1px solid #edf1ee;
+        }
+
+        .budget-menu-heading strong {
+            display: block;
+            font-size: 13px;
+            color: var(--ink);
+            margin-bottom: 5px;
+        }
+
+        .budget-menu-heading span {
+            display: block;
+            font-size: 11px;
+            color: var(--muted);
+            overflow-wrap: anywhere;
+        }
+
+        .budget-menu-content {
+            overflow-y: auto;
+            max-height: 320px;
+        }
+
+        .budget-menu-item {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+            color: #365342;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .budget-menu-item:hover {
+            background: #f0f6f2;
+            color: #246c4b;
+        }
+
+        .budget-menu-item svg,
+        .budget-menu-item i {
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
+        }
+
+        .budget-menu-item.logout-item {
+            color: #b74d4d;
+            border-top: 1px solid #edf1ee;
+        }
+
+        .budget-notification-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            padding: 12px 15px;
+            border-bottom: 1px solid #edf1ee;
+        }
+
+        .budget-notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .budget-notification-item > svg,
+        .budget-notification-item > i {
+            color: #347e59;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .budget-notification-item > div {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .budget-notification-item strong {
+            display: block;
+            font-size: 12px;
+            color: #304e3b;
+            line-height: 1.4;
+            margin-bottom: 4px;
+            overflow-wrap: anywhere;
+        }
+
+        .budget-notification-item span {
+            display: block;
+            font-size: 11px;
+            line-height: 1.5;
+            color: var(--muted);
+            overflow-wrap: anywhere;
+        }
+
+        .budget-notification-empty {
+            color: var(--muted);
+            padding: 23px 16px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .budget-notification-empty svg {
+            width: 25px;
+            height: 25px;
+            color: #347e59;
+            display: block;
+            margin: 0 auto 10px;
+        }
+
+        /* ================================================
+           MAIN CONTENT
+        ================================================ */
+
+        .content {
+            padding: 30px 32px 70px;
+            max-width: 1550px;
+            margin: 0 auto;
+        }
+
+        /* ================================================
+           PAGE HEADER
+        ================================================ */
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 22px;
+            padding: 25px 28px;
+            margin-bottom: 23px;
+            border: 1px solid #dcebe1;
+            border-radius: 18px;
+
+            background: linear-gradient(
+                112deg,
+                #e8f4ec 0%,
+                #f6faf7 64%,
+                white 100%
+            );
+        }
+
+        .page-header-text::before {
+            content: "FINANCIAL PLANNING";
+            display: block;
+            font-size: 10px;
+            color: #2d7851;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            margin-bottom: 7px;
+        }
+
+        .page-header-text h1 {
+            font-size: clamp(24px, 2.2vw, 32px);
+            font-weight: 800;
+            color: var(--ink);
+            letter-spacing: -.7px;
+            line-height: 1.2;
+        }
+
+        .page-header-text p {
+            color: #698171;
+            font-size: 13px;
+            margin-top: 9px;
+        }
+
+        .add-budget-btn {
+            flex-shrink: 0;
+            min-height: 45px;
+            border: none;
+            background: var(--deep);
+            border-radius: 11px;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 0 19px;
+            box-shadow: 0 5px 16px rgba(18,61,44,.16);
+            transition: transform .2s, background .2s;
+        }
+
+        .add-budget-btn:hover {
+            background: #216445;
+            transform: translateY(-2px);
+        }
+
+        .add-budget-btn svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        /* ================================================
+           FOUR SUMMARY CARDS
+        ================================================ */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 17px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            position: relative;
+            min-width: 0;
+            min-height: 145px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            padding: 21px 22px;
+            border-radius: 15px;
+            box-shadow: 0 4px 16px rgba(21,59,40,.035);
+            transition: transform .2s, box-shadow .2s;
+            overflow: hidden;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 9px 24px rgba(21,59,40,.07);
+        }
+
+        .summary-card::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            opacity: .72;
+            background: #65a987;
+        }
+
+        .summary-card:nth-child(2)::after {
+            background: #e39a78;
+        }
+
+        .summary-card:nth-child(3)::after {
+            background: #558eaf;
+        }
+
+        .summary-card:nth-child(4)::after {
+            background: #d4a453;
+        }
+
+        .summary-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            font-weight: 650;
+            color: #728679;
+        }
+
+        .summary-icon {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: 12px;
+            background: #eaf5ee;
+            color: #246b4a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .summary-card:nth-child(2) .summary-icon {
+            background: #fff0ed;
+            color: #b45f54;
+        }
+
+        .summary-card:nth-child(3) .summary-icon {
+            background: #edf3fa;
+            color: #407c9d;
+        }
+
+        .summary-card:nth-child(4) .summary-icon {
+            background: #fcf5e8;
+            color: #ad8239;
+        }
+
+        .summary-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .summary-value {
+            margin-top: 14px;
+            font-size: clamp(20px, 2vw, 28px);
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.18;
+            letter-spacing: -.6px;
+            font-variant-numeric: tabular-nums;
+            overflow-wrap: anywhere;
+        }
+
+        .summary-caption {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        /* ================================================
+           BUDGET PANEL
+        ================================================ */
+
+        .budgets-panel {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            overflow: hidden;
+            box-shadow: 0 5px 24px rgba(21,59,40,.035);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 22px 25px;
+            border-bottom: 1px solid #eaf0eb;
+        }
+
+        .section-header h2 {
+            color: var(--ink);
+            font-size: 17px;
+            font-weight: 750;
+        }
+
+        .budget-count {
+            padding: 6px 10px;
+            color: #417854;
+            background: #ebf6ee;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* ================================================
+           BUDGET GRID
+        ================================================ */
+
+        .budget-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 17px;
+            padding: 22px 24px 25px;
+        }
+
+        .budget-card {
+            background: linear-gradient(
+                120deg,
+                #ffffff,
+                #fbfdfb
+            );
+            min-width: 0;
+            border: 1px solid #e2ebe4;
+            border-radius: 15px;
+            padding: 23px 23px 20px;
+            transition: transform .2s,
+                        border-color .2s,
+                        box-shadow .2s;
+        }
+
+        .budget-card:hover {
+            transform: translateY(-2px);
+            border-color: #bddac8;
+            box-shadow: 0 8px 22px rgba(18,61,44,.065);
+        }
+
+        .budget-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .budget-category {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .category-icon {
+            flex-shrink: 0;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eaf5ee;
+            color: #286d4d;
+            border-radius: 12px;
+        }
+
+        .category-icon svg,
+        .category-icon i {
+            width: 21px;
+            height: 21px;
+        }
+
+        .budget-category h3 {
+            color: var(--ink);
+            font-size: 16px;
+            font-weight: 750;
+            margin-bottom: 5px;
+        }
+
+        .budget-category p {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        /* ================================================
+           BUDGET ACTIONS
+        ================================================ */
+
+        .budget-actions {
+            display: flex;
+            gap: 7px;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e6ede7;
+            background: #ffffff;
+            color: #6e8678;
+        }
+
+        .icon-btn:hover {
+            background: #eaf5ee;
+            color: #276c4d;
+        }
+
+        .icon-btn.delete:hover {
+            background: #fff0ef;
+            border-color: #efd4d3;
+            color: #bd5151;
+        }
+
+        .icon-btn svg,
+        .icon-btn i {
+            width: 17px;
+            height: 17px;
+        }
+
+        /* ================================================
+           BUDGET AMOUNTS
+        ================================================ */
+
+        .budget-amounts {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 15px;
+            margin-bottom: 13px;
+        }
+
+        .spent-amount {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -.35px;
+            color: var(--ink);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .limit-amount {
+            font-size: 12px;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+
+        /* ================================================
+           PROGRESS BAR
+        ================================================ */
+
+        .progress-track {
+            width: 100%;
+            height: 11px;
+            background: #e5eee7;
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            max-width: 100%;
+            border-radius: 100px;
+            background: linear-gradient(
+                90deg,
+                #206b49,
+                #46ab7b
+            );
+            transition: width .3s ease;
+        }
+
+        .progress-bar.warning {
+            background: linear-gradient(
+                90deg,
+                #c88828,
+                #e5b455
+            );
+        }
+
+        .progress-bar.danger {
+            background: linear-gradient(
+                90deg,
+                #bd4d4d,
+                #e68776
+            );
+        }
+
+        .budget-footer {
+            margin-top: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        /* ================================================
+           EMPTY STATE
+        ================================================ */
+
+        .empty-state {
+            grid-column: 1 / -1;
+            padding: 50px 22px;
+            min-height: 255px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            border: 1px dashed #d6e2d9;
+            border-radius: 14px;
+            background: #fcfdfc;
+        }
+
+        .empty-state-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eaf5ee;
+            color: #276b4a;
+            margin-bottom: 15px;
+        }
+
+        .empty-state-icon svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        .empty-state h3 {
+            font-size: 16px;
+            color: var(--ink);
+            margin-bottom: 7px;
+        }
+
+        .empty-state p {
+            max-width: 320px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.65;
+        }
+
+        /* ================================================
+           ADD / EDIT BUDGET MODAL
+        ================================================ */
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15,35,27,.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 19px;
+            z-index: 2600;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 470px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 22px 65px rgba(0,0,0,.18);
+        }
+
+        .modal-header {
+            padding: 22px 24px;
+            border-bottom: 1px solid #e8eee9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+            color: var(--ink);
+        }
+
+        .close-modal {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: none;
+            background: #f5f8f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #687f6f;
+        }
+
+        .close-modal:hover {
+            background: #eaf5ee;
+        }
+
+        .close-modal svg {
+            width: 19px;
+            height: 19px;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            color: #345342;
+            font-size: 13px;
+            font-weight: 650;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 45px;
+            padding: 0 13px;
+            border-radius: 10px;
+            border: 1px solid #dce6de;
+            outline: none;
+            font-size: 13px;
+            color: var(--ink);
+            background: #ffffff;
+        }
+
+        .form-control:focus {
+            border-color: #5e9c77;
+            box-shadow: 0 0 0 3px rgba(64,150,102,.12);
+        }
+
+        .modal-footer {
+            padding: 18px 24px;
+            border-top: 1px solid #e8eee9;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            min-height: 42px;
+            border-radius: 10px;
+            padding: 0 18px;
+            border: none;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .btn-secondary {
+            color: #496457;
+            background: #ecf2ee;
+        }
+
+        .btn-secondary:hover {
+            background: #dfeae2;
+        }
+
+        .btn-primary {
+            color: #ffffff;
+            background: var(--deep);
+        }
+
+        .btn-primary:hover {
+            background: #246348;
+        }
+
+        .btn-danger {
+            color: #ffffff;
+            background: #b64c4c;
+            margin-right: auto;
+        }
+
+        .btn-danger:hover {
+            background: #943737;
+        }
+
+        /* ================================================
+           TOAST NOTIFICATIONS
+        ================================================ */
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 3000;
+            color: white;
+            background: var(--deep);
+            padding: 13px 18px;
+            border-radius: 11px;
+            font-size: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,.15);
+            opacity: 0;
+            transform: translateY(16px);
+            pointer-events: none;
+            transition: transform .25s, opacity .25s;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background: #ae4545;
+        }
+
+        /* ================================================
+           RESPONSIVE DESIGN
+        ================================================ */
+
+        @media (max-width: 1200px) {
+
+            .summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+        }
+
+        @media (max-width: 1100px) {
+
+            .budget-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform .25s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .topbar {
+                padding: 0 18px;
+            }
+
+            .mobile-menu {
+                display: flex;
+            }
+
+            .content {
+                padding: 24px 20px 55px;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .topbar {
+                min-height: 64px;
+            }
+
+            .search-box {
+                display: none;
+            }
+
+            .user-info,
+            .profile-chevron {
+                display: none;
+            }
+
+            .page-header {
+                padding: 23px 20px;
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .add-budget-btn {
+                width: 100%;
+            }
+
+            .content {
+                padding: 18px 14px 48px;
+            }
+
+            .summary-grid {
+                gap: 11px;
+            }
+
+            .summary-card {
+                padding: 17px 15px;
+                min-height: 126px;
+            }
+
+            .summary-icon {
+                width: 35px;
+                height: 35px;
+                min-width: 35px;
+            }
+
+            .summary-icon svg {
+                width: 17px;
+                height: 17px;
+            }
+
+            .summary-value {
+                font-size: 20px;
+            }
+
+            .section-header {
+                padding: 19px 17px;
+            }
+
+            .budget-grid {
+                padding: 14px;
+                gap: 12px;
+            }
+
+            .budget-card {
+                padding: 18px 16px;
+            }
+
+            .spent-amount {
+                font-size: 18px;
+            }
+
+            .budget-topbar-menu {
+                max-width: calc(100vw - 26px);
+            }
+
+        }
+
+        @media (max-width: 370px) {
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================================================
+         SIDEBAR
+    ================================================ -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ₦
+            </div>
+
+            <div class="brand-name">
+                BudgetWise
+            </div>
+
+        </div>
+
+        <nav
+            class="sidebar-nav"
+            aria-label="Main navigation"
+        >
+
+            <!-- OVERVIEW -->
+
+            <div class="nav-section">
+
+                <div class="nav-section-title">
+                    Overview
+                </div>
+
+                <a
+                    class="nav-item"
+                    href="dashboard.html"
+                >
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a
+                    class="nav-item"
+                    href="transactions.html"
+                >
+                    <i data-lucide="arrow-left-right"></i>
+                    <span>Transactions</span>
+                </a>
+
+                <a
+                    class="nav-item active"
+                    aria-current="page"
+                    href="budgets.html"
+                >
+                    <i data-lucide="wallet-cards"></i>
+                    <span>Budgets</span>
+                </a>
+
+            </div>
+
+            <!-- PLANNING -->
+
+            <div class="nav-section">
+
+                <div class="nav-section-title">
+                    Planning
+                </div>
+
+                <a
+                    class="nav-item"
+                    href="reports.html"
+                >
+                    <i data-lucide="bar-chart-3"></i>
+                    <span>Reports</span>
+                </a>
+
+                <a
+                    class="nav-item"
+                    href="goals.html"
+                >
+                    <i data-lucide="target"></i>
+                    <span>Goals</span>
+                </a>
+
+            </div>
+
+            <!-- ACCOUNT -->
+
+            <div class="nav-section">
+
+                <div class="nav-section-title">
+                    Account
+                </div>
+
+                <a
+                    class="nav-item"
+                    href="settings.html"
+                >
+                    <i data-lucide="settings"></i>
+                    <span>Settings</span>
+                </a>
+
+            </div>
+
+        </nav>
+
+        <!-- SIDEBAR USER -->
+
+        <div class="sidebar-bottom">
+
+            <div class="user-mini">
+
+                <span
+                    class="avatar"
+                    id="sidebarAvatar"
+                >
+                    U
+                </span>
+
+                <div class="user-mini-info">
+
+                    <div
+                        class="user-mini-name"
+                        id="sidebarUserName"
+                    >
+                        BudgetWise User
+                    </div>
+
+                    <div class="user-mini-email">
+                        Personal Account
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+    <!-- ================================================
+         MAIN
+    ================================================ -->
+
+    <main class="main">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <button
+                class="mobile-menu"
+                id="mobileMenu"
+                type="button"
+                aria-label="Toggle navigation"
+                aria-expanded="false"
+            >
+                <i data-lucide="menu"></i>
+            </button>
+
+            <div class="topbar-left">
+
+                <label class="search-box">
+
+                    <i data-lucide="search"></i>
+
+                    <input
+                        id="budgetSearch"
+                        type="search"
+                        placeholder="Search budgets..."
+                        aria-label="Search budgets"
+                    >
+
+                </label>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <!-- NOTIFICATION BUTTON -->
+
+                <button
+                    class="notification-btn"
+                    id="notificationButton"
+                    type="button"
+                    aria-label="Notifications"
+                    aria-expanded="false"
+                    aria-controls="budgetNotificationPanel"
+                >
+                    <i data-lucide="bell"></i>
+                </button>
+
+                <!-- PROFILE -->
+
+                <div
+                    class="user-profile"
+                    id="topProfile"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Open profile menu"
+                    aria-expanded="false"
+                    aria-controls="budgetProfileMenu"
+                >
+
+                    <div
+                        class="avatar"
+                        id="userAvatar"
+                    >
+                        U
+                    </div>
+
+                    <div class="user-info">
+
+                        <div
+                            class="user-name"
+                            id="userName"
+                        >
+                            BudgetWise User
+                        </div>
+
+                        <div class="user-role">
+                            Personal Account
+                        </div>
+
+                    </div>
+
+                    <i
+                        data-lucide="chevron-down"
+                        class="profile-chevron"
+                        aria-hidden="true"
+                    ></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- ================================================
+             CONTENT
+        ================================================ -->
+
+        <section class="content">
+
+            <!-- PAGE HEADER -->
+
+            <div class="page-header">
+
+                <div class="page-header-text">
+
+                    <h1>
+                        Budget Planning
+                    </h1>
+
+                    <p>
+                        Set spending limits and keep your
+                        finances on track.
+                    </p>
+
+                </div>
+
+                <button
+                    class="add-budget-btn"
+                    id="addBudgetBtn"
+                    type="button"
+                >
+
+                    <i data-lucide="plus"></i>
+
+                    <span>
+                        Add Budget
+                    </span>
+
+                </button>
+
+            </div>
+
+            <!-- ================================================
+                 SUMMARY CARDS
+            ================================================ -->
+
+            <div
+                class="summary-grid"
+                aria-label="Budget summary"
+            >
+
+                <!-- TOTAL BUDGET -->
+
+                <div class="summary-card">
+
+                    <div class="summary-card-header">
+
+                        <span class="summary-label">
+                            Total Budget
+                        </span>
+
+                        <span class="summary-icon">
+                            <i data-lucide="wallet-cards"></i>
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="totalBudget"
+                    >
+                        ₦0
+                    </div>
+
+                    <p class="summary-caption">
+                        Your combined spending limits
+                    </p>
+
+                </div>
+
+                <!-- TOTAL SPENT -->
+
+                <div class="summary-card">
+
+                    <div class="summary-card-header">
+
+                        <span class="summary-label">
+                            Total Spent
+                        </span>
+
+                        <span class="summary-icon">
+                            <i data-lucide="credit-card"></i>
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="totalSpent"
+                    >
+                        ₦0
+                    </div>
+
+                    <p class="summary-caption">
+                        Spent in budgeted categories
+                    </p>
+
+                </div>
+
+                <!-- REMAINING -->
+
+                <div class="summary-card">
+
+                    <div class="summary-card-header">
+
+                        <span class="summary-label">
+                            Remaining
+                        </span>
+
+                        <span class="summary-icon">
+                            <i data-lucide="piggy-bank"></i>
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="remainingBudget"
+                    >
+                        ₦0
+                    </div>
+
+                    <p class="summary-caption">
+                        Available across your budgets
+                    </p>
+
+                </div>
+
+                <!-- BUDGET USAGE -->
+
+                <div class="summary-card">
+
+                    <div class="summary-card-header">
+
+                        <span class="summary-label">
+                            Budget Usage
+                        </span>
+
+                        <span class="summary-icon">
+
+                            <i
+                                data-lucide="chart-no-axes-combined"
+                            ></i>
+
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="budgetUsage"
+                    >
+                        0%
+                    </div>
+
+                    <p
+                        class="summary-caption"
+                        id="budgetUsageCaption"
+                    >
+                        Share of budget spent
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- ================================================
+                 BUDGET LIST
+            ================================================ -->
+
+            <div class="budgets-panel">
+
+                <div class="section-header">
+
+                    <h2>
+                        Your Budgets
+                    </h2>
+
+                    <span
+                        class="budget-count"
+                        id="budgetCount"
+                    >
+                        0 budgets
+                    </span>
+
+                </div>
+
+                <!-- budgets.js inserts budgets here -->
+
+                <div
+                    class="budget-grid"
+                    id="budgetList"
+                >
+
+                    <div class="empty-state">
+
+                        <div class="empty-state-icon">
+                            <i data-lucide="wallet-cards"></i>
+                        </div>
+
+                        <h3>
+                            Loading budgets...
+                        </h3>
+
+                        <p>
+                            Your budgets will appear here
+                            when they finish loading.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- ================================================
+     ADD / EDIT BUDGET MODAL
+================================================ -->
+
+<div
+    class="modal-overlay"
+    id="budgetModal"
+>
+
+    <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+    >
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">
+                Add Budget
+            </h2>
+
+            <button
+                type="button"
+                class="close-modal"
+                id="closeBudgetModal"
+                aria-label="Close"
+            >
+                <i data-lucide="x"></i>
+            </button>
+
+        </div>
+
+        <form id="budgetForm">
+
+            <div class="modal-body">
+
+                <!-- CATEGORY -->
+
+                <div class="form-group">
+
+                    <label for="budgetCategory">
+                        Category
+                    </label>
+
+                    <input
+                        type="text"
+                        id="budgetCategory"
+                        class="form-control"
+                        placeholder="e.g. Food"
+                        minlength="2"
+                        maxlength="50"
+                        required
+                    >
+
+                </div>
+
+                <!-- BUDGET AMOUNT -->
+
+                <div class="form-group">
+
+                    <label for="budgetAmount">
+                        Budget Amount (₦)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="budgetAmount"
+                        class="form-control"
+                        placeholder="e.g. 50000"
+                        min="0.01"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+            <!-- MODAL BUTTONS -->
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    id="deleteBudgetBtn"
+                    style="display: none;"
+                >
+                    Delete
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    id="cancelBudgetBtn"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    id="saveBudgetBtn"
+                >
+                    Save Budget
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- ================================================
+     TOAST
+================================================ -->
+
+<div
+    class="toast"
+    id="toast"
+    role="status"
+    aria-live="polite"
+></div>
+
+<!-- ================================================
+     EXISTING BUDGET JAVASCRIPT
+================================================ -->
+
+<script src="js/budgets.js?v=20261009"></script>
+
+<!-- ================================================
+     PAGE DISPLAY HELPERS
+================================================ -->
+
+<script>
+
+(() => {
+
+    "use strict";
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+        // ============================================
+        // LUCIDE ICONS
+        // ============================================
+
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+
+        // ============================================
+        // MOBILE SIDEBAR
+        // ============================================
+
+        const menuButton =
+            document.getElementById("mobileMenu");
+
+        const sidebar =
+            document.getElementById("sidebar");
+
+        if (menuButton && sidebar) {
+
+            menuButton.addEventListener("click", (event) => {
+
+                event.stopPropagation();
+
+                const opened =
+                    sidebar.classList.toggle("open");
+
+                menuButton.setAttribute(
+                    "aria-expanded",
+                    String(opened)
+                );
+
+            });
+
+            document.addEventListener("click", (event) => {
+
+                if (
+                    !sidebar.contains(event.target) &&
+                    !menuButton.contains(event.target)
+                ) {
+
+                    sidebar.classList.remove("open");
+
+                    menuButton.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
+
+                }
+
+            });
+
+        }
+
+        // ============================================
+        // BUDGET USAGE CARD
+        // ============================================
+
+        const totalEl =
+            document.getElementById("totalBudget");
+
+        const spentEl =
+            document.getElementById("totalSpent");
+
+        const usageEl =
+            document.getElementById("budgetUsage");
+
+        const usageCaption =
+            document.getElementById("budgetUsageCaption");
+
+        function readAmount(element) {
+
+            return Number(
+                (element?.textContent || "0")
+                    .replace(/[^0-9.-]/g, "")
+            ) || 0;
+
+        }
+
+        function updateUsage() {
+
+            const total = readAmount(totalEl);
+
+            const spent = readAmount(spentEl);
+
+            const percent =
+                total > 0
+                    ? (spent / total) * 100
+                    : 0;
+
+            usageEl.textContent =
+                `${Math.round(percent)}%`;
+
+            if (total <= 0) {
+
+                usageCaption.textContent =
+                    "Add a budget to begin";
+
+            } else if (percent >= 100) {
+
+                usageCaption.textContent =
+                    "Budget limit reached or exceeded";
+
+            } else if (percent >= 80) {
+
+                usageCaption.textContent =
+                    "Approaching your limit";
+
+            } else {
+
+                usageCaption.textContent =
+                    "Share of budget spent";
+
+            }
+
+        }
+
+        if (
+            totalEl &&
+            spentEl &&
+            usageEl &&
+            usageCaption
+        ) {
+
+            const observer =
+                new MutationObserver(updateUsage);
+
+            observer.observe(totalEl, {
+                childList: true,
+                characterData: true,
+                subtree: true
+            });
+
+            observer.observe(spentEl, {
+                childList: true,
+                characterData: true,
+                subtree: true
+            });
+
+            updateUsage();
+
+        }
+
+        // ============================================
+        // SIDEBAR PROFILE SYNC
+        // ============================================
+
+        const name =
+            document.getElementById("userName");
+
+        const avatar =
+            document.getElementById("userAvatar");
+
+        const sidebarName =
+            document.getElementById("sidebarUserName");
+
+        const sidebarAvatar =
+            document.getElementById("sidebarAvatar");
+
+        function syncProfile() {
+
+            if (sidebarName && name) {
+                sidebarName.textContent =
+                    name.textContent;
+            }
+
+            if (sidebarAvatar && avatar) {
+                sidebarAvatar.textContent =
+                    avatar.textContent;
+            }
+
+        }
+
+        if (name && avatar) {
+
+            const profileObserver =
+                new MutationObserver(syncProfile);
+
+            profileObserver.observe(name, {
+                childList: true,
+                characterData: true,
+                subtree: true
+            });
+
+            profileObserver.observe(avatar, {
+                childList: true,
+                characterData: true,
+                subtree: true
+            });
+
+            syncProfile();
+
+        }
+
+    });
+
+})();
+
+</script>
+
+</body>
+</html>

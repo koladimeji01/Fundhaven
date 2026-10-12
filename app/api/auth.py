@@ -96,15 +96,38 @@ def create_user(user: User):
 )
 def login(login_data: LoginRequest):
 
-    user = database.get_user_by_name(
-        login_data.name
-    )
+    # Login using email when email is provided.
+    if login_data.email is not None:
+
+        user = database.get_user_by_email(
+            str(login_data.email)
+        )
+
+        login_identifier = str(
+            login_data.email
+        )
+
+    # Otherwise login using username.
+    elif login_data.name is not None:
+
+        user = database.get_user_by_name(
+            login_data.name
+        )
+
+        login_identifier = login_data.name
+
+    else:
+
+        raise HTTPException(
+            status_code=422,
+            detail="Either name or email is required"
+        )
 
     if user is None:
 
         logger.warning(
             f"Login failed: user not found - "
-            f"{login_data.name}"
+            f"{login_identifier}"
         )
 
         raise HTTPException(
@@ -123,7 +146,7 @@ def login(login_data: LoginRequest):
 
         logger.warning(
             f"Login failed: incorrect password - "
-            f"{login_data.name}"
+            f"{login_identifier}"
         )
 
         raise HTTPException(
@@ -137,7 +160,7 @@ def login(login_data: LoginRequest):
 
     logger.info(
         f"User logged in successfully: "
-        f"{login_data.name}"
+        f"{login_identifier}"
     )
 
     return {

@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+
+        name="viewport"
+
+        content="width=device-width, initial-scale=1.0"
+
+    >
+
+    <title>BudgetWise | Dashboard</title>
+
+    <link
+
+        rel="stylesheet"
+
+        href="css/dashboard.css"
+
+    >
+
+    <!-- Lucide Icons -->
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+
+/* =========================================================
+   BUDGETWISE — MODERN DASHBOARD
+   Matches the redesigned Goals page.
+   All existing dashboard IDs and scripts are preserved.
+   ========================================================= */
+:root {
+    --bw-deep:#123d2c;
+    --bw-primary:#246b4a;
+    --bw-text:#173b2a;
+    --bw-muted:#74877b;
+    --bw-line:#e1eae4;
+    --bw-page:#f5f8f6;
+    --bw-soft:#ebf5ee;
+}
+*, *::before, *::after {box-sizing:border-box}
+body {margin:0;background:var(--bw-page);color:var(--bw-text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app {min-height:100vh}
+.sidebar {background:#123d2c !important;color:white}
+.sidebar .brand {display:flex;align-items:center;gap:10px}
+.sidebar .brand-icon {border-radius:10px}
+.sidebar .nav-link {display:flex;align-items:center;gap:11px;border-radius:10px;transition:background .2s ease}
+.sidebar .nav-link.active {background:#2b674d !important;color:#fff}
+.sidebar .nav-link:hover {background:rgba(255,255,255,.10)}
+.sidebar .nav-icon, .sidebar .nav-icon svg {width:18px;height:18px;flex-shrink:0}
+.sidebar .nav-title {letter-spacing:.8px}
+.sidebar .sidebar-bottom {border-top:1px solid rgba(255,255,255,.12)}
+.main {min-width:0;background:var(--bw-page)}
+.main .topbar {
+    display:flex;align-items:center;gap:16px;
+    min-height:74px;padding:0 30px;background:#fff;
+    border-bottom:1px solid var(--bw-line);
+    position:relative;z-index:50;overflow:visible
+}
+.topbar .mobile-menu {display:none !important}
+.topbar .search {
+    display:flex;align-items:center;gap:10px;
+    flex:0 1 290px;width:290px;max-width:290px;min-width:150px;
+    height:43px;padding:0 13px;border:1px solid #e0e9e3;
+    border-radius:11px;background:#f6f8f7;margin-right:auto;
+}
+.topbar .search:focus-within {background:#fff;border-color:#85b99c;box-shadow:0 0 0 3px rgba(40,122,78,.1)}
+.topbar .search input {border:0;outline:0;background:transparent;width:100%;min-width:0;color:var(--bw-text)}
+.topbar .search svg {width:17px;height:17px;color:#81968a}
+.topbar .top-actions {display:flex;align-items:center;gap:12px;margin-left:auto;flex-shrink:0}
+.topbar .notification {
+    display:flex;align-items:center;justify-content:center;
+    position:relative;width:42px;height:42px;border-radius:11px;
+    background:transparent;cursor:pointer;color:#536d5d;
+}
+.topbar .notification:hover {background:#edf5ef}
+.topbar .notification svg {width:19px;height:19px}
+.topbar .top-user {display:flex;align-items:center;gap:10px;padding:5px 9px 5px 6px;border-radius:12px;cursor:pointer}
+.topbar .top-user:hover {background:#f1f6f2}
+.topbar .top-user .avatar {width:37px;height:37px;min-width:37px;border-radius:50%;background:#deeee5;color:#123d2c;display:flex;align-items:center;justify-content:center;font-weight:700}
+.topbar .top-user-info {min-width:0}
+.topbar .top-user-info strong {display:block;font-size:13px;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.topbar .top-user-info span {display:block;font-size:11px;color:#849589}
+.main .content {width:100%;max-width:1600px;padding:30px 32px 70px;margin:0 auto}
+.main .welcome {
+    display:flex;justify-content:space-between;align-items:center;gap:20px;
+    padding:25px 28px;margin-bottom:23px;
+    background:linear-gradient(112deg,#e8f4ec 0%,#f6faf7 65%,#fff 100%);
+    border:1px solid #dcece2;border-radius:18px
+}
+.main .welcome-label {font-size:10px;letter-spacing:1.2px;font-weight:800;color:#2d7851;margin-bottom:7px}
+.main .welcome h1 {font-size:clamp(23px,2.2vw,32px);line-height:1.18;letter-spacing:-.8px;font-weight:800;margin:0;color:#173b2a}
+.main .welcome p {font-size:13px;color:#66806e;margin:9px 0 0}
+.main .add-expense-btn {
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    min-height:45px;padding:0 19px;background:#123d2c;color:#fff;
+    border-radius:11px;text-decoration:none;white-space:nowrap;
+    font-size:13px;font-weight:700;box-shadow:0 5px 16px rgba(18,61,44,.16);
+    transition:transform .2s,background .2s
+}
+.main .add-expense-btn:hover {background:#226445;transform:translateY(-2px)}
+.main .add-expense-btn svg {width:17px;height:17px}
+.main .summary-grid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px;margin-bottom:23px}
+.main .summary-card {
+    position:relative;min-width:0;min-height:147px;padding:21px 22px;
+    background:#fff;border:1px solid var(--bw-line);border-radius:15px;
+    box-shadow:0 4px 16px rgba(21,59,40,.035);
+    transition:transform .2s,box-shadow .2s
+}
+.main .summary-card:hover {transform:translateY(-2px);box-shadow:0 9px 24px rgba(21,59,40,.075)}
+.main .summary-card::after {content:"";position:absolute;bottom:0;left:0;width:100%;height:3px;background:#65a987;opacity:.7}
+.main .summary-card:nth-child(2)::after {background:#558eaf}
+.main .summary-card:nth-child(3)::after {background:#e38c7b}
+.main .summary-card:nth-child(4)::after {background:#d4a453}
+.main .summary-top {display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.main .summary-title {font-size:12px;font-weight:650;color:#73857b}
+.main .summary-icon {width:42px;height:42px;min-width:42px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#eaf5ee;color:#236b4b}
+.main .summary-card:nth-child(2) .summary-icon {background:#edf3fa;color:#407c9d}
+.main .summary-card:nth-child(3) .summary-icon {background:#fff0ed;color:#bd5c50}
+.main .summary-card:nth-child(4) .summary-icon {background:#fcf5e8;color:#ac8236}
+.main .summary-icon svg {width:20px;height:20px}
+.main .summary-value {font-size:clamp(21px,2vw,29px);font-weight:800;line-height:1.2;letter-spacing:-.6px;margin:13px 0 7px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums;color:#173b2a}
+.main .summary-change {font-size:11px;color:#758c7c}
+.main .summary-change.negative {color:#b7655e}
+.main .summary-change.positive {color:#387b55}
+.main .dashboard-grid {display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,1fr);gap:18px;margin-bottom:20px;align-items:stretch}
+.main .lower-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+.main .card {
+    min-width:0;background:#fff;border:1px solid var(--bw-line);
+    border-radius:17px;padding:23px 24px;overflow:visible;
+    box-shadow:0 5px 24px rgba(21,59,40,.035)
+}
+.main .card-header {display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:20px}
+.main .card-title {font-size:17px;font-weight:750;color:#183b2b;line-height:1.3}
+.main .card-subtitle {font-size:12px;color:#839487;margin-top:5px}
+.main .card-link {font-size:12px;font-weight:700;color:#27734e;text-decoration:none;white-space:nowrap}
+.main .card-link:hover {text-decoration:underline}
+.main .chart-card {min-height:410px}
+.main #expenseChart {width:100%;min-width:0;min-height:300px}
+.main #expenseChart svg, .main #expenseChart canvas {max-width:100%}
+.main #recentTransactions {min-height:300px}
+.main #categories, .main #budgets {min-height:180px}
+.main .empty-state {padding:26px 10px;color:#839488;text-align:center;font-size:13px}
+.main .transaction-list > * {max-width:100%}
+.main .transaction-list {overflow-wrap:anywhere}
+.main #categories .bw-category-pie-layout {max-width:100%}
+.main #budgets .budget-progress-item {max-width:100%}
+@media (max-width:1200px) {
+    .main .summary-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+    .main .dashboard-grid {grid-template-columns:minmax(0,1.4fr) minmax(260px,1fr)}
+}
+@media (max-width:950px) {
+    .main .content {padding:24px 20px 55px}
+    .main .dashboard-grid, .main .lower-grid {grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:800px) {
+    .topbar .mobile-menu {display:flex !important;align-items:center;justify-content:center;flex-shrink:0}
+    .main .topbar {padding:0 17px}
+}
+@media (max-width:600px) {
+    .main .content {padding:18px 14px 45px}
+    .main .welcome {flex-direction:column;align-items:stretch;padding:21px 19px}
+    .main .add-expense-btn {width:100%}
+    .main .summary-grid {gap:11px}
+    .main .summary-card {padding:16px 14px;min-height:122px}
+    .main .summary-icon {width:34px;height:34px;min-width:34px}
+    .main .summary-icon svg {width:17px;height:17px}
+    .main .summary-value {font-size:20px}
+    .main .card {padding:18px 16px}
+    .main .card-title {font-size:15px}
+    .main .topbar .search {display:none}
+    .main .topbar .top-user-info {display:none}
+    .main .topbar .top-actions {margin-left:auto}
+}
+@media (max-width:380px) {
+    .main .summary-grid {grid-template-columns:1fr}
+}
+
+/* ============================================
+   FIX DASHBOARD RECENT TRANSACTIONS
+============================================ */
+
+#recentTransactions {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+}
+
+#recentTransactions .transaction-item {
+    display: grid !important;
+    grid-template-columns: 42px minmax(0, 1fr) max-content !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100%;
+    min-width: 0;
+    padding: 14px 2px !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #edf1ee;
+}
+
+#recentTransactions .transaction-item:last-child {
+    border-bottom: none;
+}
+
+/* TRANSACTION ICON */
+
+#recentTransactions .transaction-icon {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ecf5ef;
+    color: #246148;
+    border-radius: 12px;
+}
+
+#recentTransactions .transaction-icon svg {
+    width: 19px !important;
+    height: 19px !important;
+}
+
+/* TRANSACTION DETAILS */
+
+#recentTransactions .transaction-details {
+    display: flex !important;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0 !important;
+    width: auto !important;
+    overflow: hidden;
+}
+
+#recentTransactions .transaction-details strong {
+    display: block;
+    color: #193b2b;
+    font-size: 13px;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#recentTransactions .transaction-details span {
+    display: block;
+    color: #829488;
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* AMOUNT ON THE RIGHT */
+
+#recentTransactions .transaction-amount {
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    justify-self: end;
+    align-self: center;
+    color: #c25454;
+    text-align: right;
+    white-space: nowrap;
+    font-weight: 750;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* SMALL SCREENS */
+
+@media (max-width: 480px) {
+    #recentTransactions .transaction-item {
+        grid-template-columns: 38px minmax(0, 1fr) !important;
+        gap: 9px !important;
+    }
+
+    #recentTransactions .transaction-amount {
+        grid-column: 2;
+        justify-self: start;
+    }
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+
+                ₦
+
+            </div>
+
+            <div class="brand-name">
+
+                BudgetWise
+
+            </div>
+
+        </div>
+
+        <!-- OVERVIEW -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+
+                Overview
+
+            </div>
+
+            <a
+
+                href="dashboard.html"
+
+                class="nav-link active"
+
+            >
+
+                <span class="nav-icon">
+
+                    <i data-lucide="layout-dashboard"></i>
+
+                </span>
+
+                <span>Dashboard</span>
+
+            </a>
+
+            <a
+
+                href="transactions.html"
+
+                class="nav-link"
+
+            >
+
+                <span class="nav-icon">
+
+                    <i data-lucide="arrow-left-right"></i>
+
+                </span>
+
+                <span>Transactions</span>
+
+            </a>
+
+            <a
+
+                href="budgets.html"
+
+                class="nav-link"
+
+            >
+
+                <span class="nav-icon">
+
+                    <i data-lucide="wallet-cards"></i>
+
+                </span>
+
+                <span>Budgets</span>
+
+            </a>
+
+        </div>
+
+        <!-- PLANNING -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+
+                Planning
+
+            </div>
+
+            <a
+
+                href="reports.html"
+
+                class="nav-link"
+
+            >
+
+                <span class="nav-icon">
+
+                    <i data-lucide="bar-chart-3"></i>
+
+                </span>
+
+                <span>Reports</span>
+
+            </a>
+
+            <a
+
+                href="goals.html"
+
+                class="nav-link"
+
+            >
+
+                <span class="nav-icon">
+
+                    <i data-lucide="target"></i>
+
+                </span>
+
+                <span>Goals</span>
+
+            </a>
+
+        </div>
+
+        <!-- ACCOUNT -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+
+                Account
+
+            </div>
+
+            <a
+
+                href="settings.html"
+
+                class="nav-link"
+
+            >
+
+                <span class="nav-icon">
+
+                    <i data-lucide="settings"></i>
+
+                </span>
+
+                <span>Settings</span>
+
+            </a>
+
+        </div>
+
+        <!-- SIDEBAR USER -->
+
+        <div class="sidebar-bottom">
+
+            <div class="user-mini">
+
+                <div
+
+                    class="avatar"
+
+                    id="sidebarAvatar"
+
+                >
+
+                    K
+
+                </div>
+
+                <div class="user-mini-info">
+
+                    <strong id="sidebarUserName">
+
+                        Kehinde
+
+                    </strong>
+
+                    <span>
+
+                        Personal Account
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <button
+
+                class="mobile-menu"
+
+                id="mobileMenu"
+
+                type="button"
+
+            >
+
+                <i data-lucide="menu"></i>
+
+            </button>
+
+            <!-- SEARCH -->
+
+            <div class="search">
+
+                <i data-lucide="search"></i>
+
+                <input
+
+                    type="text"
+
+                    id="searchInput"
+
+                    placeholder="Search transactions..."
+
+                >
+
+            </div>
+
+            <!-- TOP ACTIONS -->
+
+            <div class="top-actions">
+
+                <!-- NOTIFICATIONS -->
+
+                <div
+
+                    class="notification"
+
+                    id="notificationButton"
+
+                >
+
+                    <i data-lucide="bell"></i>
+
+                    <span
+
+                        class="notification-dot"
+
+                    ></span>
+
+                </div>
+
+                <!-- PROFILE -->
+
+                <div class="top-user">
+
+                    <div
+
+                        class="avatar"
+
+                        id="topAvatar"
+
+                    >
+
+                        K
+
+                    </div>
+
+                    <div class="top-user-info">
+
+                        <strong id="topUserName">
+
+                            Kehinde
+
+                        </strong>
+
+                        <span>
+
+                            Personal Account
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- ================= CONTENT ================= -->
+
+        <section class="content">
+
+            <!-- WELCOME -->
+
+            <div class="welcome">
+
+                <div>
+
+                    <div class="welcome-label">
+
+                        FINANCIAL OVERVIEW
+
+                    </div>
+
+                    <h1>
+
+                        Good morning,
+
+                        <span id="welcomeName">
+
+                            Kehinde
+
+                        </span>
+
+                        👋
+
+                    </h1>
+
+                    <p>
+
+                        Here's what's happening with your money.
+
+                    </p>
+
+                </div>
+
+                <a
+
+                    href="transactions.html"
+
+                    class="add-expense-btn"
+
+                >
+
+                    <i data-lucide="plus"></i>
+
+                    <span>
+
+                        Add Expense
+
+                    </span>
+
+                </a>
+
+            </div>
+
+            <!-- ================= SUMMARY ================= -->
+
+            <div class="summary-grid">
+
+                <!-- BALANCE -->
+
+                <div class="summary-card">
+
+                    <div class="summary-top">
+
+                        <span class="summary-title">
+
+                            Total Balance
+
+                        </span>
+
+                        <div class="summary-icon">
+
+                            <i data-lucide="wallet"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div
+
+                        class="summary-value"
+
+                        id="balance"
+
+                    >
+
+                        ₦0
+
+                    </div>
+
+                    <div
+
+                        class="summary-change positive"
+
+                    >
+
+                        Available balance
+
+                    </div>
+
+                </div>
+
+                <!-- INCOME -->
+
+                <div class="summary-card">
+
+                    <div class="summary-top">
+
+                        <span class="summary-title">
+
+                            Total Income
+
+                        </span>
+
+                        <div class="summary-icon">
+
+                            <i data-lucide="trending-up"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div
+
+                        class="summary-value"
+
+                        id="income"
+
+                    >
+
+                        ₦0
+
+                    </div>
+
+                    <div class="summary-change">
+
+                        Monthly income
+
+                    </div>
+
+                </div>
+
+                <!-- EXPENSES -->
+
+                <div class="summary-card expense">
+
+                    <div class="summary-top">
+
+                        <span class="summary-title">
+
+                            Total Expenses
+
+                        </span>
+
+                        <div class="summary-icon">
+
+                            <i data-lucide="trending-down"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div
+
+                        class="summary-value"
+
+                        id="expenses"
+
+                    >
+
+                        ₦0
+
+                    </div>
+
+                    <div
+
+                        class="summary-change negative"
+
+                    >
+
+                        Total spending
+
+                    </div>
+
+                </div>
+
+                <!-- SAVINGS -->
+
+                <div class="summary-card savings">
+
+                    <div class="summary-top">
+
+                        <span class="summary-title">
+
+                            Savings Rate
+
+                        </span>
+
+                        <div class="summary-icon">
+
+                            <i data-lucide="piggy-bank"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div
+
+                        class="summary-value"
+
+                        id="savingsRate"
+
+                    >
+
+                        0%
+
+                    </div>
+
+                    <div class="summary-change positive">
+
+                        Income saved
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ================= CHART + TRANSACTIONS ================= -->
+
+            <div class="dashboard-grid">
+
+                <!-- EXPENSE CHART -->
+
+                <div class="card chart-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <div class="card-title">
+
+                                Expense Overview
+
+                            </div>
+
+                            <div class="card-subtitle">
+
+                                Your spending activity
+
+                            </div>
+
+                        </div>
+
+                        <a
+
+                            href="reports.html"
+
+                            class="card-link"
+
+                        >
+
+                            View Report →
+
+                        </a>
+
+                    </div>
+
+                    <div
+
+                        class="chart-area"
+
+                        id="expenseChart"
+
+                    >
+
+                    </div>
+
+                </div>
+
+                <!-- RECENT TRANSACTIONS -->
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <div class="card-title">
+
+                                Recent Transactions
+
+                            </div>
+
+                            <div class="card-subtitle">
+
+                                Latest activity
+
+                            </div>
+
+                        </div>
+
+                        <a
+
+                            href="transactions.html"
+
+                            class="card-link"
+
+                        >
+
+                            View All →
+
+                        </a>
+
+                    </div>
+
+                    <div
+
+                        class="transaction-list"
+
+                        id="recentTransactions"
+
+                    >
+
+                        <div class="empty-state">
+
+                            Loading transactions...
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ================= LOWER GRID ================= -->
+
+            <div class="lower-grid">
+
+                <!-- CATEGORIES -->
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <div class="card-title">
+
+                                Spending by Category
+
+                            </div>
+
+                            <div class="card-subtitle">
+
+                                Where your money goes
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div id="categories">
+
+                        <div class="empty-state">
+
+                            Loading categories...
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- BUDGETS -->
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <div class="card-title">
+
+                                Budget Progress
+
+                            </div>
+
+                            <div class="card-subtitle">
+
+                                Track your spending limits
+
+                            </div>
+
+                        </div>
+
+                        <a
+
+                            href="budgets.html"
+
+                            class="card-link"
+
+                        >
+
+                            Manage →
+
+                        </a>
+
+                    </div>
+
+                    <div id="budgets">
+
+                        <div class="empty-state">
+
+                            Loading budgets...
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- ================= DASHBOARD JS ================= -->
+
+<script src="js/auth.js"></script>
+
+<script src="js/dashboard.js"></script>
+
+<!-- ================= INITIALIZE ICONS ================= -->
+
+<script>
+
+    document.addEventListener(
+
+        "DOMContentLoaded",
+
+        function () {
+
+            if (window.lucide) {
+
+                lucide.createIcons();
+
+            }
+
+        }
+
+    );
+
+</script>
+
+</body>
+
+</html>

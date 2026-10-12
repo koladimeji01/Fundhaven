@@ -1,26 +1,23 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from app import services
-
-from app.api.dependencies import (
-    get_current_user
-)
-
+from app.api.dependencies import get_current_user
 from app.api.schemas import (
     ExpenseCreate,
     ExpenseResponse,
     ExpenseListResponse
 )
-
 from app.logging_config import logger
+
 
 router = APIRouter(
     tags=["Expenses"]
 )
 
-# ==========================================
-# GET MY EXPENSES
-# ==========================================
+
+# ============================================================
+# GET EXPENSES
+# ============================================================
 
 @router.get(
     "/expenses",
@@ -28,11 +25,8 @@ router = APIRouter(
     summary="Get my expenses"
 )
 def get_expenses(
-    current_user=Depends(
-        get_current_user
-    )
+    current_user=Depends(get_current_user)
 ):
-
     user_id = current_user[0]
 
     expenses = services.get_user_expenses(
@@ -45,9 +39,9 @@ def get_expenses(
     }
 
 
-# ==========================================
+# ============================================================
 # CREATE EXPENSE
-# ==========================================
+# ============================================================
 
 @router.post(
     "/expenses",
@@ -56,18 +50,16 @@ def get_expenses(
 )
 def create_expense(
     expense: ExpenseCreate,
-    current_user=Depends(
-        get_current_user
-    )
+    current_user=Depends(get_current_user)
 ):
-
     user_id = current_user[0]
 
     new_expense = services.create_user_expense(
         user_id,
         expense.amount,
         expense.category,
-        expense.description
+        expense.description,
+        expense.date
     )
 
     logger.info(
@@ -78,9 +70,9 @@ def create_expense(
     return new_expense
 
 
-# ==========================================
+# ============================================================
 # UPDATE EXPENSE
-# ==========================================
+# ============================================================
 
 @router.put(
     "/expenses/{expense_id}",
@@ -90,11 +82,8 @@ def create_expense(
 def update_expense(
     expense_id: int,
     expense: ExpenseCreate,
-    current_user=Depends(
-        get_current_user
-    )
+    current_user=Depends(get_current_user)
 ):
-
     user_id = current_user[0]
 
     updated_expense = services.update_user_expense(
@@ -102,11 +91,11 @@ def update_expense(
         expense_id,
         expense.amount,
         expense.category,
-        expense.description
+        expense.description,
+        expense.date
     )
 
     if not updated_expense:
-
         raise HTTPException(
             status_code=404,
             detail="Expense not found"
@@ -120,21 +109,17 @@ def update_expense(
     return updated_expense
 
 
-# ==========================================
+# ============================================================
 # DELETE EXPENSE
-# ==========================================
+# ============================================================
 
 @router.delete(
-    "/expenses/{expense_id}",
-    summary="Delete an expense"
+    "/expenses/{expense_id}"
 )
 def delete_expense(
     expense_id: int,
-    current_user=Depends(
-        get_current_user
-    )
+    current_user=Depends(get_current_user)
 ):
-
     user_id = current_user[0]
 
     deleted = services.delete_user_expense(
@@ -143,7 +128,6 @@ def delete_expense(
     )
 
     if not deleted:
-
         raise HTTPException(
             status_code=404,
             detail="Expense not found"
@@ -155,6 +139,5 @@ def delete_expense(
     )
 
     return {
-        "message":
-        "Expense deleted successfully"
+        "message": "Expense deleted successfully"
     }

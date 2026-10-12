@@ -1,67 +1,41 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
 
-# ==========================================
-# DETECT ENVIRONMENT
-# ==========================================
-
-ENVIRONMENT = os.getenv(
-    "ENVIRONMENT",
-    "development"
-).lower()
+# Project root
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# ==========================================
-# LOAD ENVIRONMENT VARIABLES
-# ==========================================
+# Read the environment
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 
+
+# Load the correct environment file
 if ENVIRONMENT == "testing":
-
-    load_dotenv(
-        ".env.test"
-    )
-
-elif ENVIRONMENT == "development":
-
-    load_dotenv(
-        ".env"
-    )
+    env_file = BASE_DIR / ".env.test"
+else:
+    env_file = BASE_DIR / ".env"
 
 
-# ==========================================
-# APPLICATION SETTINGS
-# ==========================================
-
-APP_NAME = os.getenv(
-    "APP_NAME",
-    "BudgetWise"
-)
-
-APP_VERSION = os.getenv(
-    "APP_VERSION",
-    "1.0.0"
-)
+load_dotenv(env_file)
 
 
-# ==========================================
-# DATABASE
-# ==========================================
+# Application settings
+APP_NAME = os.getenv("APP_NAME", "BudgetWise")
+APP_VERSION = os.getenv("APP_VERSION", "1.0.0")
 
+
+# Database
 DATABASE_NAME = os.getenv(
     "DATABASE_NAME",
     "budgetwise.db"
 )
 
 
-# ==========================================
-# AUTHENTICATION
-# ==========================================
-
-SECRET_KEY = os.getenv(
-    "SECRET_KEY"
-)
+# Authentication
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 ALGORITHM = os.getenv(
     "ALGORITHM",
@@ -69,46 +43,5 @@ ALGORITHM = os.getenv(
 )
 
 
-# ==========================================
-# SECURITY CHECK
-# ==========================================
-
-if ENVIRONMENT == "production":
-
-    if not SECRET_KEY:
-
-        raise RuntimeError(
-            "SECRET_KEY must be configured "
-            "in production."
-        )
-
-
-# ==========================================
-# ENVIRONMENT INFORMATION
-# ==========================================
-
-print(
-    f"BudgetWise environment: {ENVIRONMENT}"
-)
-EMAIL_HOST = os.getenv(
-    "EMAIL_HOST"
-)
-
-EMAIL_PORT = int(
-    os.getenv(
-        "EMAIL_PORT",
-        "587"
-    )
-)
-
-EMAIL_USERNAME = os.getenv(
-    "EMAIL_USERNAME"
-)
-
-EMAIL_PASSWORD = os.getenv(
-    "EMAIL_PASSWORD"
-)
-
-EMAIL_FROM = os.getenv(
-    "EMAIL_FROM"
-)
+# Helpful startup information
+print(f"BudgetWise environment: {ENVIRONMENT}")

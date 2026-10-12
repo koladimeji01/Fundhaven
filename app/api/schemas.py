@@ -1,166 +1,173 @@
-from pydantic import BaseModel, Field, EmailStr
+from datetime import date as DateType
+
+from pydantic import BaseModel, EmailStr, Field
 
 
-# ==========================================
-# EXPENSE REQUEST
-# ==========================================
-
-class ExpenseCreate(BaseModel):
-
-    amount: float = Field(
-        gt=0,
-        description="Expense amount in Nigerian Naira."
-    )
-
-    category: str = Field(
-        min_length=2,
-        max_length=50,
-        description="Expense category."
-    )
-
-    description: str = Field(
-        min_length=2,
-        max_length=200,
-        description="Short description of the expense."
-    )
-
-
-# ==========================================
-# USER REQUEST
-# ==========================================
+# ============================================================
+# USER / AUTHENTICATION
+# ============================================================
 
 class User(BaseModel):
-
     name: str = Field(
         min_length=2,
-        max_length=50,
-        description="Username for the BudgetWise account."
+        max_length=50
     )
 
-    email: EmailStr = Field(
-        description="User email address."
-    )
+    email: EmailStr
 
     income: float = Field(
-        gt=0,
-        description="Monthly income in Nigerian Naira."
+        gt=0
     )
 
     password: str = Field(
         min_length=8,
-        max_length=100,
-        description="Account password."
+        max_length=100
     )
 
-
-# ==========================================
-# LOGIN REQUEST
-# ==========================================
 
 class LoginRequest(BaseModel):
-
-    name: str = Field(
+    name: str | None = Field(
+        default=None,
         min_length=2,
-        max_length=50,
-        description="BudgetWise username."
+        max_length=50
     )
+
+    email: EmailStr | None = None
 
     password: str = Field(
         min_length=8,
-        max_length=100,
-        description="Account password."
+        max_length=100
     )
 
 
-# ==========================================
-# EXPENSE RESPONSE
-# ==========================================
-
-class ExpenseResponse(BaseModel):
-
-    id: int
-    amount: float
-    category: str
-    description: str
-
-
-# ==========================================
-# EXPENSE LIST RESPONSE
-# ==========================================
-
-class ExpenseListResponse(BaseModel):
-
-    user_id: int
-    expenses: list[ExpenseResponse]
-
-
-# ==========================================
-# USER CREATED RESPONSE
-# ==========================================
-
 class UserCreatedResponse(BaseModel):
-
     id: int
     name: str
     income: float
     email: EmailStr
 
 
-# ==========================================
-# USER PROFILE RESPONSE
-# ==========================================
-
 class UserResponse(BaseModel):
-
     id: int
     name: str
     income: float
-    email: EmailStr | None
-    total_expenses: float
-    balance: float
+    email: EmailStr
+    expenses: list = []
+    total_expenses: float = 0
+    balance: float = 0
+
+
+# ============================================================
+# EXPENSES / TRANSACTIONS
+# ============================================================
+
+class ExpenseCreate(BaseModel):
+    amount: float = Field(
+        gt=0,
+        description="Expense amount must be greater than zero"
+    )
+
+    category: str = Field(
+        min_length=2,
+        max_length=50
+    )
+
+    description: str = Field(
+        min_length=2,
+        max_length=200
+    )
+
+    # Optional from the user's point of view.
+    # If no date is supplied, today's date is used.
+    date: DateType = Field(
+        default_factory=DateType.today
+    )
+
+
+class ExpenseResponse(BaseModel):
+    id: int
+    user_id: int | None = None
+    amount: float
+    category: str
+    description: str
+    date: DateType
+
+
+class ExpenseListResponse(BaseModel):
+    user_id: int
     expenses: list[ExpenseResponse]
 
 
-# ==========================================
-# DASHBOARD USER
-# ==========================================
+# ============================================================
+# BUDGETS
+# ============================================================
 
-class DashboardUser(BaseModel):
+class BudgetCreate(BaseModel):
+    category: str = Field(
+        min_length=2,
+        max_length=50
+    )
 
+    amount: float = Field(
+        gt=0
+    )
+
+
+class BudgetUpdate(BaseModel):
+    category: str = Field(
+        min_length=2,
+        max_length=50
+    )
+
+    amount: float = Field(
+        gt=0
+    )
+
+
+class BudgetResponse(BaseModel):
     id: int
-    name: str
-    income: float
-    email: EmailStr | None
-
-
-# ==========================================
-# HIGHEST SPENDING CATEGORY
-# ==========================================
-
-class HighestSpendingCategory(BaseModel):
-
-    category: str | None
+    user_id: int
+    category: str
     amount: float
 
 
-# ==========================================
-# DASHBOARD RESPONSE
-# ==========================================
+class BudgetListResponse(BaseModel):
+    user_id: int
+    budgets: list[BudgetResponse]
+
+
+# ============================================================
+# MAIN DASHBOARD
+# ============================================================
 
 class DashboardResponse(BaseModel):
-
-    user: DashboardUser
-
     income: float
-
     total_expenses: float
-
     balance: float
-
     savings_rate: float
-
-    spending_by_category: dict[str, float]
-
-    highest_spending_category: HighestSpendingCategory
-
+    spending_by_category: dict
+    highest_spending_category: dict
     warning: str
+
+# ============================================================
+# BUDGET DASHBOARD
+# ============================================================
+
+class BudgetDashboardItem(BaseModel):
+    category: str
+    budget: float
+    spent: float
+    remaining: float
+    usage_percentage: float
+    status: str
+
+
+class Dashboard2Response(BaseModel):
+    user_id: int
+    income: float
+    total_expenses: float
+    balance: float
+    total_budget: float
+    total_budget_spent: float
+    total_budget_remaining: float
+    budgets: list[BudgetDashboardItem]

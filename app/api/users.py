@@ -1,43 +1,156 @@
-from fastapi import APIRouter, Depends, HTTPException
+﻿from fastapi import APIRouter, Depends, HTTPException
 
 from app import services
+from app.api.dependencies import get_current_user
+from app.api.schemas import DashboardResponse, UserResponse
 
-from app.api.dependencies import (
-    get_current_user
-)
+router = APIRouter(tags=["User"])
 
-from app.api.schemas import UserResponse
 
-router = APIRouter(
-    tags=["User"]
-)
-
-# ==========================================
+# ============================================================
 # GET MY PROFILE
-# ==========================================
+# ============================================================
 
 @router.get(
     "/users/me",
     response_model=UserResponse,
-    summary="Get my profile"
+    summary="Get my profile",
 )
-def get_my_profile(
-    current_user=Depends(
-        get_current_user
-    )
-):
-
+def get_my_profile(current_user=Depends(get_current_user)):
     user_id = current_user[0]
 
-    profile = services.get_user_profile(
-        user_id
-    )
+    profile = services.get_user_profile(user_id)
 
     if not profile:
-
-        raise HTTPException(
-            status_code=404,
-            detail="User not found"
-        )
+        raise HTTPException(status_code=404, detail="User not found")
 
     return profile
+
+
+# ============================================================
+# UPDATE MY PROFILE
+# ============================================================
+
+@router.put(
+    "/users/me",
+    response_model=UserResponse,
+    summary="Update my profile",
+)
+def update_my_profile(profile_data: dict, current_user=Depends(get_current_user)):
+    user_id = current_user[0]
+
+    name = profile_data.get("name")
+    income = profile_data.get("income")
+
+    if not isinstance(name, str):
+        raise HTTPException(status_code=422, detail="Name must be a string")
+
+    name = name.strip()
+
+    if len(name) < 2:
+        raise HTTPException(
+            status_code=422,
+            detail="Name must be at least 2 characters",
+        )
+
+    if income is None:
+        raise HTTPException(status_code=422, detail="Income is required")
+
+    try:
+        income = float(income)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=422, detail="Income must be a number") from exc
+
+    if income <= 0:
+        raise HTTPException(status_code=422, detail="Income must be greater than 0")
+
+    try:
+        updated = services.update_user_profile(
+            user_id=user_id,
+            name=name,
+            income=income,
+        )
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+
+    if not updated:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return updated
+
+
+# ============================================================
+# CHANGE PASSWORD
+# ============================================================
+
+@router.put(
+    "/users/me/password",
+    summary="Change my password",
+)
+def change_my_password(password_data: dict, current_user=Depends(get_current_user)):
+    user_id = current_user[0]
+
+    current_password = password_data.get("current_password")
+    new_password = password_data.get("new_password")
+    confirm_password = password_data.get("confirm_password")
+
+    if not isinstance(current_password, str):
+        raise HTTPException(status_code=422, detail="Current password is required")
+
+    if not isinstance(new_password, str):
+        raise HTTPException(status_code=422, detail="New password is required")
+
+    if not isinstance(confirm_password, str):
+        raise HTTPException(status_code=422, detail="Password confirmation is required")
+
+    if len(new_password) < 8:
+        raise HTTPException(
+            status_code=422,
+            detail="New password must be at least 8 characters",
+        )
+
+    if len(new_password) > 100:
+        raise HTTPException(
+            status_code=422,
+            detail="New password must not exceed 100 characters",
+        )
+
+    if new_password != confirm_password:
+        raise HTTPException(status_code=422, detail="New passwords do not match")
+
+    if current_password == new_password:
+        raise HTTPException(
+            status_code=422,
+            detail="New password must be different from current password",
+        )
+
+    try:
+        services.change_user_password(
+            user_id=user_id,
+            current_password=current_password,
+            new_password=new_password,
+        )
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+
+    return {"message": "Password changed successfully"}
+
+
+# ============================================================
+# GET MY DASHBOARD
+# ============================================================
+
+@router.get(
+    "/users/me/dashboard",
+    response_model=DashboardResponse,
+    summary="Get my financial dashboard",
+)
+def get_my_dashboard(current_user=Depends(get_current_user)):
+    user_id = current_user[0]
+
+    dashboard = services.get_user_dashboard(user_id)
+
+    if not dashboard:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return dashboard

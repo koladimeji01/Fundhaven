@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Goals | BudgetWise</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --green: #123d2c;
+      --green-2: #23684a;
+      --mint: #e9f4ed;
+      --bg: #f5f8f6;
+      --text: #1a3428;
+      --muted: #75877b;
+      --border: #e2ebe5;
+      --shadow: 0 8px 28px rgba(20, 67, 43, .045);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text); background: var(--bg); }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #8dc4a4; outline-offset: 2px; }
+    .app { min-height: 100vh; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar { position: fixed; inset: 0 auto 0 0; width: 245px; display: flex; flex-direction: column; background: var(--green); color: white; z-index: 1000; }
+    .brand { min-height: 84px; display: flex; align-items: center; gap: 12px; padding: 0 23px; }
+    .brand-icon { width: 39px; height: 39px; border-radius: 11px; display: grid; place-items: center; background: #fff; color: var(--green); font-size: 23px; font-weight: 800; }
+    .brand-name { color: #fff; font-size: 19px; font-weight: 800; letter-spacing: -.5px; }
+    .nav-section { padding: 0 14px; margin: 14px 0 0; }
+    .nav-section-title { padding: 0 12px; margin: 0 0 9px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; font-weight: 750; color: #90b3a0; }
+    .nav-link { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 13px; margin-bottom: 4px; text-decoration: none; color: #c5d9ce; border-radius: 10px; font-size: 13px; font-weight: 550; transition: background .15s, color .15s; }
+    .nav-link:hover { background: #204e3b; color: #fff; }
+    .nav-link.active { background: #2c654b; color: #fff; font-weight: 750; }
+    .nav-link .nav-icon, .nav-link svg { width: 19px; height: 19px; flex-shrink: 0; stroke-width: 2; }
+    .sidebar-bottom { margin-top: auto; padding: 19px; border-top: 1px solid #285641; }
+    .user-mini { display: flex; gap: 10px; align-items: center; }
+    .avatar { width: 37px; height: 37px; flex-shrink: 0; display: grid; place-items: center; background: #e1eee6; color: var(--green); border-radius: 50%; font-size: 12px; font-weight: 800; }
+    .user-mini-info { min-width: 0; }
+    .user-mini-name { max-width: 158px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 700; }
+    .user-mini-role { margin-top: 4px; font-size: 10px; color: #a6c6b2; }
+
+    /* ===== MAIN / TOP BAR ===== */
+    .main { margin-left: 245px; min-height: 100vh; min-width: 0; }
+    .topbar, .main .topbar { position: relative; z-index: 50; height: 74px; display: flex; align-items: center; gap: 18px; padding: 0 34px; background: #fff; border-bottom: 1px solid var(--border); overflow: visible; }
+    .topbar .search { display: flex; gap: 10px; align-items: center; width: min(310px, 42%); min-width: 150px; height: 42px; padding: 0 13px; margin-right: auto; border: 1px solid #e0e9e3; border-radius: 11px; background: #f7f9f7; transition: .2s; }
+    .topbar .search:focus-within { background: #fff; border-color: #82b69a; box-shadow: 0 0 0 3px #e0f1e6; }
+    .topbar .search svg { width: 17px; height: 17px; color: #809285; flex-shrink: 0; }
+    .topbar .search input { width: 100%; outline: none; border: none; background: transparent; font-size: 13px; color: var(--text); }
+    .topbar .search input::placeholder { color: #9aa9a0; }
+    .topbar .top-actions { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+    .topbar .icon-button { border: 0; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 11px; background: transparent; color: #607468; position: relative; padding: 0; }
+    .topbar .icon-button:hover, .topbar .top-user:hover { background: #eef6f0; }
+    .topbar .icon-button svg { width: 19px; height: 19px; }
+    .topbar .top-user { display: flex; align-items: center; gap: 10px; padding: 4px 9px 4px 5px; min-height: 43px; border: none; border-radius: 11px; background: transparent; color: #294435; cursor: pointer; }
+    .topbar .top-user-name { max-width: 155px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 650; }
+    .topbar .top-avatar { width: 35px; height: 35px; min-width: 35px; display: grid; place-items: center; border-radius: 50%; background: #e0eee6; border: 1px solid #cfe4d7; color: var(--green); font-size: 12px; font-weight: 800; }
+    .topbar .notification-dot { position: absolute; width: 7px; height: 7px; top: 8px; right: 8px; border: 1px solid #fff; border-radius: 50%; background: #dc6856; display: none; }
+    .topbar .mobile-menu { display: none !important; }
+    .topbar .bw-top-wrap { display: flex; align-items: center; position: relative; }
+    .topbar .bw-goal-dropdown { box-shadow: 0 18px 45px rgba(18, 61, 44, .16); }
+    .topbar .bw-chevron { width: 15px; height: 15px; }
+
+    /* ===== CONTENT / HERO ===== */
+    .content { max-width: 1580px; margin: 0 auto; padding: 32px 34px 70px; }
+    .page-header { position: relative; isolation: isolate; display: flex; align-items: center; justify-content: space-between; gap: 22px; padding: 30px 34px; margin-bottom: 24px; border: 1px solid #dbe9df; border-radius: 19px; background: linear-gradient(110deg, #e7f4ea 0%, #f3faf5 55%, #fff 100%); overflow: hidden; }
+    .page-header::after { content: ""; position: absolute; width: 240px; height: 240px; right: 14%; top: -175px; z-index: -1; border-radius: 50%; background: rgba(88, 168, 116, .10); }
+    .page-eyebrow { margin: 0 0 8px; color: #31774e; font-size: 10px; letter-spacing: 1.5px; font-weight: 850; }
+    .page-title { margin: 0; color: #153c2a; font-size: clamp(25px, 2.35vw, 34px); font-weight: 800; letter-spacing: -.85px; line-height: 1.2; }
+    .page-subtitle { margin: 9px 0 0; color: #607b69; font-size: 13px; line-height: 1.5; }
+    .add-goal-btn { display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0; min-height: 46px; padding: 0 19px; border: 0; border-radius: 11px; color: #fff; background: var(--green); font-size: 13px; font-weight: 700; box-shadow: 0 8px 18px rgba(18, 61, 44, .15); transition: transform .2s, background .2s; }
+    .add-goal-btn:hover { background: #23664a; transform: translateY(-2px); }
+    .add-goal-btn svg { width: 17px; height: 17px; }
+
+    /* ===== SUMMARY CARDS ===== */
+    .summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 17px; margin-bottom: 24px; }
+    .summary-card { min-width: 0; position: relative; padding: 22px 22px 20px; min-height: 153px; border-radius: 16px; background: #fff; border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; transition: transform .2s, box-shadow .2s; }
+    .summary-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(18, 61, 44, .085); }
+    .summary-card::after { content: ""; position: absolute; left: 0; bottom: 0; right: 0; height: 3px; background: #63ad83; }
+    .summary-card:nth-child(2)::after { background: #5793bf; }
+    .summary-card:nth-child(3)::after { background: #57ae97; }
+    .summary-card:nth-child(4)::after { background: #d3a751; }
+    .summary-card-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .summary-label { color: #75867a; font-size: 12px; font-weight: 650; }
+    .summary-icon { display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; border-radius: 12px; background: #eaf4ec; color: #26704d; }
+    .summary-card:nth-child(2) .summary-icon { background: #eef4fa; color: #477da4; }
+    .summary-card:nth-child(3) .summary-icon { background: #e8f6f2; color: #318b76; }
+    .summary-card:nth-child(4) .summary-icon { background: #fff6e8; color: #b38843; }
+    .summary-icon svg { width: 20px; height: 20px; }
+    .summary-value { margin-top: 17px; font-size: clamp(22px, 2.1vw, 29px); line-height: 1.2; font-weight: 800; letter-spacing: -.65px; color: #183c2a; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+    .summary-foot { margin-top: 9px; font-size: 11px; color: #95a69a; }
+
+    /* ===== GOALS PANEL & GOAL CARDS ===== */
+    .goals-panel { background: #fff; border: 1px solid var(--border); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow); }
+    .section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 78px; padding: 21px 26px; border-bottom: 1px solid #eaf0ec; }
+    .section-title { font-size: 18px; font-weight: 780; color: #19392a; }
+    .goal-count { display: inline-flex; align-items: center; margin-left: 11px; padding: 5px 10px; background: #eaf5ed; color: #397c57; font-size: 11px; font-weight: 750; border-radius: 99px; }
+    .section-caption { margin-top: 6px; color: #96a49b; font-size: 11px; }
+    .goals-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; padding: 24px; }
+    .goal-item { min-width: 0; padding: 23px 23px 21px; border: 1px solid #e0eae3; border-radius: 15px; background: linear-gradient(145deg, #fff, #fbfdfb); box-shadow: 0 4px 12px rgba(18, 61, 44, .03); transition: border .2s, transform .2s, box-shadow .2s; }
+    .goal-item:hover { border-color: #bcd8c6; transform: translateY(-2px); box-shadow: 0 10px 26px rgba(18, 61, 44, .07); }
+    .goal-item:last-child { border-bottom: 1px solid #e0eae3; }
+    .goal-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .goal-info { min-width: 0; flex: 1; }
+    .goal-name-row { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .goal-icon { display: grid; place-items: center; flex: 0 0 45px; width: 45px; height: 45px; border-radius: 13px; color: #25734d; background: #e8f4eb; }
+    .goal-icon svg { width: 21px; height: 21px; }
+    .goal-name { color: #193c2a; font-size: 16px; line-height: 1.3; font-weight: 780; overflow-wrap: anywhere; }
+    .goal-date { margin-top: 6px; color: #829589; font-size: 11px; }
+    .goal-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .goal-action { display: grid; place-items: center; width: 35px; height: 35px; padding: 0; border: 1px solid #e6eee8; border-radius: 10px; background: #fff; color: #6c8575; }
+    .goal-action:hover { background: #ecf6ef; color: #236747; border-color: #cbdfd0; }
+    .goal-action.delete:hover { background: #fff2f1; border-color: #edd0cd; color: #bf554b; }
+    .goal-action svg { width: 16px; height: 16px; }
+    .goal-progress-area { margin: 25px 0 0; }
+    .goal-amount-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .goal-amount { font-size: 12px; color: #465f4f; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .goal-percent { font-size: 15px; font-weight: 800; color: #246e4b; font-variant-numeric: tabular-nums; }
+    .progress-track { height: 11px; width: 100%; background: #e6efe9; border-radius: 50px; overflow: hidden; }
+    .progress-bar { height: 100%; border-radius: 50px; background: linear-gradient(90deg, #225b42, #4fa57a); transition: width .35s; }
+    .progress-bar.complete { background: linear-gradient(90deg, #1e7953, #57be88); }
+    .goal-status { margin-top: 11px; font-size: 11px; color: #809487; }
+    .bw-goal-message { grid-column: 1 / -1; padding: 35px; color: #819184; text-align: center; }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state { display: none; padding: 62px 20px; text-align: center; }
+    .empty-icon { width: 57px; height: 57px; display: grid; place-items: center; margin: 0 auto 15px; background: #e8f4ec; color: #28734f; border-radius: 16px; }
+    .empty-icon svg { width: 26px; height: 26px; }
+    .empty-title { font-size: 17px; font-weight: 800; }
+    .empty-text { max-width: 390px; margin: 9px auto 20px; color: #83948a; font-size: 13px; line-height: 1.6; }
+    .empty-add-btn { padding: 12px 20px; border: 0; border-radius: 10px; background: var(--green); color: white; font-size: 12px; font-weight: 700; }
+
+    /* ===== MODAL ===== */
+    .modal-overlay { display: none; position: fixed; inset: 0; z-index: 2000; padding: 20px; align-items: center; justify-content: center; background: rgba(12, 37, 24, .55); }
+    .modal-overlay.show { display: flex; }
+    .modal { width: 100%; max-width: 520px; max-height: calc(100vh - 40px); overflow-y: auto; background: #fff; border-radius: 17px; box-shadow: 0 24px 80px rgba(0, 0, 0, .22); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 24px; border-bottom: 1px solid var(--border); }
+    .modal-title { margin: 0; font-size: 19px; color: #183a2b; }
+    .modal-close { display: grid; place-items: center; width: 36px; height: 36px; border: none; border-radius: 9px; background: #f4f7f5; color: #68796e; }
+    .modal-close svg { width: 18px; height: 18px; }
+    .modal-close:hover { background: #e9f2eb; }
+    .modal-body { padding: 24px; }
+    .form-error { display: none; margin-bottom: 16px; padding: 12px; border-radius: 9px; background: #fff1ef; color: #ad403c; font-size: 12px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group:last-child { margin-bottom: 0; }
+    .form-label { display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700; color: #435b4b; }
+    .form-input, .form-select { width: 100%; min-height: 44px; padding: 0 13px; border: 1px solid #dce7df; border-radius: 9px; outline: none; background: #fff; color: #223c2f; font-size: 13px; }
+    .form-input:focus { border-color: #66a785; box-shadow: 0 0 0 3px #e1f3e7; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 17px 24px; border-top: 1px solid var(--border); }
+    .cancel-btn, .save-btn { min-height: 41px; padding: 0 16px; border-radius: 9px; font-size: 12px; font-weight: 700; }
+    .cancel-btn { background: #f5f8f6; border: 1px solid #dce5de; color: #53695b; }
+    .cancel-btn:hover { background: #edf2ed; }
+    .save-btn { border: 0; background: var(--green); color: #fff; }
+    .save-btn:hover { background: #225e44; }
+    .save-btn:disabled { cursor: progress; opacity: .7; }
+
+    /* ===== TOAST ===== */
+    .toast { position: fixed; z-index: 3000; right: 24px; bottom: 24px; padding: 14px 18px; border-radius: 10px; background: var(--green); color: #fff; font-size: 12px; box-shadow: 0 10px 28px #123d2c33; transform: translateY(22px); opacity: 0; pointer-events: none; transition: transform .22s, opacity .22s; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.error { background: #ae4141; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1160px) {
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .content { padding: 27px 25px 60px; }
+    }
+    @media (max-width: 900px) {
+      .goals-list { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 800px) {
+      .sidebar { transform: translateX(-100%); transition: transform .25s; box-shadow: 10px 0 30px #00000018; }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .topbar .icon-button.mobile-menu { display: flex !important; }
+      .topbar, .main .topbar { padding: 0 18px; gap: 11px; }
+      .content { padding: 22px 18px 55px; }
+    }
+    @media (min-width: 801px) {
+      .topbar .icon-button.mobile-menu, .topbar #mobileMenu { display: none !important; }
+    }
+    @media (max-width: 600px) {
+      .topbar, .main .topbar { height: 64px; }
+      .topbar .search { display: none; }
+      .topbar .top-user-name { display: none; }
+      .topbar .top-actions { gap: 7px; }
+      .page-header { padding: 24px 20px; align-items: stretch; flex-direction: column; }
+      .add-goal-btn { width: 100%; }
+      .summary-grid { gap: 12px; }
+      .summary-card { padding: 17px 16px; min-height: 134px; }
+      .summary-icon { width: 35px; height: 35px; }
+      .summary-value { font-size: 22px; }
+      .section-header { padding: 19px; }
+      .goals-list { padding: 13px; gap: 13px; }
+      .goal-item { padding: 18px 15px; }
+      .goal-name { font-size: 14px; }
+      .goal-icon { width: 40px; height: 40px; flex-basis: 40px; }
+      .goal-amount { font-size: 11px; }
+    }
+    @media (max-width: 390px) {
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <div class="brand"><div class="brand-icon">₦</div><div class="brand-name">BudgetWise</div></div>
+    <nav aria-label="BudgetWise pages">
+      <div class="nav-section">
+        <div class="nav-section-title">Overview</div>
+        <a href="dashboard.html" class="nav-link"><i data-lucide="layout-dashboard" class="nav-icon"></i><span>Dashboard</span></a>
+        <a href="transactions.html" class="nav-link"><i data-lucide="arrow-left-right" class="nav-icon"></i><span>Transactions</span></a>
+        <a href="budgets.html" class="nav-link"><i data-lucide="wallet-cards" class="nav-icon"></i><span>Budgets</span></a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Planning</div>
+        <a href="reports.html" class="nav-link"><i data-lucide="bar-chart-3" class="nav-icon"></i><span>Reports</span></a>
+        <a href="goals.html" class="nav-link active" aria-current="page"><i data-lucide="target" class="nav-icon"></i><span>Goals</span></a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Account</div>
+        <a href="settings.html" class="nav-link"><i data-lucide="settings" class="nav-icon"></i><span>Settings</span></a>
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-mini">
+        <div class="avatar" id="sidebarAvatar">K</div>
+        <div class="user-mini-info">
+          <div class="user-mini-name" id="sidebarUserName">BudgetWise User</div>
+          <div class="user-mini-role">Personal Account</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-button mobile-menu" id="mobileMenu" type="button" aria-label="Open navigation"><i data-lucide="menu"></i></button>
+      <div class="search">
+        <i data-lucide="search"></i>
+        <input type="search" id="searchInput" placeholder="Search your goals..." aria-label="Search goals" autocomplete="off">
+      </div>
+      <div class="top-actions">
+        <button class="icon-button" id="notificationButton" type="button" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
+        <div class="top-user">
+          <div class="top-avatar" id="topAvatar">K</div>
+          <span class="top-user-name" id="topUserName">BudgetWise User</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="content">
+      <div class="page-header">
+        <div>
+          <p class="page-eyebrow">FINANCIAL PLANNING</p>
+          <h1 class="page-title">Your Financial Goals</h1>
+          <p class="page-subtitle">Make every naira count. Set a goal, track your savings, and see your progress.</p>
+        </div>
+        <button class="add-goal-btn" id="addGoalBtn" type="button"><i data-lucide="plus"></i><span>Add Goal</span></button>
+      </div>
+
+      <div class="summary-grid" aria-label="Goals summary">
+        <div class="summary-card">
+          <div class="summary-card-header"><span class="summary-label">Total Goals</span><div class="summary-icon"><i data-lucide="target"></i></div></div>
+          <div class="summary-value" id="totalGoals">0</div>
+          <div class="summary-foot">All your savings targets</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-header"><span class="summary-label">Active Goals</span><div class="summary-icon"><i data-lucide="circle-dot"></i></div></div>
+          <div class="summary-value" id="activeGoals">0</div>
+          <div class="summary-foot">Goals in progress</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-header"><span class="summary-label">Completed</span><div class="summary-icon"><i data-lucide="circle-check"></i></div></div>
+          <div class="summary-value" id="completedGoals">0</div>
+          <div class="summary-foot">Targets successfully reached</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-header"><span class="summary-label">Total Saved</span><div class="summary-icon"><i data-lucide="piggy-bank"></i></div></div>
+          <div class="summary-value" id="totalSaved">₦0</div>
+          <div class="summary-foot">Across all your goals</div>
+        </div>
+      </div>
+
+      <div class="goals-panel">
+        <div class="section-header">
+          <div><span class="section-title">Your Goals</span><span class="goal-count" id="goalCount">0 goals</span><div class="section-caption">Review savings progress and manage upcoming targets</div></div>
+        </div>
+        <div class="goals-list" id="goalsList"></div>
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon"><i data-lucide="target"></i></div>
+          <div class="empty-title">No goals yet</div>
+          <p class="empty-text">Create your first financial goal and start tracking your progress toward it.</p>
+          <button class="empty-add-btn" id="emptyAddGoalBtn" type="button">Create Your First Goal</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal IDs and form field names match your existing js/goals.js. -->
+<div class="modal-overlay" id="goalModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">Add Goal</h2>
+      <button class="modal-close" id="closeModalBtn" type="button" aria-label="Close goal form"><i data-lucide="x"></i></button>
+    </div>
+    <form id="goalForm">
+      <div class="modal-body">
+        <div class="form-error" id="formError" role="alert"></div>
+        <div class="form-group"><label class="form-label" for="goalName">Goal Name</label><input class="form-input" type="text" id="goalName" name="goalName" maxlength="80" placeholder="e.g. Emergency Fund" required></div>
+        <div class="form-group"><label class="form-label" for="targetAmount">Target Amount (₦)</label><input class="form-input" type="number" id="targetAmount" name="targetAmount" min="1" step="0.01" placeholder="e.g. 500000" required></div>
+        <div class="form-group"><label class="form-label" for="currentAmount">Current Saved Amount (₦)</label><input class="form-input" type="number" id="currentAmount" name="currentAmount" min="0" step="0.01" value="0" required></div>
+        <div class="form-group"><label class="form-label" for="targetDate">Target Date</label><input class="form-input" type="date" id="targetDate" name="targetDate" required></div>
+      </div>
+      <div class="modal-footer">
+        <button class="cancel-btn" id="cancelModalBtn" type="button">Cancel</button>
+        <button class="save-btn" type="submit">Save Goal</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- Only one Goals JavaScript file: handles CRUD and both top-bar dropdowns. -->
+<script src="js/goals.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => window.lucide?.createIcons());
+</script>
+</body>
+</html>
