@@ -1,5 +1,6 @@
 
 const API_URL = "http://127.0.0.1:8000/api/v1";
+let selectedReportMonth = new Date().toISOString().slice(0, 7);
 
 document.addEventListener("DOMContentLoaded", initializeReports);
 
@@ -18,6 +19,7 @@ async function initializeReports() {
     setupMobileMenu();
     setupRefreshButton();
     setupSearch();
+    setupReportMonthPicker();
     setupReportsTopbarMenus();
 
     await loadReports();
@@ -315,8 +317,8 @@ async function loadReports() {
 
         const [user, dashboard, expensesData] = await Promise.all([
             apiRequest("/users/me"),
-            apiRequest("/dashboard"),
-            apiRequest("/expenses")
+            apiRequest(`/dashboard?month=${encodeURIComponent(selectedReportMonth)}`),
+            apiRequest(`/expenses?month=${encodeURIComponent(selectedReportMonth)}`)
         ]);
 
         const expenses = Array.isArray(expensesData)
@@ -325,6 +327,7 @@ async function loadReports() {
 
         updateUser(user);
         updateSummary(user, dashboard);
+        updateIncomeHistoryNotice(dashboard);
         renderExpenseTrend(expenses);
         renderCategories(dashboard, expenses);
         renderHighestCategory(dashboard, expenses);
@@ -338,6 +341,58 @@ async function loadReports() {
             showError(error.message);
         }
     }
+}
+
+// ============================================================
+// MONTH PICKER AND HISTORICAL-INCOME NOTICE
+// ============================================================
+
+function setupReportMonthPicker() {
+    if (document.getElementById("reportsMonthInput")) return;
+    const refresh = document.getElementById("refreshReports");
+    if (!refresh) return;
+
+    const label = document.createElement("label");
+    label.style.cssText =
+        "display:inline-flex;align-items:center;gap:9px;" +
+        "font-size:13px;font-weight:700;color:#173b2a;flex-wrap:wrap";
+    label.textContent = "Financial month ";
+
+    const input = document.createElement("input");
+    input.type = "month";
+    input.id = "reportsMonthInput";
+    input.value = selectedReportMonth;
+    input.style.cssText =
+        "border:1px solid #dce9df;border-radius:10px;padding:10px 12px;" +
+        "background:#fff;color:#173b2a;font:inherit;font-size:13px;" +
+        "max-width:100%";
+    label.appendChild(input);
+    refresh.parentNode.insertBefore(label, refresh);
+
+    input.addEventListener("change", async () => {
+        if (!/^\\d{4}-(0[1-9]|1[0-2])$/.test(input.value)) return;
+        selectedReportMonth = input.value;
+        await loadReports();
+    });
+}
+
+function updateIncomeHistoryNotice(dashboard) {
+    let note = document.getElementById("reportsIncomeHistoryNotice");
+    if (!note) {
+        const anchor = document.querySelector(".reports-summary");
+        if (!anchor) return;
+        note = document.createElement("div");
+        note.id = "reportsIncomeHistoryNotice";
+        note.style.cssText =
+            "margin:10px 0;padding:11px 14px;border-radius:10px;" +
+            "background:#fff7e9;color:#8b5c23;font-size:12px";
+        anchor.parentNode.insertBefore(note, anchor);
+    }
+    note.style.display = dashboard.income_recorded === false ? "block" : "none";
+    note.textContent =
+        "No verified income record is available for this month. " +
+        "Expenses are shown accurately, but balance and savings " +
+        "calculations require historical income data.";
 }
 
 // ============================================================
