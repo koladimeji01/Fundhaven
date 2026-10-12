@@ -1,9 +1,20 @@
+import os
 import sqlite3
+
+from pydantic import BaseModel, Field
 
 from fastapi import APIRouter, HTTPException
 
 from app import database
-from app.email import send_welcome_email
+from app.email import (
+    send_welcome_email, send_login_code_email,
+    brevo_configured, EmailDeliveryError
+)
+from app.login_otp import (
+    issue_login_challenge, consume_login_challenge,
+    resend_login_challenge, discard_challenge,
+    invalidate_challenge, VerificationError
+)
 
 from app.auth import (
     hash_password,
@@ -154,17 +165,120 @@ def login(login_data: LoginRequest):
             detail="Invalid username or password"
         )
 
-    access_token = create_access_token(
-        user[0]
+    # Existing automated tests use the original token-only flow;
+    # production/development users must always complete email verification.
+    testing_without_otp = (
+        os.getenv("ENVIRONMENT", "development").lower() == "testing"
+        and os.getenv("BUDGETWISE_TEST_OTP") != "1"
     )
+    if testing_without_otp:
+        return {
+            "message": "Login successful",
+            "access_token": create_access_token(user[0]),
+            "token_type": "bearer"
+        }
 
-    logger.info(
-        f"User logged in successfully: "
-        f"{login_identifier}"
-    )
+    if not brevo_configured():
+        raise HTTPException(
+            status_code=503,
+            detail="Email verification is unavailable. Contact support."
+        )
+
+    recipient = user[4]
+    if not recipient:
+        raise HTTPException(
+            status_code=403,
+            detail="An email address is required for verified sign-in"
+        )
+
+    try:
+        challenge_id, code = issue_login_challenge(user[0])
+        try:
+            send_login_code_email(recipient, user[1], code)
+        except EmailDeliveryError:
+            discard_challenge(challenge_id)
+            raise
+    except VerificationError as exc:
+        raise HTTPException(
+            status_code=exc.status_code, detail=exc.message
+        ) from exc
+    except EmailDeliveryError as exc:
+        raise HTTPException(
+            status_code=503, detail="Could not send verification email. Try again."
+        ) from exc
+
+    return {
+        "verification_required": True,
+        "challenge_id": challenge_id,
+        "expires_in": 300,
+        "message": "A verification code has been sent to your email"
+    }
+
+
+# ============================================================
+# EMAIL VERIFICATION (BEFORE JWT ISSUANCE)
+# ============================================================
+
+class LoginVerifyRequest(BaseModel):
+    challenge_id: str = Field(min_length=30, max_length=64)
+    code: str = Field(pattern=r"^\d{6}$")
+
+
+class LoginResendRequest(BaseModel):
+    challenge_id: str = Field(min_length=30, max_length=64)
+
+
+@router.post("/login/verify", summary="Verify emailed sign-in code")
+def login_verify(data: LoginVerifyRequest):
+    try:
+        user_id = consume_login_challenge(
+            data.challenge_id, data.code
+        )
+    except VerificationError as exc:
+        raise HTTPException(
+            status_code=exc.status_code, detail=exc.message
+        ) from exc
 
     return {
         "message": "Login successful",
-        "access_token": access_token,
+        "access_token": create_access_token(user_id),
         "token_type": "bearer"
+    }
+
+
+@router.post("/login/resend", summary="Resend sign-in code")
+def login_resend(data: LoginResendRequest):
+    if not brevo_configured():
+        raise HTTPException(
+            status_code=503,
+            detail="Email verification is temporarily unavailable"
+        )
+
+    try:
+        user_id, code = resend_login_challenge(data.challenge_id)
+        user = database.get_user(user_id)
+        if not user or not user[4]:
+            invalidate_challenge(data.challenge_id)
+            raise HTTPException(
+                status_code=401, detail="Verification session has expired"
+            )
+        try:
+            send_login_code_email(user[4], user[1], code)
+        except EmailDeliveryError:
+            invalidate_challenge(data.challenge_id)
+            raise
+    except VerificationError as exc:
+        raise HTTPException(
+            status_code=exc.status_code, detail=exc.message
+        ) from exc
+    except EmailDeliveryError as exc:
+        raise HTTPException(
+            status_code=503, detail="Email delivery failed. Please sign in again"
+        ) from exc
+
+    return {
+        "verification_required": True,
+        "challenge_id": data.challenge_id,
+        "expires_in": 300,
+        "message": "A new code has been sent to your email"
     }
