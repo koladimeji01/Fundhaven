@@ -725,6 +725,25 @@
         const user = state.user;
         const d = state.dashboard;
 
+        let missingIncome = $("dashboardMissingIncome");
+        if (!missingIncome) {
+            const anchor = document.querySelector(".summary-grid");
+            if (anchor) {
+                missingIncome = document.createElement("div");
+                missingIncome.id = "dashboardMissingIncome";
+                missingIncome.style.cssText =
+                    "padding:11px 14px;margin:8px 0 12px;border-radius:10px;" +
+                    "background:#fff7e9;color:#8b5c23;font-size:12px";
+                anchor.parentNode.insertBefore(missingIncome, anchor);
+            }
+        }
+        if (missingIncome) {
+            missingIncome.style.display = d.income_recorded === false ? "block" : "none";
+            missingIncome.textContent =
+                "Income for this historical month has not been recorded. " +
+                "Expense totals are accurate, but balance and savings need income history.";
+        }
+
         const listSpent = state.expenses.reduce(
             (sum, e) => sum + amount(e),
             0
@@ -757,7 +776,7 @@
 
         if ($("balance")) {
             $("balance").textContent =
-                currency(balance);
+                d.income_recorded === false ? "—" : currency(balance);
         }
 
         if ($("income")) {
@@ -772,7 +791,7 @@
 
         if ($("savingsRate")) {
             $("savingsRate").textContent =
-                `${saved.toFixed(1)}%`;
+                d.income_recorded === false ? "—" : `${saved.toFixed(1)}%`;
         }
     }
 
