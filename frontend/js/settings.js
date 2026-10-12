@@ -24,6 +24,7 @@ loadSavedPreferences();
 createChangePasswordModal();
 
 await loadUser();
+await setupMonthlyEmailPreference();
 
 refreshIcons();
 });
@@ -2115,4 +2116,60 @@ if (
 
     window.lucide.createIcons();
 }
+}
+
+/* ============================================================
+   MONTHLY FINANCIAL REPORT EMAIL PREFERENCE
+   Saved on the backend, rather than in localStorage, so that
+   the scheduler can honour the choice after the browser closes.
+   ============================================================ */
+
+async function setupMonthlyEmailPreference() {
+    const checkbox = document.getElementById("monthlyReportsEmail");
+    if (!checkbox) return;
+
+    checkbox.disabled = true;
+    try {
+        const response = await apiRequest(
+            API_URL + "/users/me/monthly-email",
+            {method: "GET"}
+        );
+        if (!response || !response.ok) {
+            throw new Error("Could not load monthly email preference");
+        }
+        const preference = await response.json();
+        checkbox.checked = preference.monthly_reports_enabled === true;
+        checkbox.disabled = false;
+    } catch (error) {
+        showToast(error.message, true);
+        return;
+    }
+
+    checkbox.addEventListener("change", async () => {
+        const intended = checkbox.checked;
+        checkbox.disabled = true;
+        try {
+            const response = await apiRequest(
+                API_URL + "/users/me/monthly-email",
+                {
+                    method: "PUT",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({monthly_reports_enabled: intended})
+                }
+            );
+            if (!response || !response.ok) {
+                throw new Error("Could not update monthly email preference");
+            }
+            const result = await response.json();
+            checkbox.checked = result.monthly_reports_enabled === true;
+            showToast(checkbox.checked
+                ? "Monthly email reports enabled."
+                : "Monthly email reports disabled.");
+        } catch (error) {
+            checkbox.checked = !intended;
+            showToast(error.message, true);
+        } finally {
+            checkbox.disabled = false;
+        }
+    });
 }

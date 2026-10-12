@@ -75,6 +75,26 @@ def get_user_profile(user_id):
     }
 
 
+def update_user_profile(user_id, name, income):
+    """
+    Update profile fields and record this month's effective income.
+
+    database.update_user() handles the monthly-income record within
+    the same SQLite transaction. Return the updated user profile
+    because PUT /users/me declares UserResponse.
+    """
+    updated = database.update_user(
+        user_id=user_id,
+        name=name,
+        income=income,
+    )
+
+    if not updated:
+        return None
+
+    return get_user_profile(user_id)
+
+
 # ============================================================
 # EXPENSES
 # ============================================================

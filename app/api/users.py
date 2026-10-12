@@ -138,6 +138,51 @@ def change_my_password(password_data: dict, current_user=Depends(get_current_use
 
 
 # ============================================================
+# MONTHLY FINANCIAL EMAIL PREFERENCE (OPT IN)
+# ============================================================
+
+from pydantic import BaseModel
+from app import database
+
+
+class MonthlyReportPreference(BaseModel):
+    monthly_reports_enabled: bool
+
+
+@router.get("/users/me/monthly-email")
+def get_monthly_email_preference(current_user=Depends(get_current_user)):
+    conn = database.create_connection()
+    try:
+        row = conn.execute("""
+            SELECT monthly_reports_enabled FROM users WHERE id = ?
+        """, (current_user[0],)).fetchone()
+        if row is None:
+            raise HTTPException(status_code=404, detail="User not found")
+        return {"monthly_reports_enabled": bool(row[0])}
+    finally:
+        conn.close()
+
+
+@router.put("/users/me/monthly-email")
+def set_monthly_email_preference(
+    preference: MonthlyReportPreference,
+    current_user=Depends(get_current_user)
+):
+    conn = database.create_connection()
+    try:
+        updated = conn.execute("""
+            UPDATE users SET monthly_reports_enabled = ?
+            WHERE id = ?
+        """, (int(preference.monthly_reports_enabled), current_user[0]))
+        conn.commit()
+        if updated.rowcount == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        return {"monthly_reports_enabled": preference.monthly_reports_enabled}
+    finally:
+        conn.close()
+
+
+# ============================================================
 # GET MY DASHBOARD
 # ============================================================
 
