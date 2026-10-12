@@ -9,17 +9,16 @@ Do not invoke this job from the FastAPI app lifespan (multiple workers).
 """
 import argparse
 from collections import defaultdict
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from html import escape
 import time
-from zoneinfo import ZoneInfo
 
 from app import database
 from app.email import EmailDeliveryError, brevo_configured, send_email
 from app.logging_config import logger
 from app.monthly import resolve_month
 
-TZ = ZoneInfo("Africa/Lagos")
+TZ = timezone(timedelta(hours=1), name="Africa/Lagos")
 RETRY_CLAIM_AFTER_SECONDS = 30 * 60
 
 
