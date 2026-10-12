@@ -2604,7 +2604,7 @@
         const input = $("dashboardMonthInput");
         input.value = state.selectedMonth;
         input.addEventListener("change", async () => {
-            if (!/^\\d{4}-(0[1-9]|1[0-2])$/.test(input.value)) return;
+            if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(input.value)) return;
             state.selectedMonth = input.value;
             await loadDashboard();
         });
