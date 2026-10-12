@@ -1,4 +1,5 @@
-﻿from fastapi import APIRouter, Depends, HTTPException
+﻿from fastapi import APIRouter, Depends, HTTPException, Query
+from app.monthly import resolve_month
 
 from app import services
 from app.api.dependencies import get_current_user
@@ -145,10 +146,14 @@ def change_my_password(password_data: dict, current_user=Depends(get_current_use
     response_model=DashboardResponse,
     summary="Get my financial dashboard",
 )
-def get_my_dashboard(current_user=Depends(get_current_user)):
+def get_my_dashboard(current_user=Depends(get_current_user), month: str | None = Query(default=None)):
+    try:
+        month = resolve_month(month)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     user_id = current_user[0]
 
-    dashboard = services.get_user_dashboard(user_id)
+    dashboard = services.get_user_dashboard(user_id, month)
 
     if not dashboard:
         raise HTTPException(status_code=404, detail="User not found")
