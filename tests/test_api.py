@@ -1068,25 +1068,20 @@ def test_dashboard_without_token(client):
 # ==========================================
 
 def test_welcome_email_content():
-
+    """The optional welcome email is now sent through Brevo."""
     from app.email import send_welcome_email
 
-    result = send_welcome_email(
-        "test@example.com",
-        "Kehinde"
-    )
+    with patch("app.email.brevo_configured", return_value=True):
+        with patch("app.email.send_email", return_value="example-message-id") as mocked:
+            result = send_welcome_email("test@example.com", "Kehinde")
 
-    assert result["recipient"] == (
-        "test@example.com"
-    )
-
-    assert result["subject"] == (
-        "Welcome to BudgetWise"
-    )
-
-    assert "Kehinde" in result["body"]
-
-    assert "BudgetWise" in result["body"]
+    assert result == "example-message-id"
+    mocked.assert_called_once()
+    args = mocked.call_args.args
+    assert args[0] == "test@example.com"
+    assert args[1] == "Welcome to BudgetWise"
+    assert "Kehinde" in args[2]
+    assert "BudgetWise" in args[2]
 
 
 # ==========================================
