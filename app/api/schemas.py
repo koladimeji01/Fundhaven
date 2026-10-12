@@ -141,6 +141,8 @@ class BudgetListResponse(BaseModel):
 # ============================================================
 
 class DashboardResponse(BaseModel):
+    month: str | None = None
+    income_recorded: bool = True
     income: float
     total_expenses: float
     balance: float
@@ -163,6 +165,8 @@ class BudgetDashboardItem(BaseModel):
 
 
 class Dashboard2Response(BaseModel):
+    month: str | None = None
+    income_recorded: bool = True
     user_id: int
     income: float
     total_expenses: float
