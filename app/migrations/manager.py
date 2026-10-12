@@ -401,6 +401,63 @@ def run_migrations():
             )
 
         # ==================================
+        # MIGRATION 8: EMAIL OTP AND MONTHLY REPORTS
+        # ==================================
+
+        current_version = get_current_version(connection)
+
+        if current_version < 8:
+            cursor = connection.cursor()
+
+            cursor.execute("""
+                ALTER TABLE users
+                ADD COLUMN monthly_reports_enabled
+                    INTEGER NOT NULL DEFAULT 0
+                    CHECK(monthly_reports_enabled IN (0, 1))
+            """)
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS login_challenges (
+                    id TEXT PRIMARY KEY,
+                    user_id INTEGER NOT NULL,
+                    code_digest TEXT NOT NULL,
+                    created_at INTEGER NOT NULL,
+                    expires_at INTEGER NOT NULL,
+                    last_sent_at INTEGER NOT NULL,
+                    attempts INTEGER NOT NULL DEFAULT 0,
+                    resend_count INTEGER NOT NULL DEFAULT 0,
+                    consumed_at INTEGER,
+                    FOREIGN KEY(user_id)
+                        REFERENCES users(id) ON DELETE CASCADE
+                )
+            """)
+
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS idx_login_challenges_user
+                ON login_challenges(user_id, created_at)
+            """)
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS monthly_report_delivery (
+                    user_id INTEGER NOT NULL,
+                    report_month TEXT NOT NULL,
+                    status TEXT NOT NULL
+                        CHECK(status IN ('sending', 'sent', 'failed')),
+                    claimed_at INTEGER NOT NULL,
+                    sent_at INTEGER,
+                    provider_message_id TEXT,
+                    PRIMARY KEY(user_id, report_month),
+                    FOREIGN KEY(user_id)
+                        REFERENCES users(id) ON DELETE CASCADE
+                )
+            """)
+
+            record_migration(
+                connection, 8,
+                "Email verification and monthly report preferences"
+            )
+
+        # ==================================
         # FINAL VERSION
         # ==================================
 
