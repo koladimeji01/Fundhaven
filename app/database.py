@@ -202,10 +202,16 @@ def create_user(
             )
         )
 
-        connection.commit()
-
         user_id = cursor.lastrowid
 
+        cursor.execute("""
+            INSERT INTO monthly_income(user_id, month, amount)
+            VALUES (?, STRFTIME('%Y-%m','now'), ?)
+            ON CONFLICT(user_id, month)
+            DO UPDATE SET amount = excluded.amount
+        """, (user_id, income))
+
+        connection.commit()
         return user_id
 
     except sqlite3.Error as error:
@@ -379,9 +385,16 @@ def update_user(
             )
         )
 
+        updated = cursor.rowcount
+        if updated:
+            cursor.execute("""
+                INSERT INTO monthly_income(user_id, month, amount)
+                VALUES (?, STRFTIME('%Y-%m','now'), ?)
+                ON CONFLICT(user_id, month)
+                DO UPDATE SET amount = excluded.amount
+            """, (user_id, income))
         connection.commit()
-
-        return cursor.rowcount
+        return updated
 
     except sqlite3.IntegrityError as error:
         connection.rollback()
@@ -1045,5 +1058,40 @@ def update_user_password(user_id, hashed_password):
 
         raise
 
+    finally:
+        connection.close()
+
+# ============================================================
+# MONTHLY FINANCIAL RECORDS
+# ============================================================
+
+def get_month_expenses(user_id, month=None):
+    """Return only expenses belonging to the specified calendar month."""
+    from app.monthly import month_bounds
+    start, end = month_bounds(month)
+    connection = create_connection()
+    try:
+        return connection.execute("""
+            SELECT id, amount, category, description, date
+            FROM expenses
+            WHERE user_id = ? AND date >= ? AND date < ?
+            ORDER BY date DESC, id DESC
+        """, (user_id, start, end)).fetchall()
+    finally:
+        connection.close()
+
+
+def get_monthly_income(user_id, month=None):
+    """Get the income effective in a month; None if no history exists."""
+    from app.monthly import resolve_month
+    selected = resolve_month(month)
+    connection = create_connection()
+    try:
+        row = connection.execute("""
+            SELECT amount FROM monthly_income
+            WHERE user_id = ? AND month <= ?
+            ORDER BY month DESC LIMIT 1
+        """, (user_id, selected)).fetchone()
+        return float(row[0]) if row else None
     finally:
         connection.close()
