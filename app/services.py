@@ -234,15 +234,18 @@ def delete_user_budget(
 # MAIN DASHBOARD
 # ============================================================
 
-def get_user_dashboard(user_id):
+def get_user_dashboard(user_id, month=None):
+    from app.monthly import resolve_month
+    month = resolve_month(month)
     user = database.get_user(user_id)
 
     if not user:
         return None
 
-    expenses = database.get_expenses(user_id)
+    expenses = database.get_month_expenses(user_id, month)
 
-    income = float(user[2])
+    income_value = database.get_monthly_income(user_id, month)
+    income = float(income_value) if income_value is not None else 0.0
 
     total_expenses = sum(
         float(expense[1])
@@ -344,6 +347,8 @@ def get_user_dashboard(user_id):
     # --------------------------------------------------------
 
     return {
+        "month": month,
+        "income_recorded": income_value is not None,
         "income": income,
         "total_expenses": total_expenses,
         "balance": balance,
@@ -358,15 +363,18 @@ def get_user_dashboard(user_id):
 # BUDGET DASHBOARD
 # ============================================================
 
-def get_budget_dashboard(user_id):
+def get_budget_dashboard(user_id, month=None):
+    from app.monthly import resolve_month
+    month = resolve_month(month)
     user = database.get_user_by_id(user_id)
 
     if not user:
         return None
 
-    income = float(user[2])
+    income_value = database.get_monthly_income(user_id, month)
+    income = float(income_value) if income_value is not None else 0.0
 
-    expenses = database.get_expenses(user_id)
+    expenses = database.get_month_expenses(user_id, month)
 
     budgets = database.get_budgets(user_id)
 
@@ -491,6 +499,8 @@ def get_budget_dashboard(user_id):
 
     return {
         "user_id": user_id,
+        "month": month,
+        "income_recorded": income_value is not None,
         "income": income,
         "total_expenses": total_expenses,
         "balance": balance,
