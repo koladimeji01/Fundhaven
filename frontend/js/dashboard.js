@@ -33,6 +33,7 @@
         budgets: [],
         dashboard: {},
         chartDays: 7,
+        selectedMonth: new Date().toISOString().slice(0, 7),
         search: "",
         budgetError: false,
         preferences: {
@@ -678,15 +679,16 @@
     }
 
     async function dashboardRequest() {
+        const filter = `?month=${encodeURIComponent(state.selectedMonth)}`;
         try {
             return await request(
-                "/users/me/dashboard"
+                "/users/me/dashboard" + filter
             );
 
         } catch (firstError) {
             try {
                 return await request(
-                    "/dashboard"
+                    "/dashboard" + filter
                 );
 
             } catch (secondError) {
@@ -723,6 +725,25 @@
         const user = state.user;
         const d = state.dashboard;
 
+        let missingIncome = $("dashboardMissingIncome");
+        if (!missingIncome) {
+            const anchor = document.querySelector(".summary-grid");
+            if (anchor) {
+                missingIncome = document.createElement("div");
+                missingIncome.id = "dashboardMissingIncome";
+                missingIncome.style.cssText =
+                    "padding:11px 14px;margin:8px 0 12px;border-radius:10px;" +
+                    "background:#fff7e9;color:#8b5c23;font-size:12px";
+                anchor.parentNode.insertBefore(missingIncome, anchor);
+            }
+        }
+        if (missingIncome) {
+            missingIncome.style.display = d.income_recorded === false ? "block" : "none";
+            missingIncome.textContent =
+                "Income for this historical month has not been recorded. " +
+                "Expense totals are accurate, but balance and savings need income history.";
+        }
+
         const listSpent = state.expenses.reduce(
             (sum, e) => sum + amount(e),
             0
@@ -736,9 +757,10 @@
             );
 
         const income = number(
+            d.income ??
+            d.monthly_income ??
             user.income ??
             user.monthly_income ??
-            d.income ??
             d.monthly_income ??
             d.total_income
         );
@@ -754,7 +776,7 @@
 
         if ($("balance")) {
             $("balance").textContent =
-                currency(balance);
+                d.income_recorded === false ? "—" : currency(balance);
         }
 
         if ($("income")) {
@@ -769,7 +791,7 @@
 
         if ($("savingsRate")) {
             $("savingsRate").textContent =
-                `${saved.toFixed(1)}%`;
+                d.income_recorded === false ? "—" : `${saved.toFixed(1)}%`;
         }
     }
 
@@ -853,8 +875,15 @@
         const count = state.chartDays;
 
         const today = new Date();
-
         today.setHours(0, 0, 0, 0);
+        const [selectedYear, selectedNumber] = state.selectedMonth
+            .split("-").map(Number);
+        const lastDayOfSelectedMonth =
+            new Date(selectedYear, selectedNumber, 0);
+        lastDayOfSelectedMonth.setHours(0, 0, 0, 0);
+        if (lastDayOfSelectedMonth < today) {
+            today.setTime(lastDayOfSelectedMonth.getTime());
+        }
 
         const dates = Array.from(
             { length: count },
@@ -1837,7 +1866,7 @@
         const results = await Promise.allSettled([
             request("/users/me"),
             dashboardRequest(),
-            request("/expenses"),
+            request(`/expenses?month=${encodeURIComponent(state.selectedMonth)}`),
             request("/budgets")
         ]);
 
@@ -2568,6 +2597,39 @@
     }
 
     // ========================================================
+    // MONTH PICKER — keep financial months independent
+    // ========================================================
+
+    function setupMonthPicker() {
+        if ($("dashboardMonthPicker")) return;
+
+        const anchor = document.querySelector(".summary-grid");
+        if (!anchor) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.id = "dashboardMonthPicker";
+        wrapper.style.cssText =
+            "display:flex;justify-content:space-between;align-items:center;" +
+            "gap:12px;flex-wrap:wrap;margin:12px 0 14px;color:#173b2a";
+        wrapper.innerHTML =
+            '<label for="dashboardMonthInput" style="font-weight:700;font-size:13px">' +
+            'Financial month</label>' +
+            '<input id="dashboardMonthInput" type="month" ' +
+            'style="padding:10px 13px;border:1px solid #dae7df;' +
+            'border-radius:10px;background:#fff;color:#173b2a;font:inherit;' +
+            'font-size:13px;max-width:100%">';
+        anchor.parentNode.insertBefore(wrapper, anchor);
+
+        const input = $("dashboardMonthInput");
+        input.value = state.selectedMonth;
+        input.addEventListener("change", async () => {
+            if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(input.value)) return;
+            state.selectedMonth = input.value;
+            await loadDashboard();
+        });
+    }
+
+    // ========================================================
     // INITIALIZE DASHBOARD
     // ========================================================
 
@@ -2581,6 +2643,7 @@
 
             // Add dashboard dynamic styles
             addStyles();
+            setupMonthPicker();
 
             // Search recent transactions
             $("searchInput")?.addEventListener(
