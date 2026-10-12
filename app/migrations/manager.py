@@ -371,6 +371,36 @@ def run_migrations():
             )
 
         # ==================================
+        # MIGRATION 7: MONTHLY INCOME HISTORY
+        # ==================================
+
+        current_version = get_current_version(connection)
+
+        if current_version < 7:
+            cursor = connection.cursor()
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS monthly_income (
+                    user_id INTEGER NOT NULL,
+                    month TEXT NOT NULL,
+                    amount REAL NOT NULL CHECK(amount > 0),
+                    PRIMARY KEY (user_id, month),
+                    FOREIGN KEY (user_id)
+                        REFERENCES users(id) ON DELETE CASCADE
+                )
+            """)
+            # We cannot reconstruct historical salary from an undated field.
+            # Seed existing incomes from the current month onward.
+            cursor.execute("""
+                INSERT OR IGNORE INTO monthly_income
+                    (user_id, month, amount)
+                SELECT id, STRFTIME('%Y-%m','now'), income
+                FROM users
+            """)
+            record_migration(
+                connection, 7, "Track effective monthly income"
+            )
+
+        # ==================================
         # FINAL VERSION
         # ==================================
 
