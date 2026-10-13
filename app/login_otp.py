@@ -6,7 +6,7 @@ have limited attempts, are single-use and are never returned by the API.
 import hashlib
 import hmac
 import secrets
-import sqlite3
+from app.db_backend import DB_ERRORS
 import time
 from uuid import uuid4
 
@@ -180,7 +180,7 @@ def consume_login_challenge(challenge_id: str, code: str) -> int:
         return int(row[0])
     except VerificationError:
         raise
-    except sqlite3.Error:
+    except DB_ERRORS:
         db.rollback()
         raise
     finally:
