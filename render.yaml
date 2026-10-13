@@ -1,0 +1,29 @@
+# Render Free: BudgetWise FastAPI backend (frontend deploys on Vercel).
+# Provision through https://dashboard.render.com/blueprints.
+# No SQLite: DATABASE_URL must point at your existing Supabase PostgreSQL DB.
+# Secrets MUST be provided privately in Render; never add credentials here.
+
+services:
+  - type: web
+    name: budgetwise-api
+    runtime: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+
+# After deploying the frontend on Vercel, add the following variable to
+# Render service → Environment manually and redeploy:
+# BUDGETWISE_ALLOWED_ORIGINS=https://YOUR-PROJECT.vercel.app
+#
+# Existing Brevo login OTP is NOT bypassed. Sign-in requires valid server-side
+# BREVO_API_KEY and BREVO_SENDER_EMAIL, otherwise login remains unavailable.
+# OPENAI_API_KEY is optional for model-generated advice.
