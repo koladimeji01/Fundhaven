@@ -52,3 +52,13 @@ def test_prod_requires_persistent_postgresql(monkeypatch):
 
     with pytest.raises(RuntimeError, match="requires DATABASE_URL"):
         asyncio.run(start())
+
+
+def test_production_cors_uses_only_explicit_https_origin(monkeypatch):
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv(
+        "BUDGETWISE_ALLOWED_ORIGINS", "https://budgetwise-demo.vercel.app"
+    )
+    allowed = configured_cors_origins()
+    assert allowed == ["https://budgetwise-demo.vercel.app"]
+    assert "http://localhost:5500" not in allowed
