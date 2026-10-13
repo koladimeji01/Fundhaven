@@ -27,6 +27,9 @@ jobs:
           python -m pip install -r requirements-dev.txt
       - name: Run existing BudgetWise tests with SQLite
         run: python -m pytest -q
+      - name: Validate AI dashboard JavaScript
+        run: node --check frontend/js/ai-insights.js
+
 
   postgres-tests:
     runs-on: ubuntu-latest
