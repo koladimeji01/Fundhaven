@@ -24,6 +24,8 @@
 
     >
 
+    <link rel="stylesheet" href="css/ai-insights.css">
+
     <!-- Lucide Icons -->
 
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -1034,6 +1036,60 @@ body {margin:0;background:var(--bw-page);color:var(--bw-text);font-family:Inter,
 
             </div>
 
+
+            <!-- ================= AI FINANCIAL INSIGHTS ================= -->
+            <section class="bw-ai-panel" aria-labelledby="bwAITitle">
+                <div class="bw-ai-heading">
+                    <span class="bw-ai-heading-icon" aria-hidden="true">
+                        <i data-lucide="sparkles"></i>
+                    </span>
+                    <div>
+                        <h2 id="bwAITitle">AI Financial Insights</h2>
+                        <p>
+                            Understand this month's spending patterns and get
+                            practical tips without changing your financial records.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bw-ai-actions">
+                    <button id="bwLocalInsightButton" type="button"
+                            class="bw-ai-button secondary">
+                        View spending insights (private)
+                    </button>
+                </div>
+                <div id="bwLocalInsights" class="bw-ai-local"
+                     aria-live="polite"></div>
+
+                <label class="bw-ai-consent" for="bwAIConsent">
+                    <input id="bwAIConsent" type="checkbox">
+                    <span>
+                        <strong>Optional AI advice:</strong>
+                        I agree to send this month's income and expense totals,
+                        category labels and totals, and budget amounts to OpenAI
+                        for one AI-generated response. No transaction descriptions,
+                        names, passwords, or emails are sent.
+                    </span>
+                </label>
+
+                <div class="bw-ai-actions">
+                    <button id="bwAIAdviceButton" type="button"
+                            class="bw-ai-button" disabled>
+                        Generate AI advice
+                    </button>
+                </div>
+                <p id="bwAIStatus" class="bw-ai-status" role="status">
+                    Choose an option to review the selected month's finances.
+                </p>
+                <div id="bwGeneratedAdvice" class="bw-ai-generated"
+                     aria-live="polite"></div>
+                <p class="bw-ai-disclaimer">
+                    Local insights use clear spending rules, not a trained AI model.
+                    AI-generated suggestions may be inaccurate and are for education,
+                    not professional financial advice.
+                </p>
+            </section>
+
         </section>
 
     </main>
@@ -1045,6 +1101,7 @@ body {margin:0;background:var(--bw-page);color:var(--bw-text);font-family:Inter,
 <script src="js/auth.js"></script>
 
 <script src="js/dashboard.js"></script>
+<script src="js/ai-insights.js"></script>
 
 <!-- ================= INITIALIZE ICONS ================= -->
 
