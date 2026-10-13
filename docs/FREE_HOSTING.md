@@ -1,0 +1,171 @@
+# BudgetWise FREE web deployment: Vercel + Render + Supabase
+
+These instructions publish BudgetWise as a DEMO/DEVELOPMENT site.
+Vercel Hobby is for non-commercial use. Render Free may sleep after 15
+minutes and can take about a minute to wake. Neither free deployment is
+appropriate for a financial app with real customers or production SLAs.
+
+Services:
+- Website: Vercel (static HTML/CSS/JS under frontend/).
+- FastAPI backend: Render Free (api.py, Python, port from $PORT).
+- Persistent database: your existing Supabase PostgreSQL project.
+
+This repo has frontend/vercel.json, frontend/build.js, render.yaml and
+a runtime-config.js. You do NOT need to edit all the JS files manually.
+
+## Step 0 - Merge and pull the deployment branch
+
+Merge the deployment pull request into main, then run:
+
+    git switch main
+    git pull origin main
+
+Do not upload .env or your SQLite database to GitHub.
+Your previous Ubuntu pip error is unrelated to Vercel: both Render and
+Vercel install/build their dependencies in their own cloud environments.
+
+## Step 1 - Deploy the FastAPI backend on Render
+
+1. Visit https://dashboard.render.com/ and sign in.
+2. Choose New -> Blueprint.
+3. Connect the GitHub repository koladimeji01/budgetwise.
+4. Select main, and confirm Render can read render.yaml at repository root.
+5. Choose the Free service plan specified in render.yaml.
+6. For DATABASE_URL, enter the **PostgreSQL connection URI**, obtained from
+   your Supabase dashboard -> Connect -> Session pooler. It typically
+   ends with /postgres?sslmode=require and has port 5432.
+   The full URI includes the database password and must remain PRIVATE.
+7. Render generates SECRET_KEY automatically. ENVIRONMENT is production.
+8. Deploy. Wait until the service shows Live.
+9. Open https://YOUR-RENDER-NAME.onrender.com/health .
+   The API should return {"status":"healthy"}.
+
+The backend will initialize empty PostgreSQL tables on first startup.
+It does NOT copy existing SQLite records automatically.
+
+IMPORTANT: Render Free uses an ephemeral filesystem; app startup
+refuses to run in production without DATABASE_URL. This is deliberate.
+Never remove this safeguard to make SQLite work on a free cloud host.
+
+If Render fails to connect to Supabase, check:
+- You copied the full PostgreSQL URI (not a supabase.co API URL).
+- Your database password is correct and URL-encoded if necessary.
+- You chose Session pooler if IPv4 is required.
+- Your project is active, accessible and permits connections.
+- You included sslmode=require as appropriate.
+
+## Step 2 - Deploy the static frontend on Vercel
+
+1. Go to https://vercel.com/new and connect your GitHub account.
+2. Import koladimeji01/budgetwise.
+3. Set **Root Directory** to frontend (not the repo root).
+4. Set Framework Preset to Other.
+5. Confirm the frontend/vercel.json file configures:
+     Build Command: node build.js
+     Output Directory: dist
+6. Under Environment Variables, add:
+     NAME: BUDGETWISE_API_URL
+     VALUE: https://YOUR-RENDER-NAME.onrender.com/api/v1
+
+   This is a PUBLIC API address, not a secret key.
+   It must start with https and end with /api/v1.
+   NEVER set DATABASE_URL, SECRET_KEY, or OPENAI_API_KEY on the
+   public static Vercel project.
+7. Click Deploy. Vercel builds and publishes the site.
+8. Visit the .vercel.app domain it gives you.
+   index.html is the BudgetWise landing page; login.html is the login page.
+
+If the Vercel build reports "Missing BUDGETWISE_API_URL", set that
+environment variable in Vercel Project Settings, then redeploy.
+The build fails closed instead of publishing JavaScript that tries to
+connect to your local computer's 127.0.0.1 address.
+
+## Step 3 - Permit the Vercel origin on Render
+
+Once Vercel gives you the actual public hostname:
+
+1. Render Dashboard -> budgetwise-api -> Environment.
+2. Add:
+     BUDGETWISE_ALLOWED_ORIGINS=https://YOUR-PROJECT.vercel.app
+3. Save and redeploy/restart the backend.
+4. If your production domain is different from the preview domain,
+   use the exact one served to users. For multiple domains, separate
+   exact HTTPS origins with commas; no wildcards or paths.
+
+Verify that requests from the deployed login and dashboard pages can
+reach the Render API. CORS is NOT authentication: protected endpoints
+still require the BudgetWise JWT and checks in FastAPI.
+
+## Step 4 - Login and financial data (important!)
+
+The previously implemented Brevo email OTP flow is still ENABLED on
+normal deployments. Since you postponed email setup, production login
+will return HTTP 503 until BREVO_API_KEY and BREVO_SENDER_EMAIL are set
+on Render, using a verified sender in Brevo.
+
+The landing page can be public before that, but a working production
+login requires email verification. We intentionally do not bypass OTP
+on a public website.
+
+Because the Supabase database is currently new/empty, historical users,
+expenses and budgets from your local SQLite file will not appear until
+you run a safe one-time data migration. Once your local Python virtual
+environment is repaired:
+
+    python -m app.migrations.sqlite_to_postgres --dry-run
+
+Review the result, back up budgetwise.db, and only then run:
+
+    python -m app.migrations.sqlite_to_postgres --yes
+
+The destination must be empty of application data. The import preserves
+existing IDs and password hashes. Do NOT copy private SQLite DB files
+to GitHub/Vercel/Render just to run the migration.
+
+See docs/POSTGRESQL_MIGRATION.md for the full safety procedure.
+
+## Step 5 - Optional AI-generated financial advice
+
+The private monthly insights require no AI API key.
+
+For the optional OpenAI-generated advice button, add OPENAI_API_KEY
+to the Render BACKEND's private environment settings. A ChatGPT
+subscription does not automatically include API usage or credits.
+
+Do not put that key in Vercel. Do not enable unbudgeted public AI usage.
+
+## Tests and troubleshooting
+
+Both environments run over HTTPS. Tests in this repository ensure:
+- Existing frontend JS reads public API config and retains local fallback.
+- Vercel build injects the public API URL into dist/js/runtime-config.js.
+- Production FastAPI never falls back to ephemeral SQLite.
+- CORS permits only explicit trusted HTTPS website origins.
+- SQLite and PostgreSQL integration regressions still pass.
+
+Open the browser Developer Tools Network tab:
+- Requests must target https://YOUR-RENDER-NAME.onrender.com/api/v1
+- A 503 on login without Brevo is expected, NOT a database failure.
+- CORS errors mean Render's BUDGETWISE_ALLOWED_ORIGINS doesn't match.
+- A slow first request means Render Free was asleep; wait for wake-up.
+- A server error on Render startup may mean DATABASE_URL is wrong.
+
+Monthly report emails are NOT scheduled automatically with this
+free stack. They require a trusted always-on scheduler or a separate
+scheduled function and must be configured later.
+
+## Important production warning
+
+Do not use Vercel Hobby for a commercial BudgetWise launch. Its free
+Hobby plan is for non-commercial/personal use. Render Free is explicitly
+not recommended for production, has an ephemeral filesystem and cold
+starts. Before collecting real customers' financial data, plan paid
+hosting, independent backups, abuse throttling, HTTPS certificate
+verification, reliable authentication/email delivery, privacy terms,
+and security review.
+
+Documentation:
+https://vercel.com/docs/builds/configure-a-build
+https://render.com/docs/free
+https://render.com/docs/blueprint-spec
+https://supabase.com/docs/guides/database/connecting-to-postgres
