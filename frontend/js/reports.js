@@ -1,5 +1,5 @@
 
-const API_URL = "http://127.0.0.1:8000/api/v1";
+const API_URL = (window.BUDGETWISE_API_BASE_URL || "http://127.0.0.1:8000/api/v1");
 let selectedReportMonth = new Date().toISOString().slice(0, 7);
 
 document.addEventListener("DOMContentLoaded", initializeReports);
