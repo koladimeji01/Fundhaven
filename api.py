@@ -106,10 +106,13 @@ def configured_cors_origins():
     Configure BUDGETWISE_ALLOWED_ORIGINS=https://yourapp.vercel.app in Render.
     Multiple explicit origins may be supplied, separated by commas.
     """
-    origins = [
-        "http://127.0.0.1:5500",
-        "http://localhost:5500",
-    ]
+    # Do not allow localhost on public production servers; only explicit
+    # HTTPS origins from BUDGETWISE_ALLOWED_ORIGINS are trusted there.
+    origins = (
+        []
+        if os.getenv("ENVIRONMENT", "development").lower() == "production"
+        else ["http://127.0.0.1:5500", "http://localhost:5500"]
+    )
     raw = os.getenv("BUDGETWISE_ALLOWED_ORIGINS", "")
     for item in raw.split(","):
         candidate = item.strip().rstrip("/")
