@@ -1,11 +1,14 @@
 from contextlib import asynccontextmanager
 
+import os
 import sqlite3
+from urllib.parse import urlsplit
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 from app import database
+from app.db_backend import using_postgres
 
 from app.migrations.manager import run_migrations
 
@@ -27,6 +30,16 @@ from app.api.v1 import router as v1_router
 
 @asynccontextmanager
 async def lifespan(app):
+
+    # Free cloud hosts have ephemeral filesystems: never create a private
+    # SQLite database that disappears on restart, or split user accounts
+    # between independent instances.
+    if os.getenv("ENVIRONMENT", "development").lower() == "production":
+        if not using_postgres():
+            raise RuntimeError(
+                "Production deployment requires DATABASE_URL for PostgreSQL. "
+                "SQLite is supported only for local development and testing."
+            )
 
     run_migrations()
 
@@ -87,12 +100,47 @@ Then click **Authorize** in Swagger and enter:
 
     lifespan=lifespan
 )
+def configured_cors_origins():
+    """Accept exact trusted frontend URLs, never a wildcard.
+
+    Configure BUDGETWISE_ALLOWED_ORIGINS=https://yourapp.vercel.app in Render.
+    Multiple explicit origins may be supplied, separated by commas.
+    """
+    # Do not allow localhost on public production servers; only explicit
+    # HTTPS origins from BUDGETWISE_ALLOWED_ORIGINS are trusted there.
+    origins = (
+        []
+        if os.getenv("ENVIRONMENT", "development").lower() == "production"
+        else ["http://127.0.0.1:5500", "http://localhost:5500"]
+    )
+    raw = os.getenv("BUDGETWISE_ALLOWED_ORIGINS", "")
+    for item in raw.split(","):
+        candidate = item.strip().rstrip("/")
+        if not candidate:
+            continue
+        parsed = urlsplit(candidate)
+        if (
+            parsed.scheme != "https"
+            or not parsed.hostname
+            or parsed.username
+            or parsed.password
+            or parsed.path
+            or parsed.query
+            or parsed.fragment
+            or "*" in candidate
+        ):
+            raise ValueError(
+                "BUDGETWISE_ALLOWED_ORIGINS must contain complete, exact "
+                "HTTPS origins, separated by commas (no paths or wildcards)"
+            )
+        if candidate not in origins:
+            origins.append(candidate)
+    return origins
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://127.0.0.1:5500",
-        "http://localhost:5500",
-    ],
+    allow_origins=configured_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

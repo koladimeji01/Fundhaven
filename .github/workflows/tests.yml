@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feature/postgresql-integration
+      - feature/free-cloud-deployment
   pull_request:
 
 jobs:
@@ -27,8 +28,25 @@ jobs:
           python -m pip install -r requirements-dev.txt
       - name: Run existing BudgetWise tests with SQLite
         run: python -m pytest -q
-      - name: Validate AI dashboard JavaScript
-        run: node --check frontend/js/ai-insights.js
+      - name: Validate frontend JavaScript without changing icons/layout
+        run: |
+          node --check frontend/build.js
+          for file in frontend/js/*.js; do node --check "$file"; done
+      - name: Verify Vercel build injects HTTPS API URL
+        env:
+          BUDGETWISE_API_URL: https://example.onrender.com/api/v1
+        run: |
+          cd frontend
+          node build.js
+          test -f dist/index.html
+          test -f dist/dashboard.html
+          test -f dist/js/ai-insights.js
+          node --check dist/js/runtime-config.js
+          grep -q 'https://example.onrender.com/api/v1' dist/js/runtime-config.js
+          if grep -q '127.0.0.1:8000' dist/js/runtime-config.js; then
+            echo "Production runtime configuration incorrectly points at localhost"
+            exit 1
+          fi
 
 
   postgres-tests:

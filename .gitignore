@@ -1,7 +1,21 @@
+# Never commit secrets, virtual environments, or personal finance records.
 .env
-.env.test
+.env.*
+!.env.example
 venv/
+.venv/
 __pycache__/
 *.pyc
-budgetwise.db
-test_budgetwise.db
+
+# Local SQLite databases, journals, and backup copies.
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sqlite3-*
+
+# Build output and tooling metadata.
+frontend/dist/
+.vercel/
+node_modules/
