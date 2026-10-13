@@ -41,6 +41,18 @@ def get_database_url():
         raise ValueError(
             "DATABASE_URL must begin with postgresql:// or postgres://"
         )
+    # Prevent the existing SQLite test fixtures from wiping a real
+    # PostgreSQL database when a DATABASE_URL leaks into the test shell.
+    if (
+        url
+        and os.getenv("ENVIRONMENT", "development") == "testing"
+        and os.getenv("BUDGETWISE_TEST_POSTGRES") != "1"
+    ):
+        raise RuntimeError(
+            "PostgreSQL disabled for regular tests. Remove DATABASE_URL "
+            "to run SQLite tests. Only use PostgreSQL with the dedicated "
+            "isolated test suite and BUDGETWISE_TEST_POSTGRES=1."
+        )
     return url
 
 
