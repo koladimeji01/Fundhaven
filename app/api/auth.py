@@ -1,5 +1,5 @@
 import os
-import sqlite3
+from app.db_backend import INTEGRITY_ERRORS
 
 from pydantic import BaseModel, Field
 
@@ -76,7 +76,7 @@ def create_user(user: User):
             email=str(user.email)
         )
 
-    except sqlite3.IntegrityError:
+    except INTEGRITY_ERRORS:
 
         raise HTTPException(
             status_code=400,

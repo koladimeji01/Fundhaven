@@ -1,6 +1,9 @@
-import sqlite3
+from datetime import date
 
 from app.config import DATABASE_NAME
+from app.db_backend import (
+    connect_database, using_postgres, DB_ERRORS, INTEGRITY_ERRORS
+)
 from app.logging_config import logger
 
 
@@ -9,13 +12,8 @@ from app.logging_config import logger
 # ==========================================
 
 def create_connection():
-    connection = sqlite3.connect(DATABASE_NAME)
-
-    connection.execute(
-        "PRAGMA foreign_keys = ON"
-    )
-
-    return connection
+    """Connect to PostgreSQL when DATABASE_URL is set, otherwise SQLite."""
+    return connect_database(DATABASE_NAME)
 
 
 # ==========================================
@@ -23,6 +21,11 @@ def create_connection():
 # ==========================================
 
 def create_tables():
+    if using_postgres():
+        from app.migrations.postgres import run_postgres_migrations
+        run_postgres_migrations()
+        return
+
     connection = create_connection()
     cursor = connection.cursor()
 
@@ -156,7 +159,7 @@ def create_tables():
             "Database tables checked successfully."
         )
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         connection.rollback()
 
         logger.error(
@@ -206,15 +209,15 @@ def create_user(
 
         cursor.execute("""
             INSERT INTO monthly_income(user_id, month, amount)
-            VALUES (?, STRFTIME('%Y-%m','now'), ?)
+            VALUES (?, ?, ?)
             ON CONFLICT(user_id, month)
             DO UPDATE SET amount = excluded.amount
-        """, (user_id, income))
+        """, (user_id, date.today().strftime("%Y-%m"), income))
 
         connection.commit()
         return user_id
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         connection.rollback()
 
         logger.error(
@@ -249,7 +252,7 @@ def get_user(user_id):
 
         return cursor.fetchone()
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         logger.error(
             f"Database error while getting user: {error}"
         )
@@ -283,7 +286,7 @@ def get_user_by_id(user_id):
 
         return cursor.fetchone()
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         logger.error(
             f"Database error while getting user by id: {error}"
         )
@@ -316,7 +319,7 @@ def get_user_by_name(name):
 
         return cursor.fetchone()
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         logger.error(
             f"Database error while getting user by name: {error}"
         )
@@ -349,7 +352,7 @@ def get_user_by_email(email):
 
         return cursor.fetchone()
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         logger.error(
             f"Database error while getting user by email: {error}"
         )
@@ -389,14 +392,14 @@ def update_user(
         if updated:
             cursor.execute("""
                 INSERT INTO monthly_income(user_id, month, amount)
-                VALUES (?, STRFTIME('%Y-%m','now'), ?)
+                VALUES (?, ?, ?)
                 ON CONFLICT(user_id, month)
                 DO UPDATE SET amount = excluded.amount
-            """, (user_id, income))
+            """, (user_id, date.today().strftime("%Y-%m"), income))
         connection.commit()
         return updated
 
-    except sqlite3.IntegrityError as error:
+    except INTEGRITY_ERRORS as error:
         connection.rollback()
 
         logger.error(
@@ -407,7 +410,7 @@ def update_user(
             "Name already exists"
         )
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         connection.rollback()
 
         logger.error(
@@ -552,7 +555,7 @@ def delete_expense(
 
         return cursor.rowcount
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         connection.rollback()
 
         logger.error(
@@ -601,7 +604,7 @@ def add_budget(
 
         return budget_id
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         connection.rollback()
 
         logger.error(
@@ -636,7 +639,7 @@ def get_budgets(user_id):
 
         return cursor.fetchall()
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         logger.error(
             f"Database error while getting budgets: {error}"
         )
@@ -681,7 +684,7 @@ def update_budget(
 
         return cursor.rowcount
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         connection.rollback()
 
         logger.error(
@@ -720,7 +723,7 @@ def delete_budget(
 
         return cursor.rowcount
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         connection.rollback()
 
         logger.error(
@@ -775,7 +778,7 @@ def create_goal(
 
         return goal_id
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         connection.rollback()
 
         logger.error(
@@ -847,7 +850,7 @@ def get_goals(user_id):
 
         return goals
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         logger.error(
             f"Database error while getting goals: {error}"
         )
@@ -921,7 +924,7 @@ def get_goal(
             "completed": current_amount >= target_amount
         }
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         logger.error(
             f"Database error while getting goal: {error}"
         )
@@ -971,7 +974,7 @@ def update_goal(
 
         return cursor.rowcount
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         connection.rollback()
 
         logger.error(
@@ -1010,7 +1013,7 @@ def delete_goal(
 
         return cursor.rowcount
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         connection.rollback()
 
         logger.error(
@@ -1049,7 +1052,7 @@ def update_user_password(user_id, hashed_password):
 
         return cursor.rowcount
 
-    except sqlite3.Error as error:
+    except DB_ERRORS as error:
         connection.rollback()
 
         logger.error(

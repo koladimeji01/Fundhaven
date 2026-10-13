@@ -1,6 +1,7 @@
 import sqlite3
 
 from app.config import DATABASE_NAME
+from app.db_backend import using_postgres
 from app.logging_config import logger
 
 
@@ -76,6 +77,11 @@ def record_migration(
 # ==========================================
 
 def run_migrations():
+
+    if using_postgres():
+        from app.migrations.postgres import run_postgres_migrations
+        run_postgres_migrations()
+        return
 
     connection = sqlite3.connect(
         DATABASE_NAME

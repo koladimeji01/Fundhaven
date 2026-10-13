@@ -124,6 +124,14 @@ async def database_exception_handler(
     )
 
 
+# Register the same safe error response for psycopg if installed.
+try:
+    import psycopg
+    app.add_exception_handler(psycopg.Error, database_exception_handler)
+except ImportError:
+    pass
+
+
 # ==========================================
 # GENERAL ERROR HANDLER
 # ==========================================
