@@ -11,6 +11,7 @@ The bridge converts NUMERIC results to floats ONLY for compatibility with
 legacy service arithmetic. The database still stores amounts as NUMERIC(18,2).
 Future financial calculations should migrate fully to Decimal.
 """
+from datetime import date, datetime
 from decimal import Decimal
 import os
 import re
@@ -80,6 +81,16 @@ class PostgresCursor:
         )
         if needs_id:
             sql = sql.rstrip().rstrip(";") + " RETURNING id"
+
+        # SQLite automatically serializes Python date objects to ISO text.
+        # PostgreSQL TEXT columns need the same explicit representation.
+        if params is not None:
+            params = tuple(
+                value.isoformat()
+                if isinstance(value, date) and not isinstance(value, datetime)
+                else value
+                for value in params
+            )
 
         self._cursor.execute(sql, params)
 
