@@ -24,6 +24,6 @@ services:
 # Render service → Environment manually and redeploy:
 # BUDGETWISE_ALLOWED_ORIGINS=https://YOUR-PROJECT.vercel.app
 #
-# Existing Brevo login OTP is NOT bypassed. Sign-in requires valid server-side
-# BREVO_API_KEY and BREVO_SENDER_EMAIL, otherwise login remains unavailable.
+# Sign-in uses email/username and password with JWT; no Brevo OTP required.
+# Brevo may still be configured separately for optional notifications.
 # OPENAI_API_KEY is optional for model-generated advice.
