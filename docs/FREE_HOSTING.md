@@ -124,15 +124,50 @@ to GitHub/Vercel/Render just to run the migration.
 
 See docs/POSTGRESQL_MIGRATION.md for the full safety procedure.
 
-## Step 5 - Optional AI-generated financial advice
+## Step 5 - Finova: optional AI-generated financial advice
 
-The private monthly insights require no AI API key.
+Finova is the name of BudgetWise's AI spending assistant, displayed on
+the Dashboard. The **private** monthly insights use local rules and do not
+call OpenAI, so no AI API key is necessary for those insights.
 
-For the optional OpenAI-generated advice button, add OPENAI_API_KEY
-to the Render BACKEND's private environment settings. A ChatGPT
-subscription does not automatically include API usage or credits.
+The **Generate advice with Finova** button uses the OpenAI Responses API
+and requires a separate OpenAI Platform API key and API credits.
 
-Do not put that key in Vercel. Do not enable unbudgeted public AI usage.
+1. Go to https://platform.openai.com/ and create an API key in an
+   API project with billing/credits enabled. Keep the key private.
+2. In Render -> your `budgetwise` web service -> **Environment**, add
+   `OPENAI_API_KEY` with the secret API key as its value. Do not quote it.
+3. Optionally set `OPENAI_MODEL=gpt-4.1-mini` (default), or another model
+   accessible to that API project which supports the Responses API.
+4. Save and redeploy Render. Confirm that the whole backend is Live.
+5. Sign in to BudgetWise. Finova's Dashboard panel checks authenticated
+   `GET /api/v1/ai/status` which reports **key presence only**; it does
+   not reveal the key or verify its validity or billing.
+6. Select a financial month, explicitly check the consent box, then use
+   **Generate advice with Finova**. A single consent grants one request;
+   it is never saved.
+
+Finova sends up to eight category totals and eight budget totals, plus
+monthly aggregate information in NGN. It does not send user names,
+emails, passwords, or individual expense descriptions. The AI can still
+make mistakes. Users may have selected another display currency, but
+the financial source data and generated advice remain in NGN.
+
+**Troubleshooting:**
+- **Finova is not configured**: `OPENAI_API_KEY` missing in Render (not Vercel).
+- **401 from OpenAI**: invalid API key; replace it privately in Render.
+- **403/404 from OpenAI**: model or project permissions; check `OPENAI_MODEL`.
+- **429 from OpenAI**: rate limit or missing/exhausted API credits; verify
+  OpenAI API billing and project usage (ChatGPT Plus does not include API credits).
+- **Finova cannot reach the backend**: check Render deploy logs, database
+  connection `DATABASE_URL`, the Vercel `BUDGETWISE_API_URL` and CORS origin.
+- **Incomplete or empty advice**: model provider returned no usable text;
+  check model choice and review Render logs. No fictitious fallback AI is shown.
+
+Never put the OpenAI key in GitHub, Vercel frontend JavaScript, HTML,
+or screenshots. No AI request is made during page load. The backend
+limits generated-advice attempts to 3 per hour per user per process,
+which is not a durable distributed production rate limiter.
 
 ## Tests and troubleshooting
 
