@@ -69,36 +69,10 @@ def send_email(recipient: str, subject: str, body: str, html_body: str | None = 
         raise EmailDeliveryError("Email delivery is temporarily unavailable") from exc
 
 
-def send_login_code_email(recipient: str, name: str, code: str):
-    """Send OTP without logging or persisting the plaintext code."""
-    title = "Your BudgetWise sign-in code"
-    message = (
-        "Hello " + name + ",\n\n"
-        "Your BudgetWise sign-in code is: " + code + "\n"
-        "The code expires in five minutes. Do not share it.\n\n"
-        "If you did not try to sign in, you can ignore this email."
-    )
-    safe_name = html.escape(name)
-    safe_code = html.escape(code)
-    rich = (
-        '<html><body style="font-family:Arial,sans-serif;color:#193d2d">'
-        '<div style="max-width:520px;margin:auto;padding:24px">'
-        '<h2 style="color:#123d2c">BudgetWise sign-in verification</h2>'
-        '<p>Hello ' + safe_name + ',</p>'
-        '<p>Enter this code to finish signing in:</p>'
-        '<p style="font-size:34px;font-weight:bold;letter-spacing:7px">'
-        + safe_code + '</p>'
-        '<p>This code expires in <b>5 minutes</b>. Do not share it.</p>'
-        '<p>If you did not try to sign in, ignore this message.</p>'
-        '</div></body></html>'
-    )
-    return send_email(recipient, title, message, rich)
-
-
 def send_welcome_email(recipient: str, name: str):
     """Welcome messages are optional and must not interrupt registration.
 
-    Login OTP always fails closed when the provider is unavailable.
+    Login no longer requires sending a verification code.
     """
     if not brevo_configured():
         return None
