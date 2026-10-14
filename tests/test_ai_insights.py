@@ -248,3 +248,129 @@ def test_user_cannot_read_another_users_monthly_insights(setup):
     assert second["expenses_total"] == 6789
     assert first["categories"][0]["category"] == "Food"
     assert second["categories"][0]["category"] == "Travel"
+
+
+# ============================================================
+# FINOVA SETUP, PROVIDER ERRORS AND RESPONSE PARSING
+# ============================================================
+
+def test_finova_status_requires_authentication_and_never_exposes_key(
+    setup, monkeypatch
+):
+    client, auth, _ = setup
+    assert client.get("/api/v1/ai/status").status_code in (401, 403)
+
+    unset = client.get("/api/v1/ai/status", headers=auth)
+    assert unset.status_code == 200
+    assert unset.json() == {
+        "assistant": "Finova",
+        "generative_configured": False,
+        "requires_explicit_consent": True,
+    }
+
+    monkeypatch.setenv("OPENAI_API_KEY", "private-test-secret")
+    configured = client.get("/api/v1/ai/status", headers=auth)
+    assert configured.status_code == 200
+    assert configured.json()["generative_configured"] is True
+    assert "private-test-secret" not in configured.text
+
+
+@pytest.mark.parametrize(
+    "http_code, expected_phrase",
+    [
+        (400, "OPENAI_MODEL"),
+        (401, "OPENAI_API_KEY"),
+        (403, "does not have access"),
+        (404, "OPENAI_MODEL"),
+        (429, "rate or billing limit"),
+        (503, "temporarily unavailable"),
+    ],
+)
+def test_finova_provider_errors_are_actionable_and_do_not_leak_secrets(
+    setup, monkeypatch, http_code, expected_phrase
+):
+    from urllib.error import HTTPError
+
+    client, auth, _ = setup
+    secret = "private-openai-secret-not-for-response"
+    monkeypatch.setenv("OPENAI_API_KEY", secret)
+
+    with patch(
+        "app.ai_insights.urlopen",
+        side_effect=HTTPError(
+            "https://api.openai.com/v1/responses",
+            http_code,
+            "provider internal message",
+            {},
+            None,
+        ),
+    ) as mock_provider:
+        response = client.post("/api/v1/ai/insights", headers=auth, json={
+            "share_aggregates_with_ai": True
+        })
+
+    assert response.status_code == 503, response.text
+    assert expected_phrase in response.json()["detail"]
+    assert secret not in response.text
+    assert "provider internal message" not in response.text
+    mock_provider.assert_called_once()
+
+
+@pytest.mark.parametrize("invalid_data", [
+    ["not a JSON object"],
+    {"status": "completed", "output": "not-an-array"},
+    {"status": "completed", "output": ["malformed-item"]},
+    {"status": "incomplete", "output": []},
+    {"status": "completed", "output": []},
+])
+def test_finova_malformed_or_incomplete_provider_data_returns_503(
+    setup, monkeypatch, invalid_data
+):
+    client, auth, _ = setup
+    monkeypatch.setenv("OPENAI_API_KEY", "fake-key")
+
+    class Response:
+        def __enter__(self):
+            return self
+        def __exit__(self, *_args):
+            return False
+        def read(self):
+            return json.dumps(invalid_data).encode("utf-8")
+
+    with patch("app.ai_insights.urlopen", return_value=Response()):
+        answer = client.post("/api/v1/ai/insights", headers=auth, json={
+            "share_aggregates_with_ai": True
+        })
+
+    assert answer.status_code == 503
+    assert "Finova" in answer.json()["detail"]
+
+
+def test_finova_accepts_text_from_multiple_response_messages(setup, monkeypatch):
+    client, auth, _ = setup
+    monkeypatch.setenv("OPENAI_API_KEY", "fake-key")
+    fake = {
+        "status": "completed",
+        "output": [
+            {"type": "reasoning", "summary": []},
+            {"type": "message", "content": [
+                {"type": "output_text", "text": "- Reduce recurring food spending."}
+            ]},
+            {"type": "message", "content": [
+                {"type": "output_text", "text": "- Review one budget weekly."}
+            ]},
+        ],
+    }
+    with patch("app.ai_insights.urlopen") as mock_open:
+        mock_open.return_value.__enter__.return_value.read.return_value = (
+            json.dumps(fake).encode("utf-8")
+        )
+        result = client.post("/api/v1/ai/insights", headers=auth, json={
+            "share_aggregates_with_ai": True
+        })
+
+    assert result.status_code == 200, result.text
+    assert result.json()["assistant"] == "Finova"
+    assert result.json()["source"] == "ai_model"
+    assert "Reduce recurring food spending" in result.json()["advice"]
+    assert "Review one budget weekly" in result.json()["advice"]
