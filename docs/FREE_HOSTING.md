@@ -98,14 +98,14 @@ still require the BudgetWise JWT and checks in FastAPI.
 
 ## Step 4 - Login and financial data (important!)
 
-The previously implemented Brevo email OTP flow is still ENABLED on
-normal deployments. Since you postponed email setup, production login
-will return HTTP 503 until BREVO_API_KEY and BREVO_SENDER_EMAIL are set
-on Render, using a verified sender in Brevo.
+BudgetWise now signs users in using their registered email address or
+username **and password**. A successful password check returns the normal
+24-hour JWT; an emailed code or Brevo account is **not** required.
 
-The landing page can be public before that, but a working production
-login requires email verification. We intentionally do not bypass OTP
-on a public website.
+Email addresses still identify accounts and are used for optional
+notifications where separately configured. Never remove the
+SECRET_KEY or password hashing. Consider account lockouts, rate
+limiting and MFA before a real-money production launch.
 
 Because the Supabase database is currently new/empty, historical users,
 expenses and budgets from your local SQLite file will not appear until
@@ -145,7 +145,7 @@ Both environments run over HTTPS. Tests in this repository ensure:
 
 Open the browser Developer Tools Network tab:
 - Requests must target https://YOUR-RENDER-NAME.onrender.com/api/v1
-- A 503 on login without Brevo is expected, NOT a database failure.
+- Login no longer requires Brevo, but a database connection is still mandatory.
 - CORS errors mean Render's BUDGETWISE_ALLOWED_ORIGINS doesn't match.
 - A slow first request means Render Free was asleep; wait for wake-up.
 - A server error on Render startup may mean DATABASE_URL is wrong.
