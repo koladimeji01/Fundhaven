@@ -94,13 +94,7 @@ async function apiRequest(endpoint, options = {}) {
 // ============================================================
 
 function formatNaira(amount) {
-    const value = Number(amount) || 0;
-
-    return new Intl.NumberFormat("en-NG", {
-        style: "currency",
-        currency: "NGN",
-        maximumFractionDigits: 2
-    }).format(value);
+    return window.BudgetWiseCurrency.format(amount);
 }
 
 function formatDate(dateValue) {
@@ -947,3 +941,7 @@ document.addEventListener(
         }
     }
 );
+// Re-render stored NGN expense rows when FX rates finish loading.
+window.addEventListener("budgetwise:currency-ready", () => {
+    if (allTransactions.length) renderTransactions();
+});
