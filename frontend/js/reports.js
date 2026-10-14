@@ -467,27 +467,9 @@ function renderExpenseTrend(expenses) {
     // FORMATTERS
     // ========================================================
 
-    const formatNaira = (value) => {
-        return new Intl.NumberFormat("en-NG", {
-            style: "currency",
-            currency: "NGN",
-            maximumFractionDigits: 0
-        }).format(Number(value) || 0);
-    };
+    const formatNaira = value => window.BudgetWiseCurrency.format(value);
 
-    const compactNaira = (value) => {
-        const amount = Number(value) || 0;
-
-        if (amount >= 1000000) {
-            return `₦${(amount / 1000000).toFixed(1)}m`;
-        }
-
-        if (amount >= 1000) {
-            return `₦${Math.round(amount / 1000)}k`;
-        }
-
-        return `₦${Math.round(amount)}`;
-    };
+    const compactNaira = value => window.BudgetWiseCurrency.compact(value);
 
     const localDateKey = (date) => {
         return [
@@ -1485,20 +1467,11 @@ function setupSearch() {
 // ============================================================
 
 function formatCurrency(amount) {
-    return new Intl.NumberFormat("en-NG", {
-        style: "currency",
-        currency: "NGN",
-        maximumFractionDigits: 2
-    }).format(Number(amount) || 0);
+    return window.BudgetWiseCurrency.format(amount);
 }
 
 function formatCompactCurrency(amount) {
-    const value = Number(amount) || 0;
-
-    if (value >= 1000000) return `₦${(value / 1000000).toFixed(1)}M`;
-    if (value >= 1000) return `₦${(value / 1000).toFixed(1)}K`;
-
-    return `₦${Math.round(value)}`;
+    return window.BudgetWiseCurrency.compact(amount);
 }
 
 function getExpenseDate(expense) {
@@ -1583,3 +1556,12 @@ function refreshIcons() {
         window.lucide.createIcons();
     }
 }
+
+// Refresh all report amounts and SVG axis labels when FX rates arrive.
+// Do not change the selected report month.
+window.addEventListener("budgetwise:currency-ready", () => {
+    if (localStorage.getItem("access_token") &&
+        document.getElementById("reportIncome")) {
+        void loadReports();
+    }
+});
