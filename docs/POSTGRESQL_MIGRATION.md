@@ -95,9 +95,9 @@ Open http://127.0.0.1:8000/docs and then your usual frontend.
 
 Check your historical expenses, dashboard, budgets, goals and month reports.
 
-NOTE: The existing Brevo login OTP configuration is separate from the
-database migration. If your Brevo account is not configured, login still
-returns HTTP 503. This is not a PostgreSQL failure.
+NOTE: BudgetWise uses password-only login with JWT after the email OTP
+requirement was removed. A Brevo account is no longer required for login.
+The database migration is separate from authentication.
 
 ## 8. Run tests safely
 
