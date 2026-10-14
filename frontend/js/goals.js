@@ -26,11 +26,7 @@
     }
 
     function naira(value) {
-        return new Intl.NumberFormat("en-NG", {
-            style: "currency",
-            currency: "NGN",
-            maximumFractionDigits: 0
-        }).format(Number(value) || 0);
+        return window.BudgetWiseCurrency.format(value);
     }
 
     function escapeHTML(value) {
@@ -1533,6 +1529,8 @@
             // No need to delay the page's initial display.
             void loadUser();
             void loadGoals();
+
+            window.addEventListener("budgetwise:currency-ready", renderAll);
         }
     );
 
