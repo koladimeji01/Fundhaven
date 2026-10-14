@@ -32,6 +32,10 @@ jobs:
         run: |
           node --check frontend/build.js
           for file in frontend/js/*.js; do node --check "$file"; done
+      - name: Test preferred currency across BudgetWise pages
+        run: |
+          node --check frontend/test-currency.js
+          node frontend/test-currency.js
       - name: Verify Vercel build injects HTTPS API URL
         env:
           BUDGETWISE_API_URL: https://example.onrender.com/api/v1

@@ -96,14 +96,7 @@ async function apiRequest(endpoint, options = {}) {
 // ============================================================
 
 function formatCurrency(amount) {
-
-    const value = Number(amount) || 0;
-
-    return new Intl.NumberFormat("en-NG", {
-        style: "currency",
-        currency: "NGN",
-        maximumFractionDigits: 0
-    }).format(value);
+    return window.BudgetWiseCurrency.format(amount);
 }
 
 
@@ -1792,3 +1785,15 @@ document.addEventListener(
     "DOMContentLoaded",
     initializeBudgetsPage
 );
+// Preserve the active budget search when the preferred currency or rate changes.
+window.addEventListener("budgetwise:currency-ready", () => {
+    const term = document.getElementById("budgetSearch")?.value.trim().toLowerCase() || "";
+    if (term) {
+        renderFilteredBudgets(allBudgets.filter(budget =>
+            String(budget.category || "").toLowerCase().includes(term)
+        ));
+    } else {
+        renderBudgets();
+    }
+    renderBudgetNotifications();
+});

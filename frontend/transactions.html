@@ -897,6 +897,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible {o
 
     <!-- BudgetWise API endpoint: local by default, configured at deploy time -->
     <script src="js/runtime-config.js"></script>
+    <script src="js/currency.js"></script>
 </head>
 
 <body>
@@ -1538,7 +1539,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible {o
 (() => {
     "use strict";
     const $ = id => document.getElementById(id);
-    const apiRoot = "http://127.0.0.1:8000/api/v1";
+    const apiRoot = (window.BUDGETWISE_API_BASE_URL || "http://127.0.0.1:8000/api/v1");
     let currentExpenses = [];
     let updateTimer = null;
     let lastFetch = 0;
@@ -1548,9 +1549,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible {o
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
     })[c]);
 
-    const naira = amount => new Intl.NumberFormat("en-NG", {
-        style: "currency", currency: "NGN", maximumFractionDigits: 0
-    }).format(Number(amount) || 0);
+    const naira = amount => window.BudgetWiseCurrency.format(amount);
 
     const valueOf = expense => Math.max(0, Number(expense?.amount) || 0);
 
@@ -1706,6 +1705,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible {o
         });
         observer.observe(content, {childList:true,subtree:true});
     }
+
+    window.addEventListener("budgetwise:currency-ready", () => {
+        renderSummary(currentExpenses);
+        renderActivity(currentExpenses);
+    });
 
     document.addEventListener("DOMContentLoaded", () => {
         setupMenus();
