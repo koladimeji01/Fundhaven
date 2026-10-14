@@ -144,7 +144,12 @@
             return;
         }
         if (!note) {
-            const content = document.querySelector("main .content, main .page-content, main");
+            const content =
+                document.querySelector("main .content") ||
+                document.querySelector("main .transactions-content") ||
+                document.querySelector("main .reports-content") ||
+                document.querySelector("main .page-content") ||
+                document.querySelector("main");
             if (!content) return;
             note = document.createElement("div");
             note.id = "budgetwiseCurrencyStatus";
