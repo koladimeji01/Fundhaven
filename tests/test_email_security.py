@@ -1,4 +1,8 @@
-"""Brevo OTP + monthly report integration tests (all provider calls mocked)."""
+"""Password-only login + opt-in monthly report tests (email delivery mocked).
+
+Email is still an account identifier and optional reporting channel.
+It is NOT a required second-factor for signing in.
+"""
 import os
 from datetime import date
 from unittest.mock import patch
@@ -16,15 +20,15 @@ from app.monthly_reports import send_monthly_reports
 
 @pytest.fixture
 def session(tmp_path, monkeypatch):
-    name = "otp_" + uuid4().hex[:10]
+    name = "login_" + uuid4().hex[:10]
     email = name + "@example.com"
 
     monkeypatch.setenv("ENVIRONMENT", "testing")
-    monkeypatch.setenv("BUDGETWISE_TEST_OTP", "1")
+    # Only optional monthly report tests use this mocked email provider.
     monkeypatch.setenv("BREVO_API_KEY", "test-key-no-network")
     monkeypatch.setenv("BREVO_SENDER_EMAIL", "test-sender@example.com")
 
-    db_path = str(tmp_path / "brevo_test.db")
+    db_path = str(tmp_path / "budgetwise_auth_email_test.db")
     monkeypatch.setattr(database, "DATABASE_NAME", db_path)
     monkeypatch.setattr(manager, "DATABASE_NAME", db_path)
 
@@ -40,135 +44,51 @@ def session(tmp_path, monkeypatch):
         yield client, {"email": email, "name": name, "password": "password123"}
 
 
-def start_login(client, user, mocked_email):
-    result = client.post("/api/v1/login", json={
-        "email": user["email"],
-        "password": user["password"]
-    })
-    assert result.status_code == 200, result.text
-    data = result.json()
-    assert "access_token" not in data
-    assert data["verification_required"] is True
-    assert len(data["challenge_id"]) > 24
-    assert mocked_email.call_count == 1
-    code = mocked_email.call_args.args[2]
-    assert len(code) == 6 and code.isdigit()
-    return data["challenge_id"], code
-
-
-def test_otp_is_required_single_use_and_invalid_code_fails(session):
+def test_sign_in_does_not_require_brevo(session, monkeypatch):
     client, user = session
-    with patch("app.api.auth.send_login_code_email") as mail:
-        challenge_id, code = start_login(client, user, mail)
+    monkeypatch.delenv("BREVO_API_KEY", raising=False)
+    monkeypatch.delenv("BREVO_SENDER_EMAIL", raising=False)
 
-    wrong = "000000" if code != "000000" else "111111"
-    bad = client.post("/api/v1/login/verify", json={
-        "challenge_id": challenge_id, "code": wrong
-    })
-    assert bad.status_code == 401
-
-    valid = client.post("/api/v1/login/verify", json={
-        "challenge_id": challenge_id, "code": code
-    })
-    assert valid.status_code == 200
-    token = valid.json()["access_token"]
-    assert isinstance(token, str) and len(token) > 20
-    protected = client.get(
-        "/api/v1/users/me",
-        headers={"Authorization": "Bearer " + token}
-    )
-    assert protected.status_code == 200
-
-    replay = client.post("/api/v1/login/verify", json={
-        "challenge_id": challenge_id, "code": code
-    })
-    assert replay.status_code == 401
-
-
-def test_otp_expiry_and_resend_cooldown(session):
-    client, user = session
-    with patch("app.api.auth.send_login_code_email") as mail:
-        challenge_id, code = start_login(client, user, mail)
-
-        immediate = client.post("/api/v1/login/resend", json={
-            "challenge_id": challenge_id
-        })
-        assert immediate.status_code == 429
-
-        conn = database.create_connection()
-        try:
-            conn.execute(
-                "UPDATE login_challenges SET last_sent_at = last_sent_at - 61 WHERE id = ?",
-                (challenge_id,)
-            )
-            conn.commit()
-        finally:
-            conn.close()
-
-        resent = client.post("/api/v1/login/resend", json={
-            "challenge_id": challenge_id
-        })
-        assert resent.status_code == 200, resent.text
-        assert mail.call_count == 2
-        new_code = mail.call_args.args[2]
-        assert len(new_code) == 6
-
-        conn = database.create_connection()
-        try:
-            conn.execute(
-                "UPDATE login_challenges SET expires_at = 0 WHERE id = ?",
-                (challenge_id,)
-            )
-            conn.commit()
-        finally:
-            conn.close()
-
-        expired = client.post("/api/v1/login/verify", json={
-            "challenge_id": challenge_id, "code": new_code
-        })
-        assert expired.status_code == 401
-
-
-def test_otp_failed_attempt_limit(session):
-    client, user = session
-    with patch("app.api.auth.send_login_code_email") as mail:
-        challenge_id, code = start_login(client, user, mail)
-
-    wrong = "000000" if code != "000000" else "111111"
-    for _ in range(5):
-        r = client.post("/api/v1/login/verify", json={
-            "challenge_id": challenge_id, "code": wrong
-        })
-        assert r.status_code == 401
-
-    result = client.post("/api/v1/login/verify", json={
-        "challenge_id": challenge_id, "code": code
-    })
-    assert result.status_code == 401
-
-
-def test_otp_fails_closed_without_brevo(session, monkeypatch):
-    client, user = session
-    monkeypatch.delenv("BREVO_API_KEY")
     response = client.post("/api/v1/login", json={
         "email": user["email"], "password": user["password"]
     })
-    assert response.status_code == 503
-    assert "access_token" not in response.json()
+
+    assert response.status_code == 200, response.text
+    assert response.json()["token_type"] == "bearer"
+    assert isinstance(response.json()["access_token"], str)
+    assert "verification_required" not in response.json()
+    assert "challenge_id" not in response.json()
+
+    protected = client.get("/api/v1/users/me", headers={
+        "Authorization": "Bearer " + response.json()["access_token"]
+    })
+    assert protected.status_code == 200, protected.text
+
+
+def test_invalid_password_and_otp_endpoints_are_rejected(session):
+    client, user = session
+
+    wrong_password = client.post("/api/v1/login", json={
+        "email": user["email"], "password": "wrong-password!"
+    })
+    assert wrong_password.status_code == 401
+    assert "access_token" not in wrong_password.json()
+
+    assert client.post("/api/v1/login/verify", json={}).status_code == 404
+    assert client.post("/api/v1/login/resend", json={}).status_code == 404
+
+    unauthenticated = client.get("/api/v1/users/me")
+    assert unauthenticated.status_code in (401, 403)
 
 
 def test_monthly_email_preference_and_no_duplicate_delivery(session, monkeypatch):
     client, user = session
 
-    # Existing automated tests can still use direct-JWT login;
-    # this testing-only bypass never exists in normal runtime.
-    monkeypatch.setenv("BUDGETWISE_TEST_OTP", "0")
     signed_in = client.post("/api/v1/login", json={
         "email": user["email"], "password": user["password"]
     })
     assert signed_in.status_code == 200
     auth = {"Authorization": "Bearer " + signed_in.json()["access_token"]}
-    monkeypatch.setenv("BUDGETWISE_TEST_OTP", "1")
 
     preference = client.get("/api/v1/users/me/monthly-email", headers=auth)
     assert preference.status_code == 200
