@@ -1,6 +1,7 @@
 
 const API_URL = (window.BUDGETWISE_API_BASE_URL || "http://127.0.0.1:8000/api/v1");
 let selectedReportMonth = new Date().toISOString().slice(0, 7);
+let lastReportData = null; // Cached NGN source values for currency-only redraws.
 
 document.addEventListener("DOMContentLoaded", initializeReports);
 
@@ -324,6 +325,8 @@ async function loadReports() {
         const expenses = Array.isArray(expensesData)
             ? expensesData
             : expensesData.expenses || [];
+
+        lastReportData = {user, dashboard, expenses, month: selectedReportMonth};
 
         updateUser(user);
         updateSummary(user, dashboard);
@@ -1560,8 +1563,13 @@ function refreshIcons() {
 // Refresh all report amounts and SVG axis labels when FX rates arrive.
 // Do not change the selected report month.
 window.addEventListener("budgetwise:currency-ready", () => {
-    if (localStorage.getItem("access_token") &&
-        document.getElementById("reportIncome")) {
-        void loadReports();
-    }
+    if (!lastReportData || lastReportData.month !== selectedReportMonth) return;
+
+    const {user, dashboard, expenses} = lastReportData;
+    updateSummary(user, dashboard);
+    renderExpenseTrend(expenses);
+    renderCategories(dashboard, expenses);
+    renderHighestCategory(dashboard, expenses);
+    renderExpenseTable(expenses);
+    refreshIcons();
 });
