@@ -1,8 +1,10 @@
-"""Authenticated BudgetWise AI spending insights API.
+"""Authenticated Finova spending insights API for BudgetWise.
 
 Local summaries never call an external AI provider.
 The paid AI provider is called only by an explicit consented POST.
 """
+import os
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
@@ -17,7 +19,7 @@ from app.api.dependencies import get_current_user
 from app.monthly import resolve_month
 
 
-router = APIRouter(prefix="/ai", tags=["AI Financial Insights"])
+router = APIRouter(prefix="/ai", tags=["Finova AI Financial Insights"])
 
 
 class AIInsightsRequest(BaseModel):
@@ -32,7 +34,27 @@ def _month_or_422(month):
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
-@router.get("/insights", summary="View local monthly spending insights")
+@router.get("/status", summary="Check whether Finova generative advice is configured")
+def get_finova_status(current_user=Depends(get_current_user)):
+    """Report configuration only; never return tokens, passwords or credentials.
+
+    Configured means a key exists, NOT that the key is valid or has API credits.
+    """
+    configured = bool(os.getenv("OPENAI_API_KEY", "").strip())
+    return {
+        "assistant": "Finova",
+        "generative_configured": configured,
+        "message": (
+            "Finova generative advice is configured. API availability "
+            "is verified when you request advice."
+            if configured else
+            "Finova generative advice needs OPENAI_API_KEY on the "
+            "backend (Render → Environment for hosted BudgetWise)."
+        ),
+    }
+
+
+@router.get("/insights", summary="View private Finova spending insights")
 def get_local_insights(
     month: str | None = Query(default=None),
     current_user=Depends(get_current_user),
@@ -40,6 +62,7 @@ def get_local_insights(
     """No external data transfer. Uses only this user's monthly records."""
     summary = build_spending_summary(current_user[0], _month_or_422(month))
     return {
+        "assistant": "Finova",
         "month": summary["month"],
         "source": "local_rules",
         "summary": summary,
@@ -48,7 +71,7 @@ def get_local_insights(
     }
 
 
-@router.post("/insights", summary="Get consented AI financial advice")
+@router.post("/insights", summary="Generate Finova financial advice with consent")
 def post_ai_insights(
     request: AIInsightsRequest,
     current_user=Depends(get_current_user),
@@ -71,6 +94,7 @@ def post_ai_insights(
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
     return {
+        "assistant": "Finova",
         "month": summary["month"],
         "source": "ai_model",
         "summary": summary,
