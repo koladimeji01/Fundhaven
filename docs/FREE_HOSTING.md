@@ -124,15 +124,54 @@ to GitHub/Vercel/Render just to run the migration.
 
 See docs/POSTGRESQL_MIGRATION.md for the full safety procedure.
 
-## Step 5 - Optional AI-generated financial advice
+## Step 5 - Finova: private insights + generative AI advice
 
-The private monthly insights require no AI API key.
+**Finova** is the AI financial assistant inside the BudgetWise Dashboard.
 
-For the optional OpenAI-generated advice button, add OPENAI_API_KEY
-to the Render BACKEND's private environment settings. A ChatGPT
-subscription does not automatically include API usage or credits.
+- **View Finova insights (private)** reads the user's BudgetWise finances
+  through GET /api/v1/ai/insights. Suggestions use local rules only,
+  require no OpenAI API key, and send no data to the AI provider.
+- **Ask Finova for AI advice** uses OpenAI's Responses API only after
+  explicit consent for EACH request. Only monthly aggregate finances are
+  sent: income/expense totals, category names and totals, and budgets.
+  User names, emails, passwords, and transaction descriptions are not sent.
+  These amounts are recorded in NGN even when UI display is converted.
 
-Do not put that key in Vercel. Do not enable unbudgeted public AI usage.
+### Configure generative advice on Render
+
+1. Open the Render **budgetwise** service.
+2. Select **Environment → Add Environment Variable**.
+3. Set `OPENAI_API_KEY` to your **private OpenAI API key**.
+4. Optionally set `OPENAI_MODEL=gpt-4.1-mini`.
+5. Save and redeploy. Keep the secret off GitHub, Vercel, browser code,
+   screenshots, and support chats.
+6. Sign in to BudgetWise → Dashboard → **Finova**. The dashboard checks
+   authenticated `GET /api/v1/ai/status` to report whether the backend
+   key is configured (it does NOT validate credentials or billing).
+7. Tick the consent checkbox, click **Ask Finova for AI advice**, and
+   wait for the model response.
+
+An OpenAI API key AND available API billing/credits are required. A
+ChatGPT Plus/Pro subscription does not include API credits by default.
+The user and developer should never paste API keys into the frontend.
+
+### Troubleshooting Finova
+
+- **Generative advice not configured:** `OPENAI_API_KEY` is missing
+  on the Render backend. Private Finova insights continue to work.
+- **Authentication failure:** check the API key stored privately
+  on Render. Do not paste the key into a public issue.
+- **API quota or rate limit:** check API billing/credits and usage.
+- **Model unavailable:** check `OPENAI_MODEL`; leave it unset to
+  use the application default.
+- **Backend cannot be reached:** fix Render's failed deployment,
+  PostgreSQL connection, and CORS first. Finova cannot bypass this.
+- **Model gives an empty/incomplete response:** retry once; check the
+  Render logs with secrets hidden if it persists.
+
+Finova does not promise professional financial advice; the model can
+make mistakes. Server-side data protections, per-user rate limiting,
+and expense controls must remain enabled.
 
 ## Tests and troubleshooting
 
