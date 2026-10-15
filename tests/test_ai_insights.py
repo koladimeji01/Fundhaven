@@ -272,7 +272,7 @@ def test_finova_configuration_status_requires_login(setup, monkeypatch):
     assert configured.status_code == 200
     assert configured.json()["generative_configured"] is True
     assert private_key not in configured.text
-    assert "API credits" in configured.json()["message"]
+    assert "API availability" in configured.json()["message"]
 
 
 def test_finova_branding_is_consistent_without_changing_local_source(setup):
