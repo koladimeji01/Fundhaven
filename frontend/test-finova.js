@@ -37,6 +37,10 @@ class Element {
     append(...children) {
         this.children.push(...children);
     }
+    appendChild(child) {
+        this.children.push(child);
+        return child;
+    }
 }
 
 async function setup({configured = true, pendingAdvice = null} = {}) {
