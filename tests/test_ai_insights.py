@@ -248,3 +248,143 @@ def test_user_cannot_read_another_users_monthly_insights(setup):
     assert second["expenses_total"] == 6789
     assert first["categories"][0]["category"] == "Food"
     assert second["categories"][0]["category"] == "Travel"
+
+
+# ============================================================
+# FINOVA — GENERATIVE AI READINESS & FAILURE HANDLING
+# ============================================================
+
+def test_finova_configuration_status_requires_login(setup, monkeypatch):
+    client, auth, _ = setup
+
+    anonymous = client.get("/api/v1/ai/status")
+    assert anonymous.status_code in (401, 403)
+
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    not_ready = client.get("/api/v1/ai/status", headers=auth)
+    assert not_ready.status_code == 200
+    assert not_ready.json()["assistant"] == "Finova"
+    assert not_ready.json()["generative_configured"] is False
+
+    private_key = "server-secret-NEVER-PUBLISH"
+    monkeypatch.setenv("OPENAI_API_KEY", private_key)
+    configured = client.get("/api/v1/ai/status", headers=auth)
+    assert configured.status_code == 200
+    assert configured.json()["generative_configured"] is True
+    assert private_key not in configured.text
+    assert "API availability" in configured.json()["message"]
+
+
+def test_finova_branding_is_consistent_without_changing_local_source(setup):
+    client, auth, _ = setup
+    response = client.get("/api/v1/ai/insights", headers=auth)
+    assert response.status_code == 200
+    assert response.json()["assistant"] == "Finova"
+    assert response.json()["source"] == "local_rules"
+
+
+@pytest.mark.parametrize("provider_code, expected_phrase", [
+    (400, "OPENAI_MODEL"),
+    (401, "OPENAI_API_KEY"),
+    (403, "OPENAI_API_KEY"),
+    (404, "OPENAI_MODEL"),
+    (429, "billing"),
+    (503, "temporarily"),
+])
+def test_finova_explains_openai_provider_failures_safely(
+    setup, monkeypatch, provider_code, expected_phrase
+):
+    from urllib.error import HTTPError
+
+    client, auth, _ = setup
+    key = "private-test-key-not-for-clients"
+    monkeypatch.setenv("OPENAI_API_KEY", key)
+    monkeypatch.setenv("OPENAI_MODEL", "gpt-4.1-mini")
+
+    # No real network call; provider error body is not disclosed.
+    with patch("app.ai_insights.urlopen", side_effect=HTTPError(
+        "https://api.openai.com/v1/responses",
+        provider_code,
+        "simulated provider diagnostic",
+        {},
+        None,
+    )):
+        response = client.post("/api/v1/ai/insights", headers=auth, json={
+            "share_aggregates_with_ai": True
+        })
+
+    assert response.status_code == 503
+    assert expected_phrase.lower() in response.json()["detail"].lower()
+    assert key not in response.text
+    assert "simulated provider diagnostic" not in response.text
+
+
+@pytest.mark.parametrize("provider_result, expected_phrase", [
+    ({"status": "incomplete", "output": []}, "incomplete"),
+    ({"status": "completed", "output": []}, "empty"),
+    ({"status": "completed", "output": None}, "empty"),
+    ({"status": "completed", "output": [
+        {"type": "message", "content": [{"type": "output_text", "text": ""}]}
+    ]}, "empty"),
+    (["not a valid response"], "unexpected"),
+])
+def test_finova_handles_empty_incomplete_or_invalid_ai_responses(
+    setup, monkeypatch, provider_result, expected_phrase
+):
+    client, auth, _ = setup
+    monkeypatch.setenv("OPENAI_API_KEY", "fake-unit-test-key")
+
+    class FakeResponse:
+        def __enter__(self):
+            return self
+        def __exit__(self, *_args):
+            return False
+        def read(self):
+            return json.dumps(provider_result).encode("utf-8")
+
+    with patch("app.ai_insights.urlopen", return_value=FakeResponse()):
+        response = client.post("/api/v1/ai/insights", headers=auth, json={
+            "share_aggregates_with_ai": True
+        })
+
+    assert response.status_code == 503
+    assert expected_phrase in response.json()["detail"].lower()
+
+
+def test_finova_can_parse_a_completed_text_response_and_handles_reasoning_items(
+    setup, monkeypatch
+):
+    client, auth, _ = setup
+    monkeypatch.setenv("OPENAI_API_KEY", "fake-unit-test-key")
+    data = {
+        "status": "completed",
+        "output": [
+            {"type": "reasoning", "content": []},
+            {"type": "message", "content": [
+                {"type": "output_text", "text": "- Review food costs."},
+                {"type": "output_text", "text": "- Set a monthly limit."},
+            ]},
+        ],
+    }
+
+    class FakeResponse:
+        def __enter__(self):
+            return self
+        def __exit__(self, *_args):
+            return False
+        def read(self):
+            return json.dumps(data).encode("utf-8")
+
+    with patch("app.ai_insights.urlopen", return_value=FakeResponse()) as mock:
+        response = client.post("/api/v1/ai/insights", headers=auth, json={
+            "share_aggregates_with_ai": True
+        })
+
+    assert response.status_code == 200, response.text
+    assert response.json()["assistant"] == "Finova"
+    assert response.json()["source"] == "ai_model"
+    assert response.json()["advice"] == "- Review food costs.\n- Set a monthly limit."
+    request_data = json.loads(mock.call_args.args[0].data.decode("utf-8"))
+    assert "Finova" in request_data["instructions"]
+    assert request_data["store"] is False
+    assert request_data["model"] == "gpt-4.1-mini"
