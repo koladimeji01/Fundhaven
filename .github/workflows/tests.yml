@@ -32,6 +32,8 @@ jobs:
         run: |
           node --check frontend/build.js
           for file in frontend/js/*.js; do node --check "$file"; done
+      - name: Guard against slow frontend startup paths
+        run: node frontend/test-performance.js
       - name: Test preferred currency across FundHaven pages
         run: |
           node --check frontend/test-currency.js
