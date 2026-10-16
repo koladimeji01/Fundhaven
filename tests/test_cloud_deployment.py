@@ -113,3 +113,18 @@ def test_current_vercel_login_preflight_is_accepted(monkeypatch):
     assert response.status_code == 200
     assert response.headers["access-control-allow-origin"] == frontend_origin
     assert response.headers["access-control-allow-credentials"] == "true"
+
+
+
+def test_health_endpoint_supports_get_and_head_for_free_uptime_monitors():
+    """UptimeRobot uses HEAD by default: 405 must not mean downtime."""
+    from fastapi.testclient import TestClient
+
+    client = TestClient(app)
+    regular = client.get("/health")
+    assert regular.status_code == 200
+    assert regular.json() == {"status": "healthy"}
+
+    monitor = client.head("/health")
+    assert monitor.status_code == 200
+    assert monitor.content == b""

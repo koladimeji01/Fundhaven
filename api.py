@@ -4,7 +4,7 @@ import os
 import sqlite3
 from urllib.parse import urlsplit
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.responses import JSONResponse
 
 from app import database
@@ -249,6 +249,16 @@ def health_check():
     return {
         "status": "healthy"
     }
+
+
+@app.head("/health", include_in_schema=False)
+def health_check_head():
+    """Allow free uptime monitors that use HEAD requests by default.
+
+    HEAD confirms availability without returning the JSON body. Keep GET
+    unchanged for browsers, API clients, and more thorough health checks.
+    """
+    return Response(status_code=200)
 
 
 # ==========================================
