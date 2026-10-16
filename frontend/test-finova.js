@@ -149,6 +149,25 @@ async function run() {
     assert.equal(live.els.bwGeneratedAdvice.textContent, "- Reduce wasted spending.");
     assert.equal(live.getLocation(), null);
 
+    const fallback = await setup({
+        pendingAdvice: Promise.resolve({
+            assistant: "Finova",
+            month: "2026-10",
+            source: "local_rules",
+            fallback: true,
+            message: "OpenAI API credits are exhausted. Showing private rule-based spending observations instead.",
+            insights: ["Food is the highest spending category."]
+        })
+    });
+    fallback.els.bwAIConsent.checked = true;
+    await fallback.els.bwAIConsent.fire("change");
+    await fallback.els.bwAIAdviceButton.fire("click");
+    assert.ok(fallback.els.bwGeneratedAdvice.textContent.includes("NOT AI-generated"));
+    assert.ok(fallback.els.bwGeneratedAdvice.textContent.includes("Food"));
+    assert.ok(fallback.els.bwAIStatus.textContent.includes("credits are exhausted"));
+    assert.equal(fallback.els.bwAIConsent.checked, false);
+    assert.equal(fallback.requests.filter(r => r.method === "POST").length, 1);
+
     const notReady = await setup({configured: false});
     notReady.els.bwAIConsent.checked = true;
     await notReady.els.bwAIConsent.fire("change");

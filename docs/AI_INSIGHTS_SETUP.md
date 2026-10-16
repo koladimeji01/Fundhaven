@@ -66,7 +66,13 @@ POST /api/v1/ai/insights with Content-Type application/json:
     {"month":"2026-10","share_aggregates_with_ai":true}
 
 - 422: no consent / invalid month
-- 503: key missing, provider unavailable, or provider rejected request
+- 503: key missing, provider unavailable, or provider rejected request (other than 429)
+- OpenAI provider 429: HTTP 200 with `source: "local_rules"`, `fallback: true`,
+  an explanatory `message`, and transparent rule-based `insights`.
+  These are **not AI-generated suggestions** and no automatic provider retry occurs.
+  The attempted consented request may have already sent monthly aggregates.
+  A billing/quota issue still requires resolving credits or spending limits in
+  the OpenAI API account before AI generation works again.
 - 429: user reached development limit
 - 200: one plain-text AI-generated response in advice field
 

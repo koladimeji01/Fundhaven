@@ -288,7 +288,6 @@ def test_finova_branding_is_consistent_without_changing_local_source(setup):
     (401, "OPENAI_API_KEY"),
     (403, "OPENAI_API_KEY"),
     (404, "OPENAI_MODEL"),
-    (429, "billing"),
     (503, "temporarily"),
 ])
 def test_finova_explains_openai_provider_failures_safely(
@@ -317,6 +316,46 @@ def test_finova_explains_openai_provider_failures_safely(
     assert expected_phrase.lower() in response.json()["detail"].lower()
     assert key not in response.text
     assert "simulated provider diagnostic" not in response.text
+
+
+@pytest.mark.parametrize("provider_error, expected_phrase", [
+    ({"code": "credit_balance_exhausted"}, "credits are exhausted"),
+    ({"code": "insufficient_quota"}, "credits are exhausted"),
+    ({"code": "project_spend_limit_exceeded"}, "billing or usage limit"),
+    ({"code": "rate_limit_exceeded"}, "rate limit or quota"),
+])
+def test_openai_429_returns_honest_local_fallback(
+    setup, monkeypatch, provider_error, expected_phrase
+):
+    """Provider quota/rate errors must not break spending insights or leak data."""
+    from urllib.error import HTTPError
+    from io import BytesIO
+
+    client, auth, _ = setup
+    private_key = "private-test-key-do-not-expose"
+    monkeypatch.setenv("OPENAI_API_KEY", private_key)
+    error = HTTPError(
+        "https://api.openai.com/v1/responses", 429,
+        "simulated private diagnostic", {},
+        BytesIO(json.dumps({
+            "error": {**provider_error, "message": "SECRET_PROVIDER_DIAGNOSTIC"}
+        }).encode("utf-8"))
+    )
+    with patch("app.ai_insights.urlopen", side_effect=error) as mocked:
+        response = client.post("/api/v1/ai/insights", headers=auth, json={
+            "share_aggregates_with_ai": True
+        })
+
+    assert mocked.call_count == 1
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data["source"] == "local_rules"
+    assert data["fallback"] is True
+    assert data["insights"]
+    assert "not generated" in data["disclaimer"].lower()
+    assert expected_phrase in data["message"].lower()
+    assert private_key not in response.text
+    assert "SECRET_PROVIDER_DIAGNOSTIC" not in response.text
 
 
 @pytest.mark.parametrize("provider_result, expected_phrase", [

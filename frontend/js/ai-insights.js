@@ -220,6 +220,20 @@
                 });
 
                 if (requestRevision !== revision || selectedMonth() !== month) return;
+                if (result.source === "local_rules" && result.fallback === true) {
+                    const tips = Array.isArray(result.insights)
+                        ? result.insights.map(tip => "• " + String(tip)).join("\n")
+                        : "";
+                    adviceHost.textContent =
+                        "Private spending guidance (NOT AI-generated):\n" +
+                        (tips || "View private spending insights for this month.");
+                    status(
+                        String(result.message ||
+                            "AI-generated advice is unavailable. " +
+                            "Showing local rule-based insights instead.")
+                    );
+                    return;
+                }
                 if (result.source !== "ai_model" ||
                     typeof result.advice !== "string" ||
                     !result.advice.trim()) {
