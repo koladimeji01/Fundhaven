@@ -208,3 +208,20 @@ https://vercel.com/docs/builds/configure-a-build
 https://render.com/docs/free
 https://render.com/docs/blueprint-spec
 https://supabase.com/docs/guides/database/connecting-to-postgres
+
+
+## CORS for FundHaven's Vercel frontend
+
+The backend explicitly trusts the Vercel project's current deployment URL
+(`https://budgetwise-frontend-c5ajigvrg.vercel.app`) and the stable production
+alias (`https://budgetwise-frontend-tan.vercel.app`), as well as its project alias.
+This prevents browser login POST preflight requests from failing after the
+FundHaven rebrand.
+
+**Use the stable production alias for normal sign-ins.** Each uniquely named
+Vercel deployment has its own origin. To allow additional preview deployments or
+a new custom domain, add its exact HTTPS origin to Render's
+`BUDGETWISE_ALLOWED_ORIGINS` environment variable (comma-separated), then
+redeploy/restart the Render service. Do not use wildcards, localhost, or paths in
+production origins. CORS is not an authentication mechanism; JWT protection
+remains required for private API endpoints.

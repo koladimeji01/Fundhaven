@@ -60,5 +60,41 @@ def test_production_cors_uses_only_explicit_https_origin(monkeypatch):
         "BUDGETWISE_ALLOWED_ORIGINS", "https://budgetwise-demo.vercel.app"
     )
     allowed = configured_cors_origins()
-    assert allowed == ["https://budgetwise-demo.vercel.app"]
+    assert allowed == [
+        "https://budgetwise-frontend-tan.vercel.app",
+        "https://budgetwise-frontend-kehindeoladimeji455-2157s-projects.vercel.app",
+        "https://budgetwise-frontend-c5ajigvrg.vercel.app",
+        "https://budgetwise-demo.vercel.app",
+    ]
     assert "http://localhost:5500" not in allowed
+
+
+def test_current_vercel_login_preflight_is_accepted(monkeypatch):
+    """A Vercel-to-Render login OPTIONS request must not fail CORS."""
+    from fastapi import FastAPI
+    from fastapi.middleware.cors import CORSMiddleware
+    from fastapi.testclient import TestClient
+
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.delenv("BUDGETWISE_ALLOWED_ORIGINS", raising=False)
+    frontend_origin = "https://budgetwise-frontend-c5ajigvrg.vercel.app"
+    assert frontend_origin in configured_cors_origins()
+
+    protected = CORSMiddleware(
+        FastAPI(),
+        allow_origins=configured_cors_origins(),
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    response = TestClient(protected).options(
+        "/api/v1/login",
+        headers={
+            "Origin": frontend_origin,
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == frontend_origin
+    assert response.headers["access-control-allow-credentials"] == "true"
