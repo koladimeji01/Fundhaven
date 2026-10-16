@@ -32,6 +32,10 @@ class AIServiceError(RuntimeError):
     """A configured AI service is unavailable or returned an invalid answer."""
 
 
+class AIProviderLimitError(AIServiceError):
+    """The AI provider reached its own rate, credit, or spending limit."""
+
+
 class AIRateLimitError(RuntimeError):
     """User has exceeded the small per-process AI usage limit."""
 
@@ -272,10 +276,42 @@ def generate_ai_advice(summary: dict, user_id: int) -> str:
                 "Check OPENAI_API_KEY in your backend environment."
             )
         elif exc.code == 429:
-            message = (
-                "OpenAI API rate limit or quota reached. "
-                "Check API billing, credits, and usage limits."
-            )
+            # A 429 may mean exhausted prepaid credits, a hard usage cap, or
+            # a temporary request/token rate limit. Read only the small error
+            # code, never echo the provider response body or credentials.
+            error_code = ""
+            try:
+                details = json.loads(exc.read(4096).decode("utf-8"))
+                provider_error = details.get("error", {})
+                if isinstance(provider_error, dict):
+                    error_code = str(
+                        provider_error.get("code") or provider_error.get("type") or ""
+                    ).lower()
+            except (ValueError, UnicodeDecodeError, AttributeError, OSError):
+                pass
+            if error_code in {
+                "credit_balance_exhausted", "insufficient_quota",
+            }:
+                message = (
+                    "OpenAI API credits are exhausted. Check API billing and "
+                    "add credits before requesting AI-generated advice."
+                )
+            elif error_code in {
+                "organization_usage_limit_exceeded",
+                "organization_spend_limit_exceeded",
+                "project_spend_limit_exceeded",
+            }:
+                message = (
+                    "OpenAI API billing or usage limit reached. "
+                    "Check your organization and project spending limits."
+                )
+            else:
+                message = (
+                    "OpenAI API rate limit or quota reached. "
+                    "Check API billing, credits, and usage limits; "
+                    "temporary rate limits may clear later."
+                )
+            raise AIProviderLimitError(message) from exc
         elif exc.code == 404:
             message = (
                 "The configured Finova AI model is unavailable. "

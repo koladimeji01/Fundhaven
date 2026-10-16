@@ -10,6 +10,7 @@ from pydantic import BaseModel
 
 from app.ai_insights import (
     AIServiceError,
+    AIProviderLimitError,
     AIRateLimitError,
     build_spending_summary,
     generate_ai_advice,
@@ -90,6 +91,23 @@ def post_ai_insights(
         advice = generate_ai_advice(summary, current_user[0])
     except AIRateLimitError as exc:
         raise HTTPException(status_code=429, detail=str(exc)) from exc
+    except AIProviderLimitError as exc:
+        # A provider 429 is not a failure of the expense tracker.
+        # Provide transparent local rules, NEVER label them AI-generated.
+        # The user's explicit consent still governed the attempted request.
+        return {
+            "assistant": "Finova",
+            "month": summary["month"],
+            "source": "local_rules",
+            "fallback": True,
+            "message": str(exc) + " Showing private rule-based spending observations instead.",
+            "summary": summary,
+            "insights": local_insights(summary),
+            "disclaimer": (
+                "Fallback observations are calculated locally, not generated "
+                "by an AI model. The attempted API request followed your consent."
+            ),
+        }
     except AIServiceError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
