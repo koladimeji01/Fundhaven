@@ -634,6 +634,10 @@ async function loadTransactions() {
                 : [];
 
         renderTransactions();
+        // Share the already-loaded result with top-bar/notification widgets.
+        window.dispatchEvent(new CustomEvent("fundhaven:expenses-updated", {
+            detail: allTransactions
+        }));
     } catch (error) {
         console.error(
             "Error loading transactions:",

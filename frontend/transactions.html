@@ -1282,7 +1282,6 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible {o
 
                     class="add-expense-btn"
 
-                    onclick="openExpenseForm()"
 
                 >
 
@@ -1709,11 +1708,16 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible {o
         renderActivity(currentExpenses);
     });
 
+    window.addEventListener("fundhaven:expenses-updated", event => {
+        currentExpenses = Array.isArray(event.detail) ? event.detail : [];
+        renderSummary(currentExpenses);
+        renderActivity(currentExpenses);
+        lastFetch = Date.now();
+    });
+
     document.addEventListener("DOMContentLoaded", () => {
         setupMenus();
         setupQuickSearch();
-        setupRefreshAfterUpdates();
-        void refreshOverview();
         window.lucide?.createIcons();
     });
 })();

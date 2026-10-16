@@ -30,3 +30,11 @@ FundHaven is a personal **expense tracker** built with FastAPI and a lightweight
 This is a **branding change**, not a breaking API/data migration. The preferred environment variables are `FUNDHAVEN_API_URL` for the Vercel/Netlify frontend build and `FUNDHAVEN_ALLOWED_ORIGINS` for Render CORS. Older `BUDGETWISE_API_URL` and `BUDGETWISE_ALLOWED_ORIGINS` keys remain supported to avoid disrupting hosting. Existing `/api/v1` routes, token storage, `window.BUDGETWISE_API_BASE_URL`, and `budgetwise.db` are unchanged. See `docs/FREE_HOSTING.md` for deployment settings.
 
 **Security:** configure secrets only on the backend; do not commit tokens, environment files, database exports, or virtual environments.
+## Security and maintenance
+
+- The source tree excludes personal database backups and local virtual environments.
+- Password changes invalidate previously issued JWT access tokens, so users must sign in again.
+- Permanent account deletion requires a password plus the literal confirmation `DELETE`.
+- Core budgets reject duplicate categories while historical duplicates are consolidated only for display (no records are deleted).
+- Failed-login throttling is in-process only. Deploy a shared Redis-backed or gateway rate limiter before high-traffic production use.
+- Removing a sensitive file in a new commit **does not delete historical Git objects**. See `docs/SECURITY_REMEDIATION.md` before admitting real user data.
