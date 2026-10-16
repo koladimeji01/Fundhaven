@@ -1,6 +1,6 @@
 
 /* ============================================================
-   BUDGETWISE DASHBOARD — COMPLETE REPLACEMENT
+   FUNDHAVEN DASHBOARD — COMPLETE REPLACEMENT
    Currency preferences + aligned recent transactions
    ============================================================ */
 
@@ -70,7 +70,7 @@
             ) || {};
         } catch (error) {
             console.warn(
-                "Invalid BudgetWise preferences:",
+                "Invalid FundHaven preferences:",
                 error
             );
         }
@@ -806,7 +806,7 @@
             user.name ||
             user.full_name ||
             localStorage.getItem("user_name") ||
-            "BudgetWise User"
+            "FundHaven User"
         );
 
         const email = String(
@@ -1924,7 +1924,7 @@
         renderCurrencyValues();
 
         console.info(
-            "BudgetWise dashboard loaded:",
+            "FundHaven dashboard loaded:",
             {
                 income:
                     state.user.income ??

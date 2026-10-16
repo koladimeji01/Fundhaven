@@ -1,5 +1,5 @@
 /* ============================================================
-   BUDGETWISE LOGIN — EMAIL OR USERNAME + PASSWORD
+   FUNDHAVEN LOGIN — EMAIL OR USERNAME + PASSWORD
    Backend checks the password and returns a JWT directly.
    No OTP, Brevo dependency, or verification-code step.
    ============================================================ */
@@ -19,7 +19,7 @@
         const loginError = byId("loginError");
 
         if (!loginForm || !loginButton || !loginError) {
-            console.error("BudgetWise login form is missing required elements.");
+            console.error("FundHaven login form is missing required elements.");
             return;
         }
 
@@ -61,7 +61,7 @@
                     });
                 } catch {
                     throw new Error(
-                        "Cannot connect to BudgetWise. Check your internet connection and backend."
+                        "Cannot connect to FundHaven. Check your internet connection and backend."
                     );
                 }
 

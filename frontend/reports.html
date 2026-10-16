@@ -14,7 +14,7 @@
 
     >
 
-    <title>Reports - BudgetWise</title>
+    <title>Reports - FundHaven</title>
 
     <link
 
@@ -1409,11 +1409,11 @@
     </style>
 
 
-<!-- BudgetWise unified visual redesign (styles built into this HTML) -->
+<!-- FundHaven unified visual redesign (styles built into this HTML) -->
 <style>
 
 /* ==========================================================
-   BUDGETWISE | REPORTS — UNIFIED DESIGN 2026
+   FUNDHAVEN | REPORTS — UNIFIED DESIGN 2026
    Preserves all chart hooks, table hooks and existing scripts.
    ========================================================== */
 :root {
@@ -1722,9 +1722,11 @@ button {cursor:pointer}
 }
 
 </style>
-    <!-- BudgetWise API endpoint: local by default, configured at deploy time -->
+    <!-- FundHaven API endpoint: local by default, configured at deploy time -->
     <script src="js/runtime-config.js"></script>
     <script src="js/currency.js"></script>
+    <link rel="icon" type="image/svg+xml" href="assets/fundhaven-mark.svg">
+    <link rel="stylesheet" href="css/brand.css">
 </head>
 
 <body>
@@ -1747,15 +1749,11 @@ button {cursor:pointer}
 
         <div class="brand">
 
-            <div class="brand-icon">
-
-                ₦
-
-            </div>
+            <div class="brand-icon"><img src="assets/fundhaven-mark.svg" alt="" aria-hidden="true"></div>
 
             <div class="brand-name">
 
-                BudgetWise
+                FundHaven
 
             </div>
 
@@ -1997,7 +1995,7 @@ button {cursor:pointer}
 
                     >
 
-                        BudgetWise User
+                        FundHaven User
 
                     </div>
 
@@ -2085,7 +2083,7 @@ button {cursor:pointer}
 
                 <strong>Notifications</strong>
 
-                <span>Your BudgetWise updates</span>
+                <span>Your FundHaven updates</span>
 
             </div>
 
@@ -2139,7 +2137,7 @@ button {cursor:pointer}
 
                 <strong id="reportsProfileMenuName">Kehinde</strong>
 
-                <span>Manage your BudgetWise account</span>
+                <span>Manage your FundHaven account</span>
 
             </div>
 
@@ -2851,7 +2849,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (shouldOpen) {
 
-            const displayedName = document.getElementById("topUserName")?.textContent?.trim() || "BudgetWise User";
+            const displayedName = document.getElementById("topUserName")?.textContent?.trim() || "FundHaven User";
 
             const menuName = document.getElementById("reportsProfileMenuName");
 

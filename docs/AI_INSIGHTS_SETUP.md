@@ -1,4 +1,4 @@
-# AI Financial Insights for BudgetWise
+# AI Financial Insights for FundHaven
 
 This feature is an optional step toward a personal finance AI assistant.
 It does not replace your existing Dashboard, Transactions, Reports, Budgets,
@@ -6,7 +6,7 @@ Goals, Settings, sidebar, or existing Lucide icons.
 
 ## Private monthly insights (no AI key needed)
 
-1. Sign in to BudgetWise and visit Dashboard.
+1. Sign in to FundHaven and visit Dashboard.
 2. Choose the desired month with the existing month selector.
 3. Scroll to "AI Financial Insights".
 4. Click "View spending insights (private)".
@@ -88,4 +88,4 @@ The test suite mocks OpenAI and never makes real AI requests:
     python -m pytest -q
 
 No database migration is needed for AI Insights. With DATABASE_URL absent,
-BudgetWise continues using SQLite. PostgreSQL and Brevo remain separate.
+FundHaven continues using SQLite. PostgreSQL and Brevo remain separate.

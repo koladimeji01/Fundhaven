@@ -1,6 +1,6 @@
 ﻿
 /* ============================================================
-   BUDGETWISE — GOALS PAGE
+   FUNDHAVEN — GOALS PAGE
    Complete replacement: goals CRUD, search, sidebar,
    aligned top bar, notifications and profile dropdown.
    ============================================================ */
@@ -201,7 +201,7 @@
             user.name ||
             user.full_name ||
             localStorage.getItem("user_name") ||
-            "BudgetWise User"
+            "FundHaven User"
         );
 
         const email = String(
@@ -1080,7 +1080,7 @@
 
         const name =
             $("topUserName")?.textContent.trim() ||
-            "BudgetWise User";
+            "FundHaven User";
 
         const email =
             userInfo?.email ||
@@ -1199,7 +1199,7 @@
                     ${
                         alerts.length
                             ? `${alerts.length} goal reminder(s)`
-                            : "Your BudgetWise updates"
+                            : "Your FundHaven updates"
                     }
                 </small>
 

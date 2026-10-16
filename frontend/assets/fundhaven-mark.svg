@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="t">
+<title id="t">FundHaven expense tracking logo</title>
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0A6049"/><stop offset="1" stop-color="#052F25"/></linearGradient><linearGradient id="roof" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4FDF9D"/><stop offset="1" stop-color="#0B9565"/></linearGradient></defs>
+<rect width="64" height="64" rx="16" fill="url(#bg)"/>
+<path d="M10 29.5 29.3 13a4.3 4.3 0 0 1 5.4 0L54 29.5" fill="none" stroke="url(#roof)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="17" y="25" width="30" height="30" rx="6" fill="#F7FBF8"/>
+<path d="M22 47h20" stroke="#BFEAD2" stroke-width="2.5" stroke-linecap="round"/>
+<rect x="23" y="37" width="5" height="7" rx="1.5" fill="#46C98C"/>
+<rect x="30" y="32" width="5" height="12" rx="1.5" fill="#21A773"/>
+<rect x="37" y="28" width="5" height="16" rx="1.5" fill="#0A6049"/>
+</svg>

@@ -39,17 +39,17 @@ async def lifespan(app):
     database.create_tables()
 
     logger.info(
-        "BudgetWise database initialized"
+        "FundHaven database initialized"
     )
 
     logger.info(
-        "BudgetWise application started"
+        "FundHaven application started"
     )
 
     yield
 
     logger.info(
-        "BudgetWise application stopped"
+        "FundHaven application stopped"
     )
 
 # ==========================================
@@ -60,9 +60,9 @@ app = FastAPI(
     title=f"{APP_NAME} API",
     lifespan=lifespan,
     description="""
-# BudgetWise API
+# FundHaven API
 
-BudgetWise is a personal finance management API.
+FundHaven is a personal finance management API.
 
 It allows users to:
 
@@ -87,7 +87,7 @@ Then click **Authorize** in Swagger and enter:
 """,
     version=APP_VERSION,
     contact={
-        "name": "BudgetWise"
+        "name": "FundHaven"
     }
 )
 
@@ -184,7 +184,7 @@ class User(BaseModel):
     name: str = Field(
         min_length=2,
         max_length=50,
-        description="Username for the BudgetWise account."
+        description="Username for the FundHaven account."
     )
 
     income: float = Field(
@@ -208,7 +208,7 @@ class LoginRequest(BaseModel):
     name: str = Field(
         min_length=2,
         max_length=50,
-        description="BudgetWise username."
+        description="FundHaven username."
     )
 
     password: str = Field(
@@ -345,14 +345,14 @@ def get_current_user(
 @app.get(
     "/",
     tags=["System"],
-    summary="Welcome to BudgetWise",
-    description="Returns a simple welcome message from the BudgetWise API."
+    summary="Welcome to FundHaven",
+    description="Returns a simple welcome message from the FundHaven API."
 )
 def home():
 
     return {
         "message":
-        "Welcome to BudgetWise API"
+        "Welcome to FundHaven API"
     }
 
 
@@ -364,7 +364,7 @@ def home():
     "/health",
     tags=["System"],
     summary="Check API health",
-    description="Checks whether the BudgetWise API is running."
+    description="Checks whether the FundHaven API is running."
 )
 def health_check():
 
@@ -383,7 +383,7 @@ def health_check():
     tags=["Authentication"],
     summary="Create a new user",
     description="""
-Creates a new BudgetWise account.
+Creates a new FundHaven account.
 
 The password is securely hashed before being stored.
 
@@ -441,9 +441,9 @@ def create_user(
 @app.post(
     "/login",
     tags=["Authentication"],
-    summary="Login to BudgetWise",
+    summary="Login to FundHaven",
     description="""
-Authenticates a BudgetWise user.
+Authenticates a FundHaven user.
 
 If the username and password are correct,
 the API returns a JWT access token.

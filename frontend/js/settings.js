@@ -635,7 +635,7 @@ modal.innerHTML = `
                     </h2>
 
                     <p>
-                        Create a new secure password for your BudgetWise account.
+                        Create a new secure password for your FundHaven account.
                     </p>
                 </div>
 

@@ -41,7 +41,7 @@ def create_and_login_user(client):
         "password": "password123"
     }
 
-    # Actual BudgetWise registration endpoint
+    # Actual FundHaven registration endpoint
     register_response = client.post(
         "/api/v1/users",
         json=user_data

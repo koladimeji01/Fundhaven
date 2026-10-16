@@ -1,6 +1,6 @@
-# BudgetWise FREE web deployment: Vercel + Render + Supabase
+# FundHaven FREE web deployment: Vercel + Render + Supabase
 
-These instructions publish BudgetWise as a DEMO/DEVELOPMENT site.
+These instructions publish FundHaven as a DEMO/DEVELOPMENT site.
 Vercel Hobby is for non-commercial use. Render Free may sleep after 15
 minutes and can take about a minute to wake. Neither free deployment is
 appropriate for a financial app with real customers or production SLAs.
@@ -73,7 +73,7 @@ If Render fails to connect to Supabase, check:
    public static Vercel project.
 7. Click Deploy. Vercel builds and publishes the site.
 8. Visit the .vercel.app domain it gives you.
-   index.html is the BudgetWise landing page; login.html is the login page.
+   index.html is the FundHaven landing page; login.html is the login page.
 
 If the Vercel build reports "Missing BUDGETWISE_API_URL", set that
 environment variable in Vercel Project Settings, then redeploy.
@@ -94,11 +94,11 @@ Once Vercel gives you the actual public hostname:
 
 Verify that requests from the deployed login and dashboard pages can
 reach the Render API. CORS is NOT authentication: protected endpoints
-still require the BudgetWise JWT and checks in FastAPI.
+still require the FundHaven JWT and checks in FastAPI.
 
 ## Step 4 - Login and financial data (important!)
 
-BudgetWise now signs users in using their registered email address or
+FundHaven now signs users in using their registered email address or
 username **and password**. A successful password check returns the normal
 24-hour JWT; an emailed code or Brevo account is **not** required.
 
@@ -126,9 +126,9 @@ See docs/POSTGRESQL_MIGRATION.md for the full safety procedure.
 
 ## Step 5 - Finova: private insights + generative AI advice
 
-**Finova** is the AI financial assistant inside the BudgetWise Dashboard.
+**Finova** is the AI financial assistant inside the FundHaven Dashboard.
 
-- **View Finova insights (private)** reads the user's BudgetWise finances
+- **View Finova insights (private)** reads the user's FundHaven finances
   through GET /api/v1/ai/insights. Suggestions use local rules only,
   require no OpenAI API key, and send no data to the AI provider.
 - **Ask Finova for AI advice** uses OpenAI's Responses API only after
@@ -145,7 +145,7 @@ See docs/POSTGRESQL_MIGRATION.md for the full safety procedure.
 4. Optionally set `OPENAI_MODEL=gpt-4.1-mini`.
 5. Save and redeploy. Keep the secret off GitHub, Vercel, browser code,
    screenshots, and support chats.
-6. Sign in to BudgetWise → Dashboard → **Finova**. The dashboard checks
+6. Sign in to FundHaven → Dashboard → **Finova**. The dashboard checks
    authenticated `GET /api/v1/ai/status` to report whether the backend
    key is configured (it does NOT validate credentials or billing).
 7. Tick the consent checkbox, click **Ask Finova for AI advice**, and
@@ -195,7 +195,7 @@ scheduled function and must be configured later.
 
 ## Important production warning
 
-Do not use Vercel Hobby for a commercial BudgetWise launch. Its free
+Do not use Vercel Hobby for a commercial FundHaven launch. Its free
 Hobby plan is for non-commercial/personal use. Render Free is explicitly
 not recommended for production, has an ephemeral filesystem and cold
 starts. Before collecting real customers' financial data, plan paid

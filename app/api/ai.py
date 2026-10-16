@@ -1,4 +1,4 @@
-"""Authenticated Finova spending insights API for BudgetWise.
+"""Authenticated Finova spending insights API for FundHaven.
 
 Local summaries never call an external AI provider.
 The paid AI provider is called only by an explicit consented POST.
@@ -49,7 +49,7 @@ def get_finova_status(current_user=Depends(get_current_user)):
             "is verified when you request advice."
             if configured else
             "Finova generative advice needs OPENAI_API_KEY on the "
-            "backend (Render → Environment for hosted BudgetWise)."
+            "backend (Render → Environment for hosted FundHaven)."
         ),
     }
 

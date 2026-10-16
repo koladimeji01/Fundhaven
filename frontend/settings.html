@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>
-   Settings - BudgetWise
+   Settings - FundHaven
   </title>
   <style>
    /* ============================================================
@@ -917,10 +917,10 @@
             }
         }
   </style>
-  <!-- BudgetWise Goals-inspired design; all styles are embedded -->
+  <!-- FundHaven Goals-inspired design; all styles are embedded -->
   <style id="budgetwiseSettings2026">
    /* =======================================================================
-   BUDGETWISE | SETTINGS — INTEGRATED MODERN DESIGN
+   FUNDHAVEN | SETTINGS — INTEGRATED MODERN DESIGN
    Original Settings forms / tabs / toggles / scripts are preserved.
    ======================================================================= */
 :root {
@@ -1085,8 +1085,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {o
   .main-content .form-actions {flex-wrap:wrap}
 }
   </style>
-     <!-- BudgetWise API endpoint: local by default, configured at deploy time -->
+     <!-- FundHaven API endpoint: local by default, configured at deploy time -->
     <script src="js/runtime-config.js"></script>
+    <link rel="icon" type="image/svg+xml" href="assets/fundhaven-mark.svg">
+    <link rel="stylesheet" href="css/brand.css">
 </head>
  <body>
   <!-- ============================================================
@@ -1094,11 +1096,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {o
     ============================================================ -->
   <aside class="sidebar" id="sidebar">
    <div class="brand">
-    <div class="brand-icon">
-     ₦
-    </div>
+    <div class="brand-icon"><img src="assets/fundhaven-mark.svg" alt="" aria-hidden="true"></div>
     <div class="brand-text">
-     BudgetWise
+     FundHaven
     </div>
    </div>
    <div class="sidebar-content">
@@ -1282,7 +1282,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {o
        Keep your profile, security and preferences in one place.
       </p>
      </div>
-     <div aria-label="Your BudgetWise account" class="bw-settings-header-chip">
+     <div aria-label="Your FundHaven account" class="bw-settings-header-chip">
       <i data-lucide="shield-check">
       </i>
       <div>
@@ -1342,7 +1342,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {o
          Profile Information
         </h2>
         <p>
-         Update the personal information associated with your BudgetWise account.
+         Update the personal information associated with your FundHaven account.
         </p>
        </div>
        <div class="section-body">
@@ -1363,7 +1363,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {o
          <i data-lucide="info">
          </i>
          <p>
-          Your account information is used to personalize your BudgetWise experience.
+          Your account information is used to personalize your FundHaven experience.
                                     Your email address is also used when signing into your account.
          </p>
         </div>
@@ -1421,7 +1421,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {o
            Password
           </h3>
           <p>
-           Change your BudgetWise account password.
+           Change your FundHaven account password.
           </p>
          </div>
          <button class="btn btn-secondary" id="changePasswordBtn" type="button">
@@ -1434,7 +1434,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {o
            Login Session
           </h3>
           <p>
-           Sign out of your current BudgetWise session.
+           Sign out of your current FundHaven session.
           </p>
          </div>
          <button class="btn btn-secondary" id="logoutBtn" type="button">
@@ -1447,7 +1447,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {o
            Account Status
           </h3>
           <p>
-           Your BudgetWise account is currently active.
+           Your FundHaven account is currently active.
           </p>
          </div>
          <span style="
@@ -1482,7 +1482,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {o
          Notifications
         </h2>
         <p>
-         Choose which BudgetWise notifications you want to receive.
+         Choose which FundHaven notifications you want to receive.
         </p>
        </div>
        <div class="section-body">
@@ -1572,7 +1572,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {o
          Preferences
         </h2>
         <p>
-         Customize how BudgetWise displays your financial information.
+         Customize how FundHaven displays your financial information.
         </p>
        </div>
        <div class="section-body">
@@ -1654,7 +1654,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {o
           </h3>
           <p>
            Deleting your account is permanent. All account data associated
-                                        with your BudgetWise profile may be permanently removed.
+                                        with your FundHaven profile may be permanently removed.
           </p>
           <button class="btn btn-danger" id="deleteAccountBtn" type="button">
            Delete Account
@@ -1707,7 +1707,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {o
 
     function renderProfile() {
       const name = $("topUserName")?.textContent?.trim() ||
-        localStorage.getItem("user_name") || "BudgetWise User";
+        localStorage.getItem("user_name") || "FundHaven User";
       const email = localStorage.getItem("user_email") || "Personal Account";
       $("bwMenuProfileName").textContent = name;
       $("bwMenuProfileEmail").textContent = email;

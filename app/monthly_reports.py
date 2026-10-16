@@ -59,7 +59,7 @@ def _report_for(user_id: int, name: str, month: str):
 
     plain = (
         "Hello " + name + ",\n\n"
-        "Your BudgetWise report for " + heading + " (amounts in NGN):\n"
+        "Your FundHaven report for " + heading + " (amounts in NGN):\n"
         "Monthly income: " + income_label + "\n"
         "Monthly expenses: " + _money(spent) + "\n"
         "Monthly balance: " + balance_label + "\n"
@@ -67,13 +67,13 @@ def _report_for(user_id: int, name: str, month: str):
         "Spending by category:\n"
         + "".join(category + ": " + _money(value) + "\n"
                   for category, value in breakdown)
-        + "\nOpen BudgetWise to see more details.\n"
+        + "\nOpen FundHaven to see more details.\n"
     )
 
     html = (
         "<html><body style='background:#f5f8f6;font-family:Arial,sans-serif;color:#17352a'>"
         "<div style='max-width:580px;background:#fff;margin:30px auto;padding:30px;border-radius:16px'>"
-        "<h2 style='color:#123d2c'>BudgetWise monthly report</h2>"
+        "<h2 style='color:#123d2c'>FundHaven monthly report</h2>"
         "<p>Hello " + escape(name) + ", here is your " + escape(heading) + " summary.</p>"
         "<p style='color:#71887a;font-size:12px'>Amounts shown in Nigerian naira (NGN).</p>"
         "<table width='100%' cellspacing='0' style='font-size:14px'>"
@@ -84,7 +84,7 @@ def _report_for(user_id: int, name: str, month: str):
         "</table><h3>Spending by category</h3>"
         "<table width='100%' cellspacing='0' style='font-size:13px'>" + rows + "</table>"
         "<p style='color:#819689;font-size:12px'>"
-        "You received this email because you enabled monthly reports in BudgetWise Settings. "
+        "You received this email because you enabled monthly reports in FundHaven Settings. "
         "You can turn them off there at any time.</p>"
         "</div></body></html>"
     )
@@ -184,7 +184,7 @@ def send_monthly_reports(today: date | None = None, dry_run=False):
             heading, plain, html_content = _report_for(user_id, name, month)
             message_id = send_email(
                 email,
-                "Your BudgetWise report — " + heading,
+                "Your FundHaven report — " + heading,
                 plain,
                 html_content
             )
@@ -200,7 +200,7 @@ def send_monthly_reports(today: date | None = None, dry_run=False):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Send the previous month's BudgetWise reports"
+        description="Send the previous month's FundHaven reports"
     )
     parser.add_argument("--dry-run", action="store_true",
                         help="Prepare reports without sending emails")

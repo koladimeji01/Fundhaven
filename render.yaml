@@ -1,4 +1,4 @@
-# Render Free: BudgetWise FastAPI backend (frontend deploys on Vercel).
+# Render Free: FundHaven FastAPI backend (frontend deploys on Vercel).
 # Provision through https://dashboard.render.com/blueprints.
 # No SQLite: DATABASE_URL must point at your existing Supabase PostgreSQL DB.
 # Secrets MUST be provided privately in Render; never add credentials here.
