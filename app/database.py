@@ -983,3 +983,23 @@ def delete_user_account(user_id):
         raise
     finally:
         connection.close()
+
+
+def get_profile_financial_summary(user_id, month):
+    """Aggregate monthly spending and effective income in one SQL round trip."""
+    from app.monthly import month_bounds
+    start, end = month_bounds(month)
+    connection = create_connection()
+    try:
+        row = connection.execute("""
+            SELECT
+                (SELECT COALESCE(SUM(amount), 0)
+                 FROM expenses
+                 WHERE user_id = ? AND date >= ? AND date < ?),
+                (SELECT amount FROM monthly_income
+                 WHERE user_id = ? AND month <= ?
+                 ORDER BY month DESC LIMIT 1)
+        """, (user_id, start, end, user_id, month)).fetchone()
+        return float(row[0]), float(row[1]) if row[1] is not None else None
+    finally:
+        connection.close()
