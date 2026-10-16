@@ -23,8 +23,8 @@ loadSavedPreferences();
 
 createChangePasswordModal();
 
-await loadUser();
-await setupMonthlyEmailPreference();
+// Both settings endpoints are independent; eliminate an unnecessary wait.
+await Promise.all([loadUser(), setupMonthlyEmailPreference()]);
 
 refreshIcons();
 });

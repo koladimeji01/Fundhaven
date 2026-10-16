@@ -50,7 +50,7 @@ fs.mkdirSync(dist, { recursive: true });
 
 const ignored = new Set([
     "dist", "node_modules", ".git", ".vercel", "build.js",
-    "vercel.json", "test-currency.js", "test-finova.js", ".env", ".env.local", ".env.production",
+    "vercel.json", "test-currency.js", "test-finova.js", "test-performance.js", ".env", ".env.local", ".env.production",
     ".env.test", "README.md"
 ]);
 

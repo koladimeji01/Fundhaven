@@ -1762,9 +1762,9 @@ async function initializeBudgetsPage() {
     setupSearch();
     setupBudgetTopbarMenus(); // FIX: this was missing
 
-    // Load the current user's information and financial data.
-    await loadUser();
-    await loadExpenses();
+    // Fetch profile and expenses concurrently, preserving the dependency:
+    // budget progress must render only after expenses are loaded.
+    await Promise.all([loadUser(), loadExpenses()]);
     await loadBudgets();
 
     // Refresh the profile menu and notification alerts.

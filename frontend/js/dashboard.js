@@ -2682,13 +2682,19 @@
 
             icons();
 
-            // Load currency preference first
-            const fxReady = loadCurrencyPreference();
+            // Start finance API requests immediately. Refresh conversion
+            // asynchronously; external currency providers must not delay
+            // the dashboard, charts, or stored NGN financial values.
+            const dashboardReady = loadDashboard();
 
-            (async () => {
-                await fxReady;
-                await loadDashboard();
-            })().catch(error => {
+            void loadCurrencyPreference()
+                .then(() => dashboardReady)
+                .then(() => renderCurrencyValues())
+                .catch(error => {
+                    console.warn("Currency refresh failed:", error);
+                });
+
+            void dashboardReady.catch(error => {
                 console.error(
                     "Dashboard load failed:",
                     error

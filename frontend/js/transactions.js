@@ -937,8 +937,8 @@ document.addEventListener(
         setupCategoryFilter();
         setupAddExpenseButton();
 
-        await loadUser();
-        await loadTransactions();
+        // Profile and transactions do not depend on each other.
+        await Promise.all([loadUser(), loadTransactions()]);
 
         if (window.lucide) {
             lucide.createIcons();
