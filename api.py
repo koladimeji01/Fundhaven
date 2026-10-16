@@ -111,6 +111,7 @@ def configured_cors_origins():
     # The stable production aliases continue to work after future deployments.
     # Include the current deployment URL because users may open it directly.
     production_frontend_origins = [
+        "https://fundhaven.vercel.app",
         "https://budgetwise-frontend-tan.vercel.app",
         "https://budgetwise-frontend-kehindeoladimeji455-2157s-projects.vercel.app",
         "https://budgetwise-frontend-c5ajigvrg.vercel.app",
