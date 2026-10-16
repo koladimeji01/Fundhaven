@@ -21,10 +21,17 @@ router = APIRouter(tags=["User"])
     response_model=UserResponse,
     summary="Get my profile",
 )
-def get_my_profile(current_user=Depends(get_current_user)):
+def get_my_profile(
+    current_user=Depends(get_current_user),
+    include_expenses: bool = Query(default=True),
+):
     user_id = current_user[0]
 
-    profile = services.get_user_profile(user_id)
+    profile = services.get_user_profile(
+        user_id,
+        include_expenses=include_expenses,
+        authenticated_user=current_user,
+    )
 
     if not profile:
         raise HTTPException(status_code=404, detail="User not found")

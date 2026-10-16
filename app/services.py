@@ -40,32 +40,27 @@ def change_user_password(
 # USER PROFILE
 # ============================================================
 
-def get_user_profile(user_id):
-    user = database.get_user(user_id)
-
+def get_user_profile(user_id, include_expenses=True, authenticated_user=None):
+    """Accurate monthly totals without loading all history for lightweight callers."""
+    user = authenticated_user if authenticated_user is not None else database.get_user(user_id)
     if not user:
         return None
 
-    expenses = database.get_expenses(user_id)
-
     selected_month = date.today().strftime("%Y-%m")
-    monthly_expenses = database.get_month_expenses(user_id, selected_month)
-    total_expenses = float(sum(
-        (Decimal(str(expense[1])) for expense in monthly_expenses), Decimal("0")
-    ))
-    effective_income = database.get_monthly_income(user_id, selected_month)
-    balance = (float(effective_income) if effective_income is not None else 0) - total_expenses
+    total_expenses, effective_income = database.get_profile_financial_summary(
+        user_id, selected_month
+    )
+    balance = (
+        float(effective_income) if effective_income is not None else 0.0
+    ) - total_expenses
 
     formatted_expenses = []
-
-    for expense in expenses:
-        formatted_expenses.append({
-            "id": expense[0],
-            "amount": expense[1],
-            "category": expense[2],
-            "description": expense[3],
-            "date": expense[4]
-        })
+    if include_expenses:
+        formatted_expenses = [
+            {"id": e[0], "amount": e[1], "category": e[2],
+             "description": e[3], "date": e[4]}
+            for e in database.get_expenses(user_id)
+        ]
 
     return {
         "id": user[0],
@@ -74,7 +69,7 @@ def get_user_profile(user_id):
         "email": user[4],
         "expenses": formatted_expenses,
         "total_expenses": total_expenses,
-        "balance": balance
+        "balance": balance,
     }
 
 
