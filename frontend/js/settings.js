@@ -77,7 +77,7 @@ async function loadUser() {
 try {
 
     const response = await apiRequest(
-        `${API_URL}/users/me`,
+        `${API_URL}/users/me?include_expenses=false`,
         {
             method: "GET"
         }

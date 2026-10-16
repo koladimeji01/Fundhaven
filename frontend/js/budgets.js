@@ -151,7 +151,7 @@ async function loadUser() {
 
     try {
 
-        const data = await apiRequest("/users/me");
+        const data = await apiRequest("/users/me?include_expenses=false");
 
         if (!data) {
             return;

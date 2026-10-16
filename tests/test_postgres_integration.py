@@ -71,6 +71,11 @@ def test_postgres_full_budgetwise_flow(safe_postgres_test_database):
     assert profile.status_code == 200
     assert profile.json()["name"] == user["name"]
 
+    lean = client.get("/api/v1/users/me?include_expenses=false", headers=auth)
+    assert lean.status_code == 200, lean.text
+    assert lean.json()["expenses"] == []
+    assert lean.json()["income"] == 450000
+
     transaction = client.post("/api/v1/expenses", headers=auth, json={
         "amount": 25340.25,
         "category": "Food",

@@ -317,7 +317,7 @@ async function loadReports() {
         showLoading();
 
         const [user, dashboard, expensesData] = await Promise.all([
-            apiRequest("/users/me"),
+            apiRequest("/users/me?include_expenses=false"),
             apiRequest(`/dashboard?month=${encodeURIComponent(selectedReportMonth)}`),
             apiRequest(`/expenses?month=${encodeURIComponent(selectedReportMonth)}`)
         ]);

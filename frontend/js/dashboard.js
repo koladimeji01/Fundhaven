@@ -1864,7 +1864,7 @@
 
     async function loadDashboard() {
         const results = await Promise.allSettled([
-            request("/users/me"),
+            request("/users/me?include_expenses=false"),
             dashboardRequest(),
             request(`/expenses?month=${encodeURIComponent(state.selectedMonth)}`),
             request("/budgets")

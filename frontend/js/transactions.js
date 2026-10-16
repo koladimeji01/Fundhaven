@@ -372,7 +372,7 @@ function showToast(message, type = "success") {
 
 async function loadUser() {
     try {
-        const user = await apiRequest("/users/me");
+        const user = await apiRequest("/users/me?include_expenses=false");
 
         if (!user) {
             return;
