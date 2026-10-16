@@ -101,15 +101,22 @@ Then click **Authorize** in Swagger and enter:
     lifespan=lifespan
 )
 def configured_cors_origins():
-    """Accept exact trusted frontend URLs, never a wildcard.
+    """Allow our verified Vercel origins plus exact HTTPS origins from Render.
 
-    Configure BUDGETWISE_ALLOWED_ORIGINS=https://yourapp.vercel.app in Render.
-    Multiple explicit origins may be supplied, separated by commas.
+    Set BUDGETWISE_ALLOWED_ORIGINS for additional domains (e.g. custom
+    domains); comma-separated values must be exact, never wildcards.
     """
-    # Do not allow localhost on public production servers; only explicit
-    # HTTPS origins from BUDGETWISE_ALLOWED_ORIGINS are trusted there.
+    # Never allow localhost in production, and never use wildcard CORS.
+    # These HTTPS origins belong to the connected FundHaven Vercel project.
+    # The stable production aliases continue to work after future deployments.
+    # Include the current deployment URL because users may open it directly.
+    production_frontend_origins = [
+        "https://budgetwise-frontend-tan.vercel.app",
+        "https://budgetwise-frontend-kehindeoladimeji455-2157s-projects.vercel.app",
+        "https://budgetwise-frontend-c5ajigvrg.vercel.app",
+    ]
     origins = (
-        []
+        production_frontend_origins.copy()
         if os.getenv("ENVIRONMENT", "development").lower() == "production"
         else ["http://127.0.0.1:5500", "http://localhost:5500"]
     )
