@@ -41,6 +41,11 @@ async def lifespan(app):
                 "SQLite is supported only for local development and testing."
             )
 
+    if os.getenv("ENVIRONMENT", "development").lower() == "production":
+        from app.config import SECRET_KEY
+        if not SECRET_KEY or len(SECRET_KEY) < 32:
+            raise RuntimeError("Production requires a SECRET_KEY of at least 32 characters")
+
     run_migrations()
 
     logger.info(

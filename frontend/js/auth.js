@@ -73,8 +73,7 @@ function redirectIfAuthenticated() {
 
     if (isAuthenticated()) {
 
-        window.location.href =
-            "dashboard.html";
+        window.location.replace("dashboard.html");
 
     }
 
@@ -94,8 +93,7 @@ function requireAuthentication() {
 
     if (!isAuthenticated()) {
 
-        window.location.href =
-            "login.html";
+        window.location.replace("login.html");
 
         return false;
 
@@ -133,8 +131,7 @@ function logout() {
     );
 
 
-    window.location.href =
-        "login.html";
+    window.location.replace("login.html");
 
 }
 

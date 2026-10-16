@@ -32,12 +32,14 @@ class GoalCreate(BaseModel):
 
     target_amount: float = Field(
         ...,
-        gt=0
+        gt=0,
+        allow_inf_nan=False
     )
 
     current_amount: float = Field(
         default=0,
-        ge=0
+        ge=0,
+        allow_inf_nan=False
     )
 
     target_date: Optional[date] = None
@@ -53,12 +55,14 @@ class GoalUpdate(BaseModel):
 
     target_amount: Optional[float] = Field(
         default=None,
-        gt=0
+        gt=0,
+        allow_inf_nan=False
     )
 
     current_amount: Optional[float] = Field(
         default=None,
-        ge=0
+        ge=0,
+        allow_inf_nan=False
     )
 
     target_date: Optional[date] = None
@@ -288,10 +292,8 @@ def update_goal(
     )
 
     target_date = (
-        goal.target_date.isoformat()
-        if goal.target_date is not None
-        else existing_goal.get("target_date")
-    )
+        goal.target_date.isoformat() if goal.target_date is not None else None
+    ) if "target_date" in goal.model_fields_set else existing_goal.get("target_date")
 
     # ----------------------------------------
     # Validate amounts

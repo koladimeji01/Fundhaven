@@ -1,4 +1,8 @@
 ﻿from fastapi import APIRouter, Depends, HTTPException, Query
+import math
+from typing import Literal
+from pydantic import BaseModel, Field
+from app.auth import verify_password
 from app.monthly import resolve_month
 
 from app import services
@@ -48,6 +52,9 @@ def update_my_profile(profile_data: dict, current_user=Depends(get_current_user)
 
     name = name.strip()
 
+    if len(name) > 50:
+        raise HTTPException(status_code=422, detail="Name must be at most 50 characters")
+
     if len(name) < 2:
         raise HTTPException(
             status_code=422,
@@ -61,6 +68,9 @@ def update_my_profile(profile_data: dict, current_user=Depends(get_current_user)
         income = float(income)
     except (TypeError, ValueError) as exc:
         raise HTTPException(status_code=422, detail="Income must be a number") from exc
+
+    if not math.isfinite(income):
+        raise HTTPException(status_code=422, detail="Income must be a finite number")
 
     if income <= 0:
         raise HTTPException(status_code=422, detail="Income must be greater than 0")
@@ -126,7 +136,7 @@ def change_my_password(password_data: dict, current_user=Depends(get_current_use
         )
 
     try:
-        services.change_user_password(
+        changed = services.change_user_password(
             user_id=user_id,
             current_password=current_password,
             new_password=new_password,
@@ -134,14 +144,32 @@ def change_my_password(password_data: dict, current_user=Depends(get_current_use
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
 
-    return {"message": "Password changed successfully"}
+    if not changed:
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+
+    return {"message": "Password changed. Sign in again on all devices."}
+
+
+class DeleteAccountRequest(BaseModel):
+    password: str = Field(min_length=1)
+    confirmation: Literal["DELETE"]
+
+
+@router.delete("/users/me", summary="Permanently delete my account")
+def delete_my_account(
+    request: DeleteAccountRequest, current_user=Depends(get_current_user)
+):
+    if not verify_password(request.password, current_user[3]):
+        raise HTTPException(status_code=400, detail="Incorrect password")
+    if not database.delete_user_account(current_user[0]):
+        raise HTTPException(status_code=404, detail="Account not found")
+    return {"message": "Account deleted"}
 
 
 # ============================================================
 # MONTHLY FINANCIAL EMAIL PREFERENCE (OPT IN)
 # ============================================================
 
-from pydantic import BaseModel
 from app import database
 
 

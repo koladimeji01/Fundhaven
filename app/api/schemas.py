@@ -16,7 +16,8 @@ class User(BaseModel):
     email: EmailStr
 
     income: float = Field(
-        gt=0
+        gt=0,
+        allow_inf_nan=False
     )
 
     password: str = Field(
@@ -109,7 +110,8 @@ class BudgetCreate(BaseModel):
     )
 
     amount: float = Field(
-        gt=0
+        gt=0,
+        allow_inf_nan=False
     )
 
 
@@ -120,7 +122,8 @@ class BudgetUpdate(BaseModel):
     )
 
     amount: float = Field(
-        gt=0
+        gt=0,
+        allow_inf_nan=False
     )
 
 

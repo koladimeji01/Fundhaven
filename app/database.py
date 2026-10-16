@@ -21,155 +21,9 @@ def create_connection():
 # ==========================================
 
 def create_tables():
-    if using_postgres():
-        from app.migrations.postgres import run_postgres_migrations
-        run_postgres_migrations()
-        return
-
-    connection = create_connection()
-    cursor = connection.cursor()
-
-    try:
-
-        # --------------------------------------
-        # USERS TABLE
-        # --------------------------------------
-
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL UNIQUE,
-                income REAL NOT NULL CHECK(income > 0),
-                password TEXT NOT NULL,
-                email TEXT
-            )
-            """
-        )
-
-        # --------------------------------------
-        # EXPENSES TABLE
-        # --------------------------------------
-
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS expenses (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                amount REAL NOT NULL CHECK(amount > 0),
-                category TEXT NOT NULL,
-                description TEXT NOT NULL,
-                date TEXT NOT NULL,
-                FOREIGN KEY (user_id)
-                    REFERENCES users(id)
-                    ON DELETE CASCADE
-            )
-            """
-        )
-
-        # --------------------------------------
-        # EXPENSE INDEX
-        # --------------------------------------
-
-        cursor.execute(
-            """
-            CREATE INDEX IF NOT EXISTS idx_expenses_user_id
-            ON expenses(user_id)
-            """
-        )
-
-        # --------------------------------------
-        # EMAIL INDEX
-        # --------------------------------------
-
-        cursor.execute(
-            """
-            CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email
-            ON users(email)
-            WHERE email IS NOT NULL
-            """
-        )
-
-        # --------------------------------------
-        # BUDGETS TABLE
-        # --------------------------------------
-
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS budgets (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                category TEXT NOT NULL,
-                amount REAL NOT NULL CHECK(amount > 0),
-                updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id)
-                    REFERENCES users(id)
-                    ON DELETE CASCADE
-            )
-            """
-        )
-
-        # --------------------------------------
-        # BUDGET INDEX
-        # --------------------------------------
-
-        cursor.execute(
-            """
-            CREATE INDEX IF NOT EXISTS idx_budgets_user_id
-            ON budgets(user_id)
-            """
-        )
-
-        # --------------------------------------
-        # GOALS TABLE
-        # --------------------------------------
-
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS goals (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                name TEXT NOT NULL,
-                target_amount REAL NOT NULL
-                    CHECK(target_amount > 0),
-                current_amount REAL NOT NULL DEFAULT 0
-                    CHECK(current_amount >= 0),
-                target_date TEXT,
-                FOREIGN KEY (user_id)
-                    REFERENCES users(id)
-                    ON DELETE CASCADE
-            )
-            """
-        )
-
-        # --------------------------------------
-        # GOALS INDEX
-        # --------------------------------------
-
-        cursor.execute(
-            """
-            CREATE INDEX IF NOT EXISTS idx_goals_user_id
-            ON goals(user_id)
-            """
-        )
-
-        connection.commit()
-
-        logger.info(
-            "Database tables checked successfully."
-        )
-
-    except DB_ERRORS as error:
-        connection.rollback()
-
-        logger.error(
-            f"Database table creation error: {error}"
-        )
-
-        raise
-
-    finally:
-        connection.close()
+    """Deprecated compatibility wrapper: one migration authority only."""
+    from app.migrations.manager import run_migrations
+    run_migrations()
 
 
 # ==========================================
@@ -581,6 +435,14 @@ def add_budget(
 
     try:
         cursor = connection.cursor()
+        cursor.execute("BEGIN IMMEDIATE")
+        cursor.execute(
+            "SELECT id FROM budgets WHERE user_id = ? AND LOWER(TRIM(category)) = LOWER(TRIM(?))",
+            (user_id, category.strip()),
+        )
+        if cursor.fetchone():
+            connection.rollback()
+            raise ValueError("A budget already exists for this category")
 
         cursor.execute(
             """
@@ -660,6 +522,14 @@ def update_budget(
 
     try:
         cursor = connection.cursor()
+        cursor.execute("BEGIN IMMEDIATE")
+        cursor.execute(
+            "SELECT id FROM budgets WHERE user_id = ? AND id != ? AND LOWER(TRIM(category)) = LOWER(TRIM(?))",
+            (user_id, budget_id, category.strip()),
+        )
+        if cursor.fetchone():
+            connection.rollback()
+            raise ValueError("A budget already exists for this category")
 
         cursor.execute(
             """
@@ -1096,5 +966,20 @@ def get_monthly_income(user_id, month=None):
             ORDER BY month DESC LIMIT 1
         """, (user_id, selected)).fetchone()
         return float(row[0]) if row else None
+    finally:
+        connection.close()
+
+
+def delete_user_account(user_id):
+    """Delete only the authenticated user's account and cascading records."""
+    connection = create_connection()
+    try:
+        cursor = connection.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        deleted = cursor.rowcount
+        connection.commit()
+        return bool(deleted)
+    except DB_ERRORS:
+        connection.rollback()
+        raise
     finally:
         connection.close()

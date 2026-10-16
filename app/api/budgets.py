@@ -26,7 +26,8 @@ class BudgetCreate(BaseModel):
     )
 
     amount: float = Field(
-        gt=0
+        gt=0,
+        allow_inf_nan=False
     )
 
 
@@ -47,11 +48,14 @@ def create_budget(
 
     user_id = current_user[0]
 
-    budget_id = database.add_budget(
-        user_id=user_id,
-        category=budget.category,
-        amount=budget.amount
-    )
+    try:
+        budget_id = database.add_budget(
+            user_id=user_id,
+            category=budget.category,
+            amount=budget.amount
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
 
     return {
         "id": budget_id,
@@ -113,12 +117,15 @@ def update_budget(
 
     user_id = current_user[0]
 
-    updated = database.update_budget(
-        user_id=user_id,
-        budget_id=budget_id,
-        category=budget.category,
-        amount=budget.amount
-    )
+    try:
+        updated = database.update_budget(
+            user_id=user_id,
+            budget_id=budget_id,
+            category=budget.category,
+            amount=budget.amount
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
 
     if not updated:
 

@@ -594,15 +594,79 @@ if (deleteAccountButton) {
     deleteAccountButton.addEventListener(
         "click",
         function () {
-
-            showToast(
-                "Account deletion will be connected to the backend next.",
-                true
-            );
+            openDeleteAccountDialog();
         }
     );
 }
 }
+/* ============================================================
+ACCOUNT DELETION — REQUIRES PASSWORD AND EXPLICIT CONFIRMATION
+============================================================ */
+function openDeleteAccountDialog() {
+    document.getElementById("deleteAccountModal")?.remove();
+    const dialog = document.createElement("div");
+    dialog.id = "deleteAccountModal";
+    dialog.innerHTML = `
+        <div class="password-modal-overlay" style="position:fixed;inset:0;z-index:5000;display:flex;justify-content:center;align-items:center;padding:16px;background:rgba(15,23,42,.6)">
+          <form id="deleteAccountForm" class="password-modal" role="dialog" aria-modal="true" aria-labelledby="deleteAccountTitle">
+            <div class="password-modal-header">
+              <div><h2 id="deleteAccountTitle">Permanently delete account</h2>
+              <p>This permanently deletes your profile, expenses, budgets and goals. This cannot be undone.</p></div>
+            </div>
+            <div class="password-modal-body">
+              <label for="deleteAccountPassword">Your current password</label>
+              <input id="deleteAccountPassword" type="password" autocomplete="current-password" required
+                     style="width:100%;padding:12px;margin:8px 0 16px">
+              <label for="deleteAccountConfirmation">Type DELETE to confirm</label>
+              <input id="deleteAccountConfirmation" type="text" autocomplete="off" required
+                     style="width:100%;padding:12px;margin:8px 0 12px">
+              <p id="deleteAccountError" role="alert" style="color:#b91c1c"></p>
+            </div>
+            <div class="password-modal-footer" style="display:flex;gap:12px;justify-content:flex-end;padding:16px">
+              <button type="button" id="cancelDeleteAccount">Cancel</button>
+              <button type="submit" id="confirmDeleteAccount" style="background:#b91c1c;color:white;padding:10px 18px;border-radius:8px">Delete account</button>
+            </div>
+          </form>
+        </div>`;
+    document.body.appendChild(dialog);
+    const close = () => dialog.remove();
+    dialog.querySelector("#cancelDeleteAccount").addEventListener("click", close);
+    dialog.querySelector(".password-modal-overlay").addEventListener("click", event => {
+        if (event.target === event.currentTarget) close();
+    });
+    const form = dialog.querySelector("#deleteAccountForm");
+    form.addEventListener("submit", async event => {
+        event.preventDefault();
+        const password = dialog.querySelector("#deleteAccountPassword").value;
+        const confirmation = dialog.querySelector("#deleteAccountConfirmation").value.trim();
+        const errorNode = dialog.querySelector("#deleteAccountError");
+        if (confirmation !== "DELETE") {
+            errorNode.textContent = "Enter DELETE exactly to confirm.";
+            return;
+        }
+        const button = dialog.querySelector("#confirmDeleteAccount");
+        button.disabled = true;
+        try {
+            const response = await apiRequest(API_URL + "/users/me", {
+                method: "DELETE",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({password, confirmation})
+            });
+            if (!response) return;
+            const data = await readResponseData(response);
+            if (!response.ok) throw new Error(getApiErrorMessage(data, "Account deletion failed."));
+            close();
+            window.alert("Your FundHaven account has been deleted.");
+            logout();
+        } catch (error) {
+            errorNode.textContent = error.message || "Unable to delete your account.";
+        } finally {
+            button.disabled = false;
+        }
+    });
+    dialog.querySelector("#deleteAccountPassword").focus();
+}
+
 /* ============================================================
 CHANGE PASSWORD MODAL
 ============================================================ */
@@ -1211,11 +1275,9 @@ try {
 
 
     closeChangePasswordModal();
-
-
-    showToast(
-        "Password changed successfully."
-    );
+    // The backend invalidates all tokens issued before this password change.
+    window.alert("Password changed successfully. Please sign in again.");
+    logout();
 
 
 } catch (error) {

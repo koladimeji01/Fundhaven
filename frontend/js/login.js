@@ -37,11 +37,11 @@
             event.preventDefault();
             clearError();
 
-            const email = byId("email")?.value.trim() || "";
+            const identifier = byId("email")?.value.trim() || "";
             const password = byId("password")?.value || "";
 
-            if (!email || !password) {
-                showError("Enter your email and password.");
+            if (!identifier || !password) {
+                showError("Enter your email or username and password.");
                 return;
             }
 
@@ -57,7 +57,7 @@
                             "Content-Type": "application/json",
                             "Accept": "application/json"
                         },
-                        body: JSON.stringify({email, password})
+                        body: JSON.stringify(identifier.includes("@") ? {email: identifier, password} : {name: identifier, password})
                     });
                 } catch {
                     throw new Error(
@@ -82,7 +82,7 @@
                     .forEach(key => localStorage.removeItem(key));
 
                 localStorage.setItem("access_token", data.access_token);
-                localStorage.setItem("user_email", email);
+                if (identifier.includes("@")) localStorage.setItem("user_email", identifier);
 
                 window.location.replace("dashboard.html");
             } catch (error) {

@@ -7,7 +7,7 @@ from fastapi.security import (
 
 from app import database
 
-from app.auth import decode_access_token
+from app.auth import decode_access_token, token_matches_password
 
 
 # ==========================================
@@ -60,5 +60,8 @@ def get_current_user(
             status_code=401,
             detail="User not found"
         )
+
+    if not token_matches_password(payload, user[3]):
+        raise HTTPException(status_code=401, detail="Session expired. Sign in again.")
 
     return user
