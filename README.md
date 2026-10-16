@@ -27,6 +27,6 @@ FundHaven is a personal **expense tracker** built with FastAPI and a lightweight
 
 ## Deployment compatibility
 
-This is a **branding change**, not a breaking API/data migration. Existing `/api/v1` routes, token storage keys, `window.BUDGETWISE_API_BASE_URL`, `BUDGETWISE_API_URL` and `BUDGETWISE_ALLOWED_ORIGINS` are intentionally preserved to avoid breaking already configured hosting. Existing `budgetwise.db` databases and the GitHub repository slug also remain unchanged. See `docs/FREE_HOSTING.md` for the current deployment settings.
+This is a **branding change**, not a breaking API/data migration. The preferred environment variables are `FUNDHAVEN_API_URL` for the Vercel/Netlify frontend build and `FUNDHAVEN_ALLOWED_ORIGINS` for Render CORS. Older `BUDGETWISE_API_URL` and `BUDGETWISE_ALLOWED_ORIGINS` keys remain supported to avoid disrupting hosting. Existing `/api/v1` routes, token storage, `window.BUDGETWISE_API_BASE_URL`, and `budgetwise.db` are unchanged. See `docs/FREE_HOSTING.md` for deployment settings.
 
 **Security:** configure secrets only on the backend; do not commit tokens, environment files, database exports, or virtual environments.

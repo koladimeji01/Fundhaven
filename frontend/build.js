@@ -1,14 +1,15 @@
 /*
- * Generate a static Vercel deployment from FundHaven/frontend.
+ * Generate a static Vercel or Netlify deployment from FundHaven/frontend.
  *
- * For Vercel, set a public build-time environment variable:
- *   BUDGETWISE_API_URL=https://YOUR-RENDER-SERVICE.onrender.com/api/v1
+ * Preferred public build-time environment variable:
+ *   FUNDHAVEN_API_URL=https://YOUR-RENDER-SERVICE.onrender.com/api/v1
+ * The old BUDGETWISE_API_URL is also accepted during migration.
  *
  * This is a public API endpoint, not a secret. Never put DATABASE_URL,
- * SECRET_KEY, or any API token in the frontend or Vercel env for this site.
+ * SECRET_KEY, or any API token in public build configuration.
  *
  * Usage:
- *   cd frontend && BUDGETWISE_API_URL=https://... node build.js
+ *   cd frontend && FUNDHAVEN_API_URL=https://... node build.js
  */
 "use strict";
 const fs = require("node:fs");
@@ -20,8 +21,8 @@ const dist = path.join(root, "dist");
 function parsePublicApiUrl(raw) {
     if (!raw || !raw.trim()) {
         throw new Error(
-            "Missing BUDGETWISE_API_URL. In Vercel project Settings → " +
-            "Environment Variables, set it to the Render HTTPS URL " +
+            "Missing FUNDHAVEN_API_URL. In Netlify/Vercel site settings → " +
+            "Environment variables, set it to the Render HTTPS URL " +
             "ending in /api/v1, then redeploy."
         );
     }
@@ -29,19 +30,21 @@ function parsePublicApiUrl(raw) {
     try {
         url = new URL(raw.trim());
     } catch {
-        throw new Error("BUDGETWISE_API_URL is not a valid URL.");
+        throw new Error("FUNDHAVEN_API_URL is not a valid URL.");
     }
     if (url.protocol !== "https:" || url.username || url.password ||
         url.search || url.hash || url.pathname.replace(/\/$/, "") !== "/api/v1") {
         throw new Error(
-            "BUDGETWISE_API_URL must be a public https://.../api/v1 URL " +
+            "FUNDHAVEN_API_URL must be a public https://.../api/v1 URL " +
             "with no credentials, query string or fragments."
         );
     }
     return url.origin + "/api/v1";
 }
 
-const apiUrl = parsePublicApiUrl(process.env.BUDGETWISE_API_URL);
+const apiUrl = parsePublicApiUrl(
+    process.env.FUNDHAVEN_API_URL || process.env.BUDGETWISE_API_URL
+);
 fs.rmSync(dist, { recursive: true, force: true });
 fs.mkdirSync(dist, { recursive: true });
 

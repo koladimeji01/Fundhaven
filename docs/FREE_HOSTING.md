@@ -1,5 +1,27 @@
 # FundHaven FREE web deployment: Vercel + Render + Supabase
 
+## FundHaven environment variable transition (Netlify + Render)
+
+You can rename the environment variables before moving the frontend.
+**Do not change the backend URL to an unverified hostname.**
+
+- **Render** service `budgetwise-31m8.onrender.com`: add
+  `FUNDHAVEN_ALLOWED_ORIGINS=https://fundhaven.vercel.app` initially.
+  After Netlify assigns its exact domain, add that origin too, separated by a
+  comma. The old `BUDGETWISE_ALLOWED_ORIGINS` key is still accepted.
+- **Netlify** build variable:
+  `FUNDHAVEN_API_URL=https://budgetwise-31m8.onrender.com/api/v1`.
+  Base directory `frontend`, build `node build.js`, publish `dist`.
+- **Vercel** (if kept): it may continue using `BUDGETWISE_API_URL` until
+  you're ready to update it. The build accepts either name.
+- The browser runtime config variable `window.BUDGETWISE_API_BASE_URL`
+  remains intentionally unchanged so all existing pages continue to connect.
+- Changing a Render service's display name or its `onrender.com` hostname
+  is separate from changing environment-variable keys and needs a verified
+  migration of all frontend API URLs.
+
+
+
 These instructions publish FundHaven as a DEMO/DEVELOPMENT site.
 Vercel Hobby is for non-commercial use. Render Free may sleep after 15
 minutes and can take about a minute to wake. Neither free deployment is

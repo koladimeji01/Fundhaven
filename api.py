@@ -101,10 +101,11 @@ Then click **Authorize** in Swagger and enter:
     lifespan=lifespan
 )
 def configured_cors_origins():
-    """Allow our verified Vercel origins plus exact HTTPS origins from Render.
+    """Allow verified production sites and explicitly configured HTTPS origins.
 
-    Set BUDGETWISE_ALLOWED_ORIGINS for additional domains (e.g. custom
-    domains); comma-separated values must be exact, never wildcards.
+    FUNDHAVEN_ALLOWED_ORIGINS is the preferred Render setting. The legacy
+    BUDGETWISE_ALLOWED_ORIGINS remains supported during migration; both are
+    validated and combined without wildcards.
     """
     # Never allow localhost in production, and never use wildcard CORS.
     # These HTTPS origins belong to the connected FundHaven Vercel project.
@@ -121,28 +122,30 @@ def configured_cors_origins():
         if os.getenv("ENVIRONMENT", "development").lower() == "production"
         else ["http://127.0.0.1:5500", "http://localhost:5500"]
     )
-    raw = os.getenv("BUDGETWISE_ALLOWED_ORIGINS", "")
-    for item in raw.split(","):
-        candidate = item.strip().rstrip("/")
-        if not candidate:
-            continue
-        parsed = urlsplit(candidate)
-        if (
-            parsed.scheme != "https"
-            or not parsed.hostname
-            or parsed.username
-            or parsed.password
-            or parsed.path
-            or parsed.query
-            or parsed.fragment
-            or "*" in candidate
-        ):
-            raise ValueError(
-                "BUDGETWISE_ALLOWED_ORIGINS must contain complete, exact "
-                "HTTPS origins, separated by commas (no paths or wildcards)"
-            )
-        if candidate not in origins:
-            origins.append(candidate)
+    # Accept the renamed key without removing the already deployed setting.
+    # The extra origins are additive so existing users remain able to log in.
+    for key in ("FUNDHAVEN_ALLOWED_ORIGINS", "BUDGETWISE_ALLOWED_ORIGINS"):
+        for item in os.getenv(key, "").split(","):
+            candidate = item.strip().rstrip("/")
+            if not candidate:
+                continue
+            parsed = urlsplit(candidate)
+            if (
+                parsed.scheme != "https"
+                or not parsed.hostname
+                or parsed.username
+                or parsed.password
+                or parsed.path
+                or parsed.query
+                or parsed.fragment
+                or "*" in candidate
+            ):
+                raise ValueError(
+                    f"{key} must contain complete, exact HTTPS origins, "
+                    "separated by commas (no paths or wildcards)"
+                )
+            if candidate not in origins:
+                origins.append(candidate)
     return origins
 
 
