@@ -16,6 +16,12 @@ from decimal import Decimal
 import os
 import re
 import sqlite3
+from threading import Lock
+
+try:
+    from psycopg_pool import ConnectionPool
+except ImportError:
+    ConnectionPool = None
 
 try:
     import psycopg
@@ -132,9 +138,40 @@ class PostgresCursor:
         self._cursor.close()
 
 
+_pool_lock = Lock()
+_pools = {}
+
+
+def get_postgres_pool(url):
+    """Reuse remote PostgreSQL connections for synchronous FastAPI queries."""
+    if ConnectionPool is None:
+        raise RuntimeError("Missing PostgreSQL pool; install requirements.txt")
+    with _pool_lock:
+        pool = _pools.get(url)
+        if pool is None or pool.closed:
+            try:
+                size = max(1, min(8, int(os.getenv("FUNDHAVEN_DB_POOL_SIZE", "4"))))
+            except ValueError as exc:
+                raise ValueError("FUNDHAVEN_DB_POOL_SIZE must be an integer") from exc
+            pool = ConnectionPool(
+                conninfo=url,
+                min_size=0,
+                max_size=size,
+                max_idle=60.0,
+                max_lifetime=600.0,
+                timeout=10.0,
+                kwargs={"connect_timeout": 10},
+                open=True,
+            )
+            _pools[url] = pool
+        return pool
+
+
 class PostgresConnection:
-    def __init__(self, connection):
+    def __init__(self, connection, pool=None):
         self._connection = connection
+        self._pool = pool
+        self._returned = False
 
     def cursor(self):
         return PostgresCursor(self._connection.cursor())
@@ -149,7 +186,13 @@ class PostgresConnection:
         self._connection.rollback()
 
     def close(self):
-        self._connection.close()
+        if self._returned:
+            return
+        self._returned = True
+        if self._pool is not None:
+            self._pool.putconn(self._connection)
+        else:
+            self._connection.close()
 
 
 def connect_database(sqlite_path):
@@ -166,5 +209,6 @@ def connect_database(sqlite_path):
 
     # SSL is expected for remote managed databases. Add sslmode=require to
     # your DATABASE_URL if it is not already configured by your provider.
-    connection = psycopg.connect(url, connect_timeout=10)
-    return PostgresConnection(connection)
+    pool = get_postgres_pool(url)
+    connection = pool.getconn()
+    return PostgresConnection(connection, pool=pool)
