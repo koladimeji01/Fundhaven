@@ -1,5 +1,7 @@
 from app import database
 from app.auth import hash_password, verify_password
+from decimal import Decimal
+from datetime import date
 
 
 # ============================================================
@@ -46,12 +48,13 @@ def get_user_profile(user_id):
 
     expenses = database.get_expenses(user_id)
 
-    total_expenses = sum(
-        float(expense[1])
-        for expense in expenses
-    )
-
-    balance = float(user[2]) - total_expenses
+    selected_month = date.today().strftime("%Y-%m")
+    monthly_expenses = database.get_month_expenses(user_id, selected_month)
+    total_expenses = float(sum(
+        (Decimal(str(expense[1])) for expense in monthly_expenses), Decimal("0")
+    ))
+    effective_income = database.get_monthly_income(user_id, selected_month)
+    balance = (float(effective_income) if effective_income is not None else 0) - total_expenses
 
     formatted_expenses = []
 
@@ -441,28 +444,31 @@ def get_budget_dashboard(user_id, month=None):
     # EACH BUDGET
     # --------------------------------------------------------
 
+    # Group pre-existing duplicate category budgets rather than counting
+    # the SAME expenses once per budget. API rejects new duplicates.
+    grouped_budgets = {}
     for budget in budgets:
+        key = str(budget[2]).strip().casefold()
+        if key not in grouped_budgets:
+            grouped_budgets[key] = {
+                "category": str(budget[2]).strip(),
+                "limit": Decimal("0"),
+            }
+        grouped_budgets[key]["limit"] += Decimal(str(budget[3]))
 
-        category = budget[2]
-        budget_amount = float(budget[3])
-
-        spent = 0.0
-
-        for (
-            expense_category,
-            expense_amount
-        ) in spending_by_category.items():
-
-            if (
-                expense_category.lower()
-                == category.lower()
-            ):
-                spent = expense_amount
-                break
-
-        remaining = (
-            budget_amount - spent
+    spending_by_normalized_category = {}
+    for expense in expenses:
+        key = str(expense[2]).strip().casefold()
+        spending_by_normalized_category[key] = (
+            spending_by_normalized_category.get(key, Decimal("0"))
+            + Decimal(str(expense[1]))
         )
+
+    for key, group in grouped_budgets.items():
+        category = group["category"]
+        budget_amount = float(group["limit"])
+        spent = float(spending_by_normalized_category.get(key, Decimal("0")))
+        remaining = budget_amount - spent
 
         if budget_amount > 0:
 

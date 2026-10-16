@@ -1,4 +1,5 @@
 from app.db_backend import INTEGRITY_ERRORS
+from app.login_limits import locked_out, record_failure, clear_failures
 
 from fastapi import APIRouter, HTTPException
 
@@ -123,8 +124,12 @@ def login(login_data: LoginRequest):
             detail="Either name or email is required"
         )
 
+    if locked_out(login_identifier):
+        raise HTTPException(status_code=429, detail="Too many login attempts. Please try again later.")
+
     if user is None:
 
+        record_failure(login_identifier)
         logger.warning(
             f"Login failed: user not found - "
             f"{login_identifier}"
@@ -144,6 +149,7 @@ def login(login_data: LoginRequest):
 
     if not password_is_correct:
 
+        record_failure(login_identifier)
         logger.warning(
             f"Login failed: incorrect password - "
             f"{login_identifier}"
@@ -154,10 +160,11 @@ def login(login_data: LoginRequest):
             detail="Invalid username or password"
         )
 
-    # Successful password authentication issues a short-lived JWT directly.
-    # No email provider, OTP challenge, or testing-only bypass is required.
+    # Reset failed attempts on successful sign-in.
+    clear_failures(login_identifier)
+    # A token is bound to the current password hash for session invalidation.
     return {
         "message": "Login successful",
-        "access_token": create_access_token(user[0]),
+        "access_token": create_access_token(user[0], user[3]),
         "token_type": "bearer"
     }
