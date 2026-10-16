@@ -92,7 +92,7 @@ def create_user(user: User):
 
 @router.post(
     "/login",
-    summary="Login to BudgetWise"
+    summary="Login to FundHaven"
 )
 def login(login_data: LoginRequest):
 

@@ -147,7 +147,7 @@ def test_home(client):
     data = response.json()
 
     assert data["message"] == (
-        "Welcome to BudgetWise API"
+        "Welcome to FundHaven API"
     )
 
 
@@ -1079,9 +1079,9 @@ def test_welcome_email_content():
     mocked.assert_called_once()
     args = mocked.call_args.args
     assert args[0] == "test@example.com"
-    assert args[1] == "Welcome to BudgetWise"
+    assert args[1] == "Welcome to FundHaven"
     assert "Kehinde" in args[2]
-    assert "BudgetWise" in args[2]
+    assert "FundHaven" in args[2]
 
 
 # ==========================================

@@ -1,6 +1,6 @@
-"""SQLite/PostgreSQL connection adapter for BudgetWise.
+"""SQLite/PostgreSQL connection adapter for FundHaven.
 
-Existing BudgetWise services use sqlite3-style '?' parameters and positional
+Existing FundHaven services use sqlite3-style '?' parameters and positional
 tuples. This deliberately small bridge preserves their interface while allowing
 a gradual switch to psycopg 3.
 

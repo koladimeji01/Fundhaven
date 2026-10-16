@@ -1,4 +1,4 @@
-"""Brevo transactional email delivery for BudgetWise.
+"""Brevo transactional email delivery for FundHaven.
 
 Brevo credentials are read only on the server from environment variables.
 Never put an API key in JavaScript or commit the .env file.
@@ -36,7 +36,7 @@ def send_email(recipient: str, subject: str, body: str, html_body: str | None = 
     payload = {
         "sender": {
             "email": sender,
-            "name": os.getenv("BREVO_SENDER_NAME", "BudgetWise"),
+            "name": os.getenv("BREVO_SENDER_NAME", "FundHaven"),
         },
         "to": [{"email": recipient}],
         "subject": subject,
@@ -79,9 +79,9 @@ def send_welcome_email(recipient: str, name: str):
     try:
         return send_email(
             recipient,
-            "Welcome to BudgetWise",
-            "Hello " + name + ",\n\nWelcome to BudgetWise. "
-            "Your personal finance account is ready.\n\nThe BudgetWise Team",
+            "Welcome to FundHaven",
+            "Hello " + name + ",\n\nWelcome to FundHaven. "
+            "Your personal finance account is ready.\n\nThe FundHaven Team",
         )
     except EmailDeliveryError:
         logger.warning("Optional welcome email could not be sent")

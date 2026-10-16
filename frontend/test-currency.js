@@ -1,4 +1,4 @@
-/* Regression tests for BudgetWise shared display currency.
+/* Regression tests for FundHaven shared display currency.
    Run: node frontend/test-currency.js
    Uses only Node built-ins; no internet or external currency provider calls.
 */
@@ -168,7 +168,7 @@ async function main() {
             file + " must not hardcode NGN display formatting");
     }
 
-    console.log("BudgetWise currency tests passed (NGN, USD, GBP, EUR, cache, offline, HTML).");
+    console.log("FundHaven currency tests passed (NGN, USD, GBP, EUR, cache, offline, HTML).");
 }
 
 main().catch(error => {

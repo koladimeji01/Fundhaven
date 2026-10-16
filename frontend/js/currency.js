@@ -1,6 +1,6 @@
 /* ============================================================
-   BUDGETWISE SHARED DISPLAY CURRENCY
-   Money in BudgetWise is STORED and ENTERED in NGN.
+   FUNDHAVEN SHARED DISPLAY CURRENCY
+   Money in FundHaven is STORED and ENTERED in NGN.
    This helper converts NGN for display only using the same
    preference and exchange-rate cache as the Dashboard.
    ============================================================ */

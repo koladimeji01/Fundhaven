@@ -1,4 +1,4 @@
-# BudgetWise email verification and monthly reports (Brevo)
+# FundHaven email verification and monthly reports (Brevo)
 
 This feature builds on the month-based finance changes in PR #1.
 
@@ -15,7 +15,7 @@ Keep any existing variables and add:
 
     BREVO_API_KEY=your_real_brevo_api_key
     BREVO_SENDER_EMAIL=verified-sender@your-domain.com
-    BREVO_SENDER_NAME=BudgetWise
+    BREVO_SENDER_NAME=FundHaven
 
 Do not paste the secret key in chat or put it in frontend JavaScript.
 
@@ -110,7 +110,7 @@ Use Windows Task Scheduler → Create Task:
 - Trigger: Daily at 09:00 local Nigeria time.
 - Program: absolute path to your project's venv\Scripts\python.exe
 - Arguments: -m app.monthly_reports
-- Start in: absolute path to the BudgetWise repository root.
+- Start in: absolute path to the FundHaven repository root.
 - Prefer to run only while the computer can reach the Internet.
 - Enable retry on failure; the database ledger prevents routine duplicates.
 

@@ -1650,7 +1650,7 @@ function refreshBudgetProfileMenu() {
         document.getElementById("budgetProfileEmail");
 
     const name =
-        localStorage.getItem("user_name") || "BudgetWise User";
+        localStorage.getItem("user_name") || "FundHaven User";
 
     const email =
         localStorage.getItem("user_email") || "";
@@ -1747,7 +1747,7 @@ function renderBudgetNotifications() {
 // ============================================================
 
 async function initializeBudgetsPage() {
-    console.log("BudgetWise budgets page loading...");
+    console.log("FundHaven budgets page loading...");
 
     if (!getToken()) {
         logout();
@@ -1773,7 +1773,7 @@ async function initializeBudgetsPage() {
     refreshIcons();
 
     console.log(
-        "BudgetWise budgets page initialization complete."
+        "FundHaven budgets page initialization complete."
     );
 }
 

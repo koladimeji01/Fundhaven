@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Goals | BudgetWise</title>
+  <title>Goals | FundHaven</title>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     :root {
@@ -204,15 +204,17 @@
       *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
     }
   </style>
-    <!-- BudgetWise API endpoint: local by default, configured at deploy time -->
+    <!-- FundHaven API endpoint: local by default, configured at deploy time -->
     <script src="js/runtime-config.js"></script>
     <script src="js/currency.js"></script>
+    <link rel="icon" type="image/svg+xml" href="assets/fundhaven-mark.svg">
+    <link rel="stylesheet" href="css/brand.css">
 </head>
 <body>
 <div class="app">
   <aside class="sidebar" id="sidebar" aria-label="Main navigation">
-    <div class="brand"><div class="brand-icon">₦</div><div class="brand-name">BudgetWise</div></div>
-    <nav aria-label="BudgetWise pages">
+    <div class="brand"><div class="brand-icon"><img src="assets/fundhaven-mark.svg" alt="" aria-hidden="true"></div><div class="brand-name">FundHaven</div></div>
+    <nav aria-label="FundHaven pages">
       <div class="nav-section">
         <div class="nav-section-title">Overview</div>
         <a href="dashboard.html" class="nav-link"><i data-lucide="layout-dashboard" class="nav-icon"></i><span>Dashboard</span></a>
@@ -233,7 +235,7 @@
       <div class="user-mini">
         <div class="avatar" id="sidebarAvatar">K</div>
         <div class="user-mini-info">
-          <div class="user-mini-name" id="sidebarUserName">BudgetWise User</div>
+          <div class="user-mini-name" id="sidebarUserName">FundHaven User</div>
           <div class="user-mini-role">Personal Account</div>
         </div>
       </div>
@@ -251,7 +253,7 @@
         <button class="icon-button" id="notificationButton" type="button" aria-label="Notifications"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
         <div class="top-user">
           <div class="top-avatar" id="topAvatar">K</div>
-          <span class="top-user-name" id="topUserName">BudgetWise User</span>
+          <span class="top-user-name" id="topUserName">FundHaven User</span>
         </div>
       </div>
     </header>

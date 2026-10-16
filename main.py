@@ -31,7 +31,7 @@ database.create_tables()
 # ==========================================
 
 print("==============================")
-print("       BUDGETWISE")
+print("       FUNDHAVEN")
 print("==============================")
 print()
 
@@ -134,7 +134,7 @@ while True:
 
         print(
             "\nThank you for using "
-            "BudgetWise!"
+            "FundHaven!"
         )
 
         break

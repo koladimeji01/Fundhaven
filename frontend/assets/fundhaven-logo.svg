@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 670 148" role="img" aria-labelledby="title desc">
+<title id="title">FundHaven</title><desc id="desc">Track smarter. Spend better.</desc>
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0A6049"/><stop offset="1" stop-color="#052F25"/></linearGradient></defs>
+<g transform="translate(9 14) scale(1.85)"><rect width="64" height="64" rx="16" fill="url(#bg)"/><path d="M10 29.5 29.3 13a4.3 4.3 0 0 1 5.4 0L54 29.5" fill="none" stroke="#4FDF9D" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><rect x="17" y="25" width="30" height="30" rx="6" fill="#F7FBF8"/><rect x="23" y="37" width="5" height="7" rx="1.5" fill="#46C98C"/><rect x="30" y="32" width="5" height="12" rx="1.5" fill="#21A773"/><rect x="37" y="28" width="5" height="16" rx="1.5" fill="#0A6049"/></g>
+<text x="156" y="90" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="63" font-weight="800" letter-spacing="-2.4"><tspan fill="#063F30">Fund</tspan><tspan fill="#159B63">Haven</tspan></text>
+<text x="159" y="123" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20" letter-spacing=".3" fill="#386653">Track smarter. Spend better.</text>
+</svg>

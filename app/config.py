@@ -23,7 +23,7 @@ load_dotenv(env_file)
 
 
 # Application settings
-APP_NAME = os.getenv("APP_NAME", "BudgetWise")
+APP_NAME = os.getenv("APP_NAME", "FundHaven")
 APP_VERSION = os.getenv("APP_VERSION", "1.0.0")
 
 
@@ -44,4 +44,4 @@ ALGORITHM = os.getenv(
 
 
 # Helpful startup information
-print(f"BudgetWise environment: {ENVIRONMENT}")
+print(f"FundHaven environment: {ENVIRONMENT}")

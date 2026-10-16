@@ -44,17 +44,17 @@ async def lifespan(app):
     run_migrations()
 
     logger.info(
-        "BudgetWise database initialized"
+        "FundHaven database initialized"
     )
 
     logger.info(
-        "BudgetWise application started"
+        "FundHaven application started"
     )
 
     yield
 
     logger.info(
-        "BudgetWise application stopped"
+        "FundHaven application stopped"
     )
 
 # ==========================================
@@ -66,9 +66,9 @@ app = FastAPI(
     title=f"{APP_NAME} API",
 
     description="""
-# BudgetWise API
+# FundHaven API
 
-BudgetWise is a personal finance management API.
+FundHaven is a personal finance management API.
 
 It allows users to:
 
@@ -95,7 +95,7 @@ Then click **Authorize** in Swagger and enter:
     version=APP_VERSION,
 
     contact={
-        "name": "BudgetWise"
+        "name": "FundHaven"
     },
 
     lifespan=lifespan
@@ -213,13 +213,13 @@ async def general_exception_handler(
 @app.get(
     "/",
     tags=["System"],
-    summary="Welcome to BudgetWise"
+    summary="Welcome to FundHaven"
 )
 def home():
 
     return {
         "message":
-        "Welcome to BudgetWise API"
+        "Welcome to FundHaven API"
     }
 
 

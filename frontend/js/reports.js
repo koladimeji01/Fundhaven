@@ -107,7 +107,7 @@ function setupReportsTopbarMenus() {
     profileMenu.innerHTML = `
         <div class="reports-dropdown-heading">
             <strong id="reportsProfileName">Your account</strong>
-            <span id="reportsProfileEmail">BudgetWise account</span>
+            <span id="reportsProfileEmail">FundHaven account</span>
         </div>
 
         <a class="reports-dropdown-item" href="settings.html">
@@ -221,7 +221,7 @@ function setupReportsTopbarMenus() {
         localStorage.getItem("user_name") || "Your account";
 
     profileMenu.querySelector("#reportsProfileEmail").textContent =
-        localStorage.getItem("user_email") || "BudgetWise account";
+        localStorage.getItem("user_email") || "FundHaven account";
 
     refreshIcons();
 }
@@ -414,7 +414,7 @@ function updateUser(user) {
 
     if (sidebarName) sidebarName.textContent = name;
     if (topName) topName.textContent = name;
-    if (sidebarEmail) sidebarEmail.textContent = user.email || "BudgetWise User";
+    if (sidebarEmail) sidebarEmail.textContent = user.email || "FundHaven User";
     if (sidebarAvatar) sidebarAvatar.textContent = firstLetter;
     if (topAvatar) topAvatar.textContent = firstLetter;
 
@@ -422,7 +422,7 @@ function updateUser(user) {
     const menuEmail = document.getElementById("reportsProfileEmail");
 
     if (menuName) menuName.textContent = name;
-    if (menuEmail) menuEmail.textContent = user.email || "BudgetWise account";
+    if (menuEmail) menuEmail.textContent = user.email || "FundHaven account";
 }
 
 // ============================================================

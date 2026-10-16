@@ -1,5 +1,5 @@
 /*
- * Generate a static Vercel deployment from BudgetWise/frontend.
+ * Generate a static Vercel deployment from FundHaven/frontend.
  *
  * For Vercel, set a public build-time environment variable:
  *   BUDGETWISE_API_URL=https://YOUR-RENDER-SERVICE.onrender.com/api/v1
@@ -73,10 +73,10 @@ const configPath = path.join(dist, "js", "runtime-config.js");
 fs.mkdirSync(path.dirname(configPath), { recursive: true });
 fs.writeFileSync(
     configPath,
-    "// Built by BudgetWise deployment; API URL is public.\n" +
+    "// Built by FundHaven deployment; API URL is public.\n" +
     "window.BUDGETWISE_API_BASE_URL = " +
     JSON.stringify(apiUrl).replace(/</g, "\\u003c") +
     ";\n",
     "utf8"
 );
-console.log("BudgetWise frontend built in dist/ with HTTPS API endpoint.");
+console.log("FundHaven frontend built in dist/ with HTTPS API endpoint.");

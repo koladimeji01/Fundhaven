@@ -1,4 +1,4 @@
-# BudgetWise PostgreSQL integration (Windows + Supabase)
+# FundHaven PostgreSQL integration (Windows + Supabase)
 
 This version adds native PostgreSQL support via psycopg 3 without removing
 SQLite. Existing frontend pages, FastAPI routes, authentication and business
@@ -37,14 +37,14 @@ you can later set sslmode=verify-full and point to the relevant CA cert.
 
 ## 3. Install the Python dependencies
 
-In your activated BudgetWise virtual environment:
+In your activated FundHaven virtual environment:
 
     python -m pip install -r requirements.txt
 
 The psycopg driver is listed there. No Supabase anon key or service-role
 key is needed: FastAPI uses a server-side PostgreSQL connection.
 
-## 4. Add DATABASE_URL in BudgetWise/.env
+## 4. Add DATABASE_URL in FundHaven/.env
 
 Add a SINGLE line with your actual Supabase connection URI:
 
@@ -95,7 +95,7 @@ Open http://127.0.0.1:8000/docs and then your usual frontend.
 
 Check your historical expenses, dashboard, budgets, goals and month reports.
 
-NOTE: BudgetWise uses password-only login with JWT after the email OTP
+NOTE: FundHaven uses password-only login with JWT after the email OTP
 requirement was removed. A Brevo account is no longer required for login.
 The database migration is separate from authentication.
 

@@ -120,7 +120,7 @@ async function run() {
     ]) {
         assert.ok(html.includes('id="' + id + '"'), "Dashboard requires " + id);
     }
-    assert.ok(html.includes("Finova — BudgetWise AI"));
+    assert.ok(html.includes("Finova — FundHaven AI"));
     assert.ok(html.includes('data-lucide="sparkles"'));
 
     const live = await setup();

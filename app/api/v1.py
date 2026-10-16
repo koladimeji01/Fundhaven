@@ -65,7 +65,7 @@ def api_v1_home():
 
     return {
         "message":
-        "Welcome to BudgetWise API v1",
+        "Welcome to FundHaven API v1",
 
         "version":
         "1"

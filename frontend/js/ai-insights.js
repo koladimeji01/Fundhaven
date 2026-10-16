@@ -1,5 +1,5 @@
 /* ============================================================
-   FINOVA — BUDGETWISE AI
+   FINOVA — FUNDHAVEN AI
    Private spending observations + optional consented generative advice.
    Never sends monthly financial totals to the AI provider on page load.
    ============================================================ */
@@ -61,7 +61,7 @@
             });
         } catch {
             throw new Error(
-                "Finova cannot reach the BudgetWise backend. " +
+                "Finova cannot reach the FundHaven backend. " +
                 "Check your internet connection and Render deployment."
             );
         }
@@ -70,7 +70,7 @@
             ["access_token", "user_email", "user_name", "user_id"]
                 .forEach(key => localStorage.removeItem(key));
             window.location.replace("login.html");
-            throw new Error("Your BudgetWise session has expired.");
+            throw new Error("Your FundHaven session has expired.");
         }
 
         const data = await response.json().catch(() => ({}));
@@ -147,7 +147,7 @@
             }
         }
 
-        // Normal insights are calculated in BudgetWise, without an AI provider.
+        // Normal insights are calculated in FundHaven, without an AI provider.
         localButton.addEventListener("click", async () => {
             if (loadingLocal) return;
             interacted = true;

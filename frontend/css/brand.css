@@ -1,0 +1,17 @@
+/* FundHaven brand assets – shared by all screens. Functional Lucide icons are unchanged. */
+:root { --fundhaven-forest: #063f30; --fundhaven-emerald: #159b63; --fundhaven-mint: #9be8c1; }
+.brand-icon, .logo-mark, .brand-mark, .preview-brand-mark {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  flex-shrink: 0;
+}
+.brand-icon img, .logo-mark img, .brand-mark img, .preview-brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.brand-name, .brand-text { letter-spacing: -.035em; }
+.auth-logo h1 { letter-spacing: -.045em; }

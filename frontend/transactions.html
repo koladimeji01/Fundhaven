@@ -14,7 +14,7 @@
 
     >
 
-    <title>Transactions | BudgetWise</title>
+    <title>Transactions | FundHaven</title>
 
     <link
 
@@ -743,7 +743,7 @@
         }
 
 /* ===========================================================
-   TRANSACTIONS / BUDGETWISE MODERN PAGE DESIGN
+   TRANSACTIONS / FUNDHAVEN MODERN PAGE DESIGN
    Match Goals & Dashboard. Embedded so no new CSS file needed.
    =========================================================== */
 :root { --bw-deep:#123d2c;--bw-green:#266d4d;--bw-text:#173b2a;--bw-muted:#73877a;--bw-line:#e2ebe5;--bw-soft:#eef6f0;--bw-page:#f5f8f6; }
@@ -895,9 +895,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible {o
 
     </style>
 
-    <!-- BudgetWise API endpoint: local by default, configured at deploy time -->
+    <!-- FundHaven API endpoint: local by default, configured at deploy time -->
     <script src="js/runtime-config.js"></script>
     <script src="js/currency.js"></script>
+    <link rel="icon" type="image/svg+xml" href="assets/fundhaven-mark.svg">
+    <link rel="stylesheet" href="css/brand.css">
 </head>
 
 <body>
@@ -922,15 +924,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible {o
 
         <div class="brand">
 
-            <div class="brand-icon">
-
-                ₦
-
-            </div>
+            <div class="brand-icon"><img src="assets/fundhaven-mark.svg" alt="" aria-hidden="true"></div>
 
             <div class="brand-name">
 
-                BudgetWise
+                FundHaven
 
             </div>
 
@@ -1150,7 +1148,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible {o
 
                     >
 
-                        BudgetWise User
+                        FundHaven User
 
                     </div>
 
@@ -1629,7 +1627,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible {o
 
     function renderProfileMenu() {
         const name = $("topUserName")?.textContent?.trim() ||
-            localStorage.getItem("user_name") || "BudgetWise User";
+            localStorage.getItem("user_name") || "FundHaven User";
         const email = localStorage.getItem("user_email") || "Personal Account";
         const panel = $("transactionsProfileMenu");
         if (!panel) return;
