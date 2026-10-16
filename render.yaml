@@ -1,4 +1,4 @@
-# Render Free: FundHaven FastAPI backend (frontend deploys on Vercel).
+# Render Free: FundHaven FastAPI backend (frontend deploys on Netlify or Vercel).
 # Provision through https://dashboard.render.com/blueprints.
 # No SQLite: DATABASE_URL must point at your existing Supabase PostgreSQL DB.
 # Secrets MUST be provided privately in Render; never add credentials here.
@@ -20,9 +20,11 @@ services:
       - key: DATABASE_URL
         sync: false
 
-# After deploying the frontend on Vercel, add the following variable to
-# Render service → Environment manually and redeploy:
-# BUDGETWISE_ALLOWED_ORIGINS=https://YOUR-PROJECT.vercel.app
+# After deploying the frontend on Netlify (or Vercel), set in
+# Render service → Environment, then redeploy:
+# FUNDHAVEN_ALLOWED_ORIGINS=https://YOUR-EXACT-APP.netlify.app
+# Keep BUDGETWISE_ALLOWED_ORIGINS temporarily if already in use.
+# The existing Render service name is a hosting identifier, not app branding.
 #
 # Sign-in uses email/username and password with JWT; no Brevo OTP required.
 # Brevo may still be configured separately for optional notifications.

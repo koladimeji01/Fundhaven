@@ -40,9 +40,10 @@ jobs:
         run: |
           node --check frontend/test-finova.js
           node frontend/test-finova.js
-      - name: Verify Vercel build injects HTTPS API URL
+      - name: Verify Netlify/Vercel build accepts FundHaven API URL
         env:
-          BUDGETWISE_API_URL: https://example.onrender.com/api/v1
+          FUNDHAVEN_API_URL: https://example.onrender.com/api/v1
+          BUDGETWISE_API_URL: https://legacy.onrender.com/api/v1
         run: |
           cd frontend
           node build.js
@@ -51,10 +52,18 @@ jobs:
           test -f dist/js/ai-insights.js
           node --check dist/js/runtime-config.js
           grep -q 'https://example.onrender.com/api/v1' dist/js/runtime-config.js
+          ! grep -q 'https://legacy.onrender.com/api/v1' dist/js/runtime-config.js
           if grep -q '127.0.0.1:8000' dist/js/runtime-config.js; then
             echo "Production runtime configuration incorrectly points at localhost"
             exit 1
           fi
+      - name: Legacy BudgetWise build key stays functional
+        env:
+          BUDGETWISE_API_URL: https://legacy.onrender.com/api/v1
+        run: |
+          cd frontend
+          node build.js
+          grep -q 'https://legacy.onrender.com/api/v1' dist/js/runtime-config.js
 
 
   postgres-tests:
