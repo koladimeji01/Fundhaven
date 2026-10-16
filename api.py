@@ -163,6 +163,20 @@ app.add_middleware(
 )
 
 # ==========================================
+# NEVER CACHE FINANCIAL API RESPONSES
+# ==========================================
+
+@app.middleware("http")
+async def prevent_sensitive_api_caching(request, call_next):
+    """Do not let browsers or intermediaries persist finance/auth responses."""
+    response = await call_next(request)
+    if request.url.path.startswith("/api/v1/"):
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["Pragma"] = "no-cache"
+    return response
+
+
+# ==========================================
 # DATABASE ERROR HANDLER
 # ==========================================
 

@@ -30,3 +30,10 @@ may have been seen by third parties. Do not print or post their contents.
 - Deploy a gateway/Redis login and AI-request rate limiter for multi-worker use.
 - Run SQLite and PostgreSQL tests and browser end-to-end tests against a staging site.
 - Use a database backup/restore drill; never upload real backup files to GitHub.
+
+## Additional protection available
+GitHub CI now contains `repository-hygiene`, which rejects **new** commits
+tracking common private database backups, compiled files, virtual environments,
+credentials and environment files. It does **not** scan or erase historical
+commits, and cannot replace GitHub secret scanning. Keep GitHub branch
+rules enabled so the check cannot be bypassed on `main`.
