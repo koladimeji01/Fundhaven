@@ -27,7 +27,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
       - name: Run existing FundHaven tests with SQLite
-        run: python -m pytest -q
+        run: python -m pytest -q tests
       - name: Validate frontend JavaScript without changing icons/layout
         run: |
           node --check frontend/build.js
@@ -105,3 +105,50 @@ jobs:
           python -m pip install -r requirements-dev.txt
       - name: Run real PostgreSQL integration and data migration tests
         run: python -m pytest tests/test_postgres_integration.py -q
+
+  browser-e2e:
+    name: Browser acceptance — isolated SQLite
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: testing
+      DATABASE_NAME: ci_browser_fundhaven.sqlite3
+      SECRET_KEY: browser-ci-only-fundhaven-test-key-2026
+      ALGORITHM: HS256
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install app and Playwright Chromium
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Start isolated local application
+        run: |
+          set -eu
+          test -z "${DATABASE_URL:-}"
+          python -m uvicorn api:app --host 127.0.0.1 --port 8000 > /tmp/fundhaven-e2e-backend.log 2>&1 &
+          python -m http.server 5500 --bind 127.0.0.1 --directory frontend > /tmp/fundhaven-e2e-frontend.log 2>&1 &
+          for attempt in $(seq 1 45); do
+            if curl --silent --fail http://127.0.0.1:8000/ready >/dev/null &&
+               curl --silent --fail http://127.0.0.1:5500/login.html >/dev/null; then
+              echo "Local QA servers ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Local QA servers not ready"
+          exit 1
+      - name: Run real-browser financial workflow
+        run: python -m pytest -q browser_tests/test_user_journey.py
+      - name: Upload isolated test screenshot if workflow fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fundhaven-local-browser-error
+          path: browser_tests/artifacts/
+          if-no-files-found: ignore
+          retention-days: 3
