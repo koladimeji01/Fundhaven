@@ -431,7 +431,7 @@
     }
 
     function init() {
-        bellButton = element("notificationButton") || element("notificationBtn");
+        bellButton = element("notificationButton") || element("goalsNotificationButton") || element("notificationBtn");
         profileButton = element("topProfile") ||
             document.querySelector(".topbar .top-actions .top-user") ||
             document.querySelector(".topbar .topbar-right .top-user");
