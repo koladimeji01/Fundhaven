@@ -75,6 +75,7 @@ def test_fundhaven_browser_journey():
             page.locator("#goalName").fill(goal)
             page.locator("#targetAmount").fill("100000")
             page.locator("#currentAmount").fill("10000")
+            page.locator("#targetDate").fill("2027-12-01")
             with page.expect_response(lambda r: r.url == API + "/goals" and r.request.method == "POST") as goal_response:
                 page.locator('#goalForm button[type="submit"]').click()
             assert goal_response.value.status == 200
