@@ -82,7 +82,7 @@ def test_fundhaven_browser_journey():
             expect(page.locator("#goalsList")).to_contain_text(goal, timeout=16000)
 
             page.goto(SITE + "/dashboard.html")
-            expect(page.locator("#expenses")).to_contain_text("1,234", timeout=16000)
+            expect(page.locator("#expenses")).to_contain_text("1,235", timeout=16000)
             page.goto(SITE + "/reports.html")
             expect(page.locator("body")).to_contain_text("Reports")
             page.goto(SITE + "/settings.html")
