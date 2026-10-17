@@ -8,7 +8,20 @@ on:
       - feature/free-cloud-deployment
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
+  repository-hygiene:
+    name: Prevent accidental private data/secret commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate tracked files
+        run: python3 scripts/check_repository_hygiene.py
+
   sqlite-tests:
     runs-on: ubuntu-latest
     env:
