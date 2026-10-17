@@ -27,7 +27,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
       - name: Run existing FundHaven tests with SQLite
-        run: python -m pytest -q
+        run: python -m pytest -q tests
       - name: Validate frontend JavaScript without changing icons/layout
         run: |
           node --check frontend/build.js
