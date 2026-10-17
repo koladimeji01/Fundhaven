@@ -29,3 +29,12 @@ api_backup.py
 *.db-shm
 **/__pycache__/
 **/*.pyc
+
+# Reject private certificate files and common credential exports.
+*.pem
+*.p12
+*.pfx
+*.key
+credentials.json
+id_rsa
+id_ed25519
