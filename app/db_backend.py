@@ -189,10 +189,17 @@ class PostgresConnection:
         if self._returned:
             return
         self._returned = True
-        if self._pool is not None:
-            self._pool.putconn(self._connection)
-        else:
-            self._connection.close()
+        # psycopg begins a transaction even for read-only SELECT statements.
+        # Resolve it explicitly before returning the connection to the pool;
+        # otherwise psycopg_pool warns that it must roll back an INTRANS
+        # connection on every dashboard/profile read.
+        try:
+            self._connection.rollback()
+        finally:
+            if self._pool is not None:
+                self._pool.putconn(self._connection)
+            else:
+                self._connection.close()
 
 
 def connect_database(sqlite_path):
