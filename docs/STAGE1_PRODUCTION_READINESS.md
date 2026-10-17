@@ -39,3 +39,21 @@ Per-process login/AI throttling is not a distributed abuse control.
 PR #17 separately proposes repository-hygiene and cache-control fixes.
 Do not point the PostgreSQL integration tests at production; they delete
 test data and intentionally reject non-local test databases.
+
+
+## Manual RLS implementation — pending approval gates
+
+We have now prepared precisely scoped, **not applied** permission changes:
+- `docs/sql/supabase_rls_lockdown_manual.sql` — transactional revocations and enabling RLS.
+- `docs/sql/supabase_rls_verify.sql` — read-only post-change checks.
+- `scripts/inspect_backend_db_role.py` — prints only the current backend role
+  and its RLS bypass status when run inside Render with its real environment.
+
+Supabase's catalog confirms eight tables owned by `postgres`, with no RLS
+policies, and five publicly usable sequences. The management API's `postgres`
+role bypasses RLS. The **actual Render service connection role has not yet been
+verified**; a matching PostgreSQL role cannot be inferred from table ownership.
+
+**Do not execute the SQL** until (1) Render's live role check passes,
+(2) the owner confirms a restorable backup, and (3) a rollback and staging
+smoke check are coordinated. No database permission change has occurred.
