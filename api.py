@@ -251,6 +251,33 @@ def health_check():
     }
 
 
+@app.get("/ready", tags=["System"], summary="Verify database readiness")
+def readiness_check():
+    """Test database connectivity without returning secrets or customer data."""
+    connection = None
+    try:
+        connection = database.create_connection()
+        row = connection.execute("SELECT 1").fetchone()
+        if not row or row[0] != 1:
+            raise RuntimeError("Database readiness check failed")
+    except Exception:
+        logger.warning("FundHaven database is not ready")
+        return JSONResponse(
+            status_code=503, content={"status": "unavailable"},
+            headers={"Cache-Control": "no-store"},
+        )
+    finally:
+        if connection is not None:
+            try:
+                connection.close()
+            except Exception:
+                logger.warning("Readiness probe connection close failed")
+    return JSONResponse(
+        status_code=200, content={"status": "ready"},
+        headers={"Cache-Control": "no-store"},
+    )
+
+
 @app.head("/health", include_in_schema=False)
 def health_check_head():
     """Allow free uptime monitors that use HEAD requests by default.
