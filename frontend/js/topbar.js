@@ -278,9 +278,17 @@
     }
 
     function notificationsFrom(dashboard, goals, expenses) {
+        let preferences = {};
+        try {
+            preferences = JSON.parse(localStorage.getItem("budgetwise_notifications") || "{}") || {};
+        } catch {
+            // Corrupt local settings should never prevent the bell from opening.
+        }
         const alerts = [];
         const activity = [];
-        for (const budget of (Array.isArray(dashboard?.budgets) ? dashboard.budgets : [])) {
+        const allowedBudgets = preferences.budgetAlerts === false ? [] :
+            (Array.isArray(dashboard?.budgets) ? dashboard.budgets : []);
+        for (const budget of allowedBudgets) {
             const spent = Number(budget.spent) || 0;
             const limit = Number(budget.budget) || 0;
             const percent = limit > 0 ? spent / limit * 100 : 0;
@@ -300,7 +308,8 @@
                 });
             }
         }
-        if (dashboard && Number(dashboard.balance) < 0 && Number(dashboard.income) >= 0) {
+        if (preferences.budgetAlerts !== false &&
+            dashboard && Number(dashboard.balance) < 0 && Number(dashboard.income) >= 0) {
             alerts.push({
                 icon: "trending-down",
                 title: "Expenses are above this month's income",
@@ -310,7 +319,9 @@
         }
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        for (const goal of (Array.isArray(goals?.goals) ? goals.goals : [])) {
+        const allowedGoals = preferences.goalReminders === false ? [] :
+            (Array.isArray(goals?.goals) ? goals.goals : []);
+        for (const goal of allowedGoals) {
             if (goal.completed || !goal.target_date) continue;
             const target = new Date(String(goal.target_date).slice(0, 10) + "T00:00:00");
             const days = Math.round((target - today) / 86400000);
@@ -323,7 +334,8 @@
                 link: "goals.html"
             });
         }
-        const records = Array.isArray(expenses?.expenses) ? expenses.expenses : [];
+        const records = preferences.transactionNotifications === false ? [] :
+            (Array.isArray(expenses?.expenses) ? expenses.expenses : []);
         const ordered = records.slice().sort((a, b) =>
             String(b.date || "").localeCompare(String(a.date || "")) ||
             Number(b.id || 0) - Number(a.id || 0)
@@ -388,7 +400,15 @@
         refresh.append(icon("refresh-cw"), textElement("span", "Refresh"));
         refresh.addEventListener("click", () => loadNotifications(requestVersion));
         footer.appendChild(refresh);
-        footer.appendChild(action("settings", "Preferences", "settings.html"));
+        const preferences = action("settings", "Preferences", "settings.html#notificationsSection");
+        preferences.addEventListener("click", event => {
+            if (window.location.pathname?.endsWith("/settings.html")) {
+                event.preventDefault();
+                closePopup();
+                document.querySelector('.settings-tab[data-section="notificationsSection"]')?.click();
+            }
+        });
+        footer.appendChild(preferences);
         popup.appendChild(footer);
         refreshIcons();
     }
@@ -484,6 +504,9 @@
         window.addEventListener("fundhaven:expenses-updated", () => {
             if (currentMenu === "notifications") void loadNotifications(requestVersion);
         });
+        if (window.location.hash === "#notificationsSection") {
+            document.querySelector('.settings-tab[data-section="notificationsSection"]')?.click();
+        }
         window.FundHavenTopbar = {
             close: closePopup,
             refresh: () => {

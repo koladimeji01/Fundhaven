@@ -117,6 +117,16 @@ async function main(){
         assert.equal(s.store.has("access_token"),false);
         assert.equal(s.location.url,"login.html");
     }
+    const off=setup("notificationButton");
+    off.store.set("budgetwise_notifications",JSON.stringify({
+        budgetAlerts:false, goalReminders:false, transactionNotifications:false
+    }));
+    off.emit("click",off.bell);
+    await new Promise(r=>setImmediate(r));
+    assert.doesNotMatch(contents(off.panel),/budget is near its limit/);
+    assert.doesNotMatch(contents(off.panel),/Study is overdue/);
+    assert.doesNotMatch(contents(off.panel),/Food recorded/);
+    assert.equal(off.dot.style.display,"none");
     console.log("Shared FundHaven topbar interaction tests passed");
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});
