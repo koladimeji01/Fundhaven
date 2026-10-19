@@ -802,18 +802,13 @@
     function renderUser() {
         const user = state.user;
 
-        const name = String(
-            user.name ||
-            user.full_name ||
-            localStorage.getItem("user_name") ||
-            "FundHaven User"
-        );
-
-        const email = String(
-            user.email ||
-            localStorage.getItem("user_email") ||
-            ""
-        );
+        // Profile data is authoritative. Never show a previously cached
+        // person's name or email while a different session is loading.
+        const verifiedName = String(
+            user.name || user.full_name || ""
+        ).trim();
+        const name = verifiedName || "Your account";
+        const email = verifiedName ? String(user.email || "") : "";
 
         const initials = name
             .trim()
@@ -830,7 +825,7 @@
 
         set(
             "welcomeName",
-            name.trim().split(/\s+/)[0]
+            verifiedName ? verifiedName.split(/\s+/)[0] : "there"
         );
 
         set("sidebarUserName", name);
@@ -839,19 +834,19 @@
         set("sidebarAvatar", initials || "U");
         set("topAvatar", initials || "U");
 
-        localStorage.setItem(
-            "user_name",
-            name
-        );
+        // Only persist names supplied by the authenticated profile API.
+        if (verifiedName) {
+            localStorage.setItem("user_name", verifiedName);
+        }
 
-        if (email) {
+        if (verifiedName && email) {
             localStorage.setItem(
                 "user_email",
                 email
             );
         }
 
-        if (user.id) {
+        if (verifiedName && user.id) {
             localStorage.setItem(
                 "user_id",
                 String(user.id)

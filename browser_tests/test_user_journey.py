@@ -37,12 +37,27 @@ def test_fundhaven_browser_journey():
 
             page.locator("#email").fill(email)
             page.locator("#password").fill(password)
+            # Simulate a temporarily unavailable profile endpoint. The
+            # dashboard must never show another account's hard-coded name.
+            page.route("**/api/v1/users/me*", lambda route: route.abort())
             with page.expect_response(lambda r: r.url == API + "/login" and r.request.method == "POST") as logged:
                 page.locator("#loginButton").click()
             assert logged.value.status == 200
             page.wait_for_url("**/dashboard.html", timeout=20000)
             token = page.evaluate("localStorage.getItem('access_token')")
             assert token, "Browser login did not save the JWT"
+
+            # On first paint and even after a failed profile fetch, labels
+            # remain neutral until we have verified this account's name.
+            expect(page.locator("#welcomeName")).to_have_text("there")
+            expect(page.locator("#sidebarUserName")).to_have_text("Your account")
+            expect(page.locator("#topUserName")).to_have_text("Your account")
+            assert page.evaluate("localStorage.getItem('user_name')") is None
+            page.unroute("**/api/v1/users/me*")
+            page.reload()
+            expect(page.locator("#welcomeName")).to_have_text("Browser", timeout=16000)
+            expect(page.locator("#sidebarUserName")).to_have_text(username)
+            expect(page.locator("#topUserName")).to_have_text(username)
 
             page.goto(SITE + "/transactions.html")
             page.locator("#openAddExpense").first.click()

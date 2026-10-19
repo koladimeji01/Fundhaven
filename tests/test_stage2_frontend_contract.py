@@ -64,3 +64,17 @@ def test_scripts_and_stylesheets_reference_existing_local_files(page):
         local = local_asset(asset)
         if local is not None:
             assert local.is_file(), f"{page}: missing asset {asset}"
+
+
+def test_dashboard_does_not_expose_a_personal_name_before_profile_load():
+    """Names and avatar initials are filled only from authenticated profile data."""
+    import re
+    html = (FRONTEND / "dashboard.html").read_text(encoding="utf-8")
+    assert "Kehinde" not in html
+    for identifier in ("sidebarUserName", "topUserName"):
+        assert re.search(
+            rf'id="{identifier}"\s*>\s*Your account\s*</strong>', html
+        )
+    assert re.search(r'id="welcomeName"\s*>\s*there\s*</span>', html)
+    for identifier in ("sidebarAvatar", "topAvatar"):
+        assert re.search(rf'id="{identifier}"\s*>\s*U\s*</div>', html)
