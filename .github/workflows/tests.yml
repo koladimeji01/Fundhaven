@@ -53,6 +53,8 @@ jobs:
         run: |
           node --check frontend/test-currency.js
           node frontend/test-currency.js
+      - name: Verify consistent sidebar across all authenticated pages
+        run: node frontend/test-sidebar.js
       - name: Test Finova AI dashboard interactions without a network
         run: |
           node --check frontend/test-finova.js
